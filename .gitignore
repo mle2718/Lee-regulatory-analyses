@@ -15,3 +15,9 @@ library.bib
 *.aux
 *.out
 *.dta
+*.jpg
+*.tif
+*.png
+*.xlsx
+*.xls
+*.csv
