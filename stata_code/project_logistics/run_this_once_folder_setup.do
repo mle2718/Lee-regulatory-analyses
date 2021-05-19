@@ -4,18 +4,17 @@ version 15.1
 
 
 /*
-I used this to setup the folder structure, but it's easier to just pull the repository
-
 global user minyang;
 or 
 global user minyangWin;
+
 */
 
 if strmatch("$user","minyang"){;
-global my_projdir "/home/mlee/Documents/projects/new-project-templates";
+global my_projdir "/home/mlee/Documents/projects/READ-SSB-Lee-herring-analyses";
 };
 if strmatch("$user","minyangWin"){;
-global my_projdir "C:/Users/Min-Yang.Lee/Documents/new-project-templates";
+global my_projdir "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-herring-analyses";
 
 };
 
@@ -25,7 +24,7 @@ cap mkdir $my_projdir;
 global my_codedir "${my_projdir}/stata_code";
 cap mkdir $my_codedir;
 
-global my_adopath "${my_codedir}/ado";
+global my_adopath "${my_codedir}/aceprice_ado";
 cap mkdir $my_adopath;
 
 
@@ -52,6 +51,9 @@ cap mkdir $my_datadir;
 
 global data_raw "${my_datadir}/raw";
 cap mkdir $data_raw;
+global memberids ${data_raw}/memberids;
+cap mkdir $memberids;
+
 
 
 global data_internal "${my_datadir}/internal";
@@ -66,6 +68,12 @@ cap mkdir $data_main;
 global data_intermediate "${my_datadir}/intermediate";
 cap mkdir $data_intermediate;
 
+global data_traders "${data_intermediate}/traders";
+cap mkdir $data_traders;
+
+
+global trade_clean "${data_intermediate}/intra_clean";
+cap mkdir $trade_clean;
 
 /* don't need this one 
 global spacepanels "/home/mlee/Documents/projects/spacepanels/scallop/spatial_project_11182019";
@@ -80,6 +88,11 @@ cap mkdir $my_results;
 
 global my_tables "${my_projdir}/tables";
 cap mkdir $my_tables;
+
+
+global hedonicR_results "${my_results}/hedonicR";
+cap mkdir $hedonicR_results;
+
 
 
 /* setup images folders */

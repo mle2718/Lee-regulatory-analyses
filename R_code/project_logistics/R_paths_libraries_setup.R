@@ -3,7 +3,7 @@
 
 
 # This line is the only line you should have to change to get it to run.
-my_projdir<-"C:/Users/Min-Yang.Lee/Documents/project_templates"
+my_projdir<-"C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-herring_analyses"
 
 # Setup directories
 
