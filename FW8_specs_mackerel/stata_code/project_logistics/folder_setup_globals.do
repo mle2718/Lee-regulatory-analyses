@@ -63,6 +63,9 @@ global exploratory "${my_images}/exploratory";
 adopath + $my_adopath ;
 
 
+global jderobafolder "work2/jderoba/Herring/";
+
+
 /*set the date field */
 local date: display %td_CCYY_NN_DD date(c(current_date), "DMY");
 global today_date_string = subinstr(trim("`date'"), " " , "_", .);
