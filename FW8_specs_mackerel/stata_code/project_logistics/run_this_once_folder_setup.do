@@ -68,8 +68,8 @@ cap mkdir $data_internal;
 global data_external "${my_datadir}/external";
 cap mkdir $data_external;
 
-global data_master "${my_datadir}/master";
-cap mkdir $data_master;
+global data_main "${my_datadir}/main";
+cap mkdir $data_main;
 
 global data_intermediate "${my_datadir}/intermediate";
 cap mkdir $data_intermediate;

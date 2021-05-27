@@ -43,7 +43,7 @@ global memberids ${data_raw}/memberids;
 global data_internal "${my_datadir}/internal";
 global data_external"${my_datadir}/external";
 
-global data_master "${my_datadir}/master";
+global data_main "${my_datadir}/main";
 
 global data_intermediate "${my_datadir}/intermediate";
 
@@ -63,8 +63,8 @@ global exploratory "${my_images}/exploratory";
 adopath + $my_adopath ;
 
 
-global jderobafolder "work2/jderoba/Herring/";
 
+global jderobafolder "work2/jderoba/Herring";
 
 /*set the date field */
 local date: display %td_CCYY_NN_DD date(c(current_date), "DMY");
