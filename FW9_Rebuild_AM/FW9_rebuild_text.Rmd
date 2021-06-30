@@ -9,8 +9,27 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Prices
+# Prices
 
 Figure “herring_price_quantity_scatter.png” contains a scatterplot of real herring prices and landings, in 1000s of metric tons.    Data available after the Amendment 8 analysis is marked with triangles.  We have added an ordinary least squares regression line that describes this relationship.  We use this equation to predict the real annual prices corresponding to different harvest levels projected under the rebuilding plan.  We use this equation, rather than the one developed in Amendment 8. 
 
-## Rebuilding
+This equation is:
+$$
+price\_ per\_mt =  815.02 -   5.89 landings + \varepsilon
+$$
+# Rebuilding
+
+To describe the projected revenues under the different rebuilding trajectories, we:
+
+1.  Use the ABCs described in the various projections. When ABCs are low, we assume landings are equal to ABCs.  However, when ABCs are higher than higest observed US catch (124,100 mt in 1997), we set catch to this amount. 
+1.  Construct predicted prices (in Real 2019 dollars) from the equation in the previous section. 
+1.  Multiply price by landings to construct revenue.
+1.  Discount by 7\% or 3\%. These are in Circular A-4 from 2003.
+
+## Figures
+We present a box plot of discounted revenues (for the ABC CR and Constant F)
+
+We also present a time series of the mean revenue and the 25th and 75th percentile revenues.
+
+## Tables
+
