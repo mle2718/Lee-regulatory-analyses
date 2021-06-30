@@ -2,7 +2,9 @@
 title: "Herring FW9 Rebuild"
 author: "Min-Yang Lee"
 date: "6/30/2021"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -17,6 +19,7 @@ This equation is:
 $$
 price\_ per\_mt =  815.02 -   5.89 landings + \varepsilon
 $$
+
 # Rebuilding
 
 To describe the projected revenues under the different rebuilding trajectories, we:
@@ -27,9 +30,12 @@ To describe the projected revenues under the different rebuilding trajectories, 
 1.  Discount by 7\% or 3\%. These are in Circular A-4 from 2003.
 
 ## Figures
-We present a box plot of discounted revenues (for the ABC CR and Constant F)
+We present a box plot of discounted revenues (for the ABC CR and Constant F) boxplot_discounted_rev.png
 
-We also present a time series of the mean revenue and the 25th and 75th percentile revenues.
+We also present a time series of the mean revenue and the 25th and 75th percentiles (in each year) -- not done yet
+
+
 
 ## Tables
 
+Mean, std dev, and median of revenues for each alt.
