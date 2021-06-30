@@ -67,6 +67,17 @@ gen d7_rev=discount_factor7*revenue
 
 
 save "${data_main}/revenue_trajectory_${vintage_string}.dta", replace
+/* you might want to plot mean revenue for each shortname over time.*/
+
+replace revenue=revenue/1000000
+drop if shortname==""
+collapse (mean) revenue (sd) sdrev=revenue (p50) median_rev=revenue (p25) p25_rev=revenue (p75) p75_rev=revenue, by(year shortname)
+encode shortname, gen(mys)
+tsset mys year
+save "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
+
+/* more graphs here */
+tsline revenue p25 p75 if shortname=="Constant F"
 
 
 
@@ -74,7 +85,7 @@ save "${data_main}/revenue_trajectory_${vintage_string}.dta", replace
 
 
 
-
+use "${data_main}/revenue_trajectory_${vintage_string}.dta", replace
 
 collapse (sum) d3_rev d7_rev, by(full_filename replicate_number shortname)
 replace d3_rev=d3_rev/1000000
