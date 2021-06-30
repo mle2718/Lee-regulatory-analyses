@@ -4,25 +4,26 @@ do "$extraction_code/extractZ01_external_data_FRED.do"
 
 
 
-/* only do this 1 time */
+/* only do this 1 time
 do "$extraction_code/B01_get_ABCs.do"
 do "$extraction_code/B02_readin_ABCs.do"
 
 
-
-/*
+ */
+ 
 /* 
 pulls data out of oracle and constructs a datset of prices. No depends.
 
 Ran properly */
 
-do "$extraction_code/A01price_maker2.do"
+ do "$extraction_code/A01price_maker2.do"
 
-
+ 
+ 
 
 do "$extraction_code/A02permits.do"
 /* 
-pulls data out of oracle and constructs a datset of herring permits with their categories.  Does not handle the DE vessels properly 
+pulls data out of oracle and constructs a datset of herring permits with their categories.  
 Depends on nothing.
 
 Ran properly, created 1x observation per permit-year
@@ -32,6 +33,14 @@ Ran properly, created 1x observation per permit-year
 do "$extraction_code/A04herring_monthly_prices_quantities.do"
 
 do "$extraction_code/A03extracting_loop_herring_vtr2.do"
+
+
+
+ /*
+
+
+
+
 /* 
 pulls data out of oracle and constructs a dataset of herring trips.
 Constructs a csv containing just lat, lon, and an id that can be used in a spatial join.

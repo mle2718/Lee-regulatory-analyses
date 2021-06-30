@@ -1,0 +1,16 @@
+---
+title: "Herring FW9 Rebuild"
+author: "Min-Yang Lee"
+date: "6/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Prices
+
+Figure “herring_price_quantity_scatter.png” contains a scatterplot of real herring prices and landings, in 1000s of metric tons.    Data available after the Amendment 8 analysis is marked with triangles.  We have added an ordinary least squares regression line that describes this relationship.  We use this equation to predict the real annual prices corresponding to different harvest levels projected under the rebuilding plan.  We use this equation, rather than the one developed in Amendment 8. 
+
+## Rebuilding

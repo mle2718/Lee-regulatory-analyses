@@ -47,7 +47,7 @@ global data_main"${my_datadir}/main";
 
 global data_intermediate "${my_datadir}/intermediate";
 
-global RFA_dataset  "C:/Users/Min-Yang.Lee/Documents/RFAdataset/data_folder/affiliates_2020_06_01.dta";
+global RFA_dataset  "C:/Users/Min-Yang.Lee/Documents/RFAdataset/data_folder/affiliates_2021_06_07.dta";
 
 /* setup results folders */
 global intermediate_results "${my_projdir}/intermediate_results";
