@@ -75,6 +75,9 @@ cap drop ABC_2033
 order full_filename replicate
 cap drop markin
 compress
+
+reshape long ABC_, i(full_filename replicate_number) j(year)
+
 save "${data_main}\ABCs_${vintage_string}.dta", replace
 
 /* mark in the ones I need */
