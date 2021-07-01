@@ -30,7 +30,17 @@ To describe the projected revenues under the different rebuilding trajectories, 
 1.  Discount by 7\% or 3\%. These are in Circular A-4 from 2003.
 
 ## Figures
-We present a box plot of discounted revenues (for the ABC CR and Constant F) boxplot_discounted_rev.png
+We present a box plot of discounted revenues (for the ABC CR and Constant F) boxplot_discounted_rev.png.  This is discounted total revenue over the 2020-2032 time period (we can change this easily, as needed to exclude 2020 or 2021). The line inside the box 
+represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
+
+The scenarios have similar upside  (the top whisker are similar for many scenarios). Some of the scenarios have quite different downside -- we infer this from the bottom whisker and the "outside values" (dots) that are below.  For example the ABC AR and Constant F AR have quite large bottom whiskers and outside values. 
+
+There are two reason that the scenarios have similar upside.  First, some ABCs that are quite high; well outside the historcal range of catch. Because we set landings equal to the highest historical level, this limits total landings.  Second, prices decline when landings are high; this also limits revenue. 
+
+We discount at 3\% and 7\% because OMB tells us to do so.
+
+
+
 
 We also present a time series of the mean revenue and the 25th and 75th percentiles (in each year) -- not done yet
 
