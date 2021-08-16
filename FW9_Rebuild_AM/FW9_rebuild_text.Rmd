@@ -1,24 +1,45 @@
 ---
 title: "Herring FW9 Rebuild"
 author: "Min-Yang Lee"
-date: "6/30/2021"
+date: "`r format(Sys.time(), '%B %d, %Y')`" 
 output:
-  word_document: default
-  html_document: default
+  pdf_document: 
+    keep_tex: yes
+    pandoc_args: --pdf-engine=xelatex
+    number_sections: true
+  html_document: null
+  word_document: null
+fontsize: 12pt
+
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+my_projdir<-"C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-herring-analyses/FW9_Rebuild_AM"
+# This file needs to be run 1 time (ever). It sets up folders. After your first knit, you can comment it out (although leaving it in will not hurt
+setwd(my_projdir)
+
+my_images<-file.path(my_projdir,"images")
+my_tables<-file.path(my_projdir,"tables")
+
 ```
 
 # Prices
 
-Figure “herring_price_quantity_scatter.png” contains a scatterplot of real herring prices and landings, in 1000s of metric tons.    Data available after the Amendment 8 analysis is marked with triangles.  We have added an ordinary least squares regression line that describes this relationship.  We use this equation to predict the real annual prices corresponding to different harvest levels projected under the rebuilding plan.  We use this equation, rather than the one developed in Amendment 8. 
+Figure \ref{herring_iv} contains a scatterplot of real herring prices and landings, in 1000s of metric tons.    Data available after the Amendment 8 analysis is marked with squares.  A least-squares regression will be biased if prices and quantities are simultaneously determined.  An IV estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  We have added an instrumental variables regression fit line that describes this relationship.   We use this equation to predict the real annual prices corresponding to different harvest levels projected under the rebuilding plan.  We use this equation, rather than the one developed in Amendment 8. 
 
 This equation is:
 $$
 price\_ per\_mt =  815.02 -   5.89 landings + \varepsilon
 $$
+
+
+
+```{r foo, fig.show = "hold", out.width = "75%", fig.cap="\\label{herring_iv} Annual Herring Prices and Landings",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,c("herring_price_quantity_iv_scatter.png")))
+```
+
+
 
 # Rebuilding
 
@@ -27,25 +48,54 @@ To describe the projected revenues under the different rebuilding trajectories, 
 1.  Use the ABCs described in the various projections. When ABCs are low, we assume landings are equal to ABCs.  However, when ABCs are higher than higest observed US catch (124,100 mt in 1997), we set catch to this amount. 
 1.  Construct predicted prices (in Real 2019 dollars) from the equation in the previous section. 
 1.  Multiply price by landings to construct revenue.
-1.  Discount by 7\% or 3\%. These are in Circular A-4 from 2003.
+1.  Discount by 7\% or 3\% as mandated by OMB Circular A-4.
+1.  Sum up the discounted yearly revenue.
 
 ## Figures
-We present a box plot of discounted revenues (for the ABC CR and Constant F) boxplot_discounted_rev.png.  This is discounted total revenue over the 2020-2032 time period (we can change this easily, as needed to exclude 2020 or 2021). The line inside the box 
-represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
-
-The scenarios have similar upside  (the top whisker are similar for many scenarios). Some of the scenarios have quite different downside -- we infer this from the bottom whisker and the "outside values" (dots) that are below.  For example the ABC AR and Constant F AR have quite large bottom whiskers and outside values. 
-
-There are two reason that the scenarios have similar upside.  First, some ABCs that are quite high; well outside the historcal range of catch. Because we set landings equal to the highest historical level, this limits total landings.  Second, prices decline when landings are high; this also limits revenue. 
-
-We discount at 3\% and 7\% because OMB tells us to do so.
+We present a box plot of discounted revenues over the 2020-2032 time period using a 3\% discount rate and a 7\% discount rate in figures \ref{discount3} and  \ref{discount7}. The line inside the box represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
 
 
+```{r discounted_rev3, fig.show = "hold", out.width = "75%", fig.cap="\\label{discount3} Boxplots of discounted (3\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev3.png")))
+```
 
 
-We also present a time series of the mean revenue and the 25th and 75th percentiles (in each year) -- not done yet
+```{r discounted_rev7, fig.show = "hold", out.width = "75%", fig.cap="\\label{discount7} Boxplots of discounted (7\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev7.png")))
+```
 
+From the first two boxplots in Figure \ref{discount3}, we find that the Alternative 2 (ABC CR) is likely to have lower revenues than Alternative 3 (Constant F) under baseline (average) recruitment. Alternative 2 is likely to have lower revenues under the Autocorrelated Recruitment and the "AR in AVG" scenarios as well.  Alternative 2 and 3 perform similarly in the "AVG in AR" scenario.  We discount at 3\% and 7\%.  Changes in the discount rate do not change the order of the scenarios.
+
+\clearpage
+
+<!--We also present a time series of the mean revenue and the 25th and 75th percentiles (in each year) -- not done yet
+-->
 
 
 ## Tables
+Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard deviation of the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). 
 
-Mean, std dev, and median of revenues for each alt.
+
+
+\begin{table}[htbp]
+  \begin{center}
+  \begin{scriptsize}
+    \input{./tables/summary_stats_A2.tex}
+  \end{scriptsize}
+    \caption{Mean (\$M USD) and standard deviation of discounted revenues using a 3\% and 7\% discount rates for Alternative 2.  \label{A2_summary}}
+
+  \end{center}
+\end{table}
+
+
+
+
+\begin{table}[htbp]
+  \begin{center}
+  \begin{scriptsize}
+    \input{./tables/summary_stats_A3.tex}
+  \end{scriptsize}
+    \caption{Mean (\$M USD) and standard deviation of discounted revenues using a 3\% and 7\% discount rates for Alternative 3.  \label{A3_summary}}
+
+  \end{center}
+\end{table}

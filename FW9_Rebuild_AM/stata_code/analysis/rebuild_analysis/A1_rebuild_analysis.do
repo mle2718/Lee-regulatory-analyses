@@ -1,6 +1,6 @@
 version 16.1
 clear
-
+set scheme s2color
 
 local data_in "${data_main}/ABCs_${vintage_string}.dta"
 
@@ -27,7 +27,27 @@ pricemt_re~P |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 
 
 
-. ivregress 2sls pricemt_realGDP (landings=l1.landings);
+. ivregress 2sls pricemt_realGDP (landings=l1.landings), first;
+
+
+-----------------------
+
+                                                Number of obs     =         17
+                                                F(   1,     15)   =      29.57
+                                                Prob > F          =     0.0001
+                                                R-squared         =     0.6635
+                                                Adj R-squared     =     0.6410
+                                                Root MSE          =    16.7516
+
+------------------------------------------------------------------------------
+    landings |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    landings |
+         L1. |   .9654579   .1775325     5.44   0.000     .5870563     1.34386
+             |
+       _cons |  -2.511697   14.17393    -0.18   0.862    -32.72271    27.69932
+------------------------------------------------------------------------------
+
 
 Instrumental variables (2SLS) regression          Number of obs   =         17
                                                   Wald chi2(1)    =      88.00
@@ -178,7 +198,7 @@ graph export "${my_images}/boxplot_discounted_rev7.png", as(png) replace
 /*
 graph box d3_rev if alt==1, over(shortname) nooutsides
 
-
+*/
 
 
 
@@ -188,7 +208,9 @@ graph box d3_rev if alt==1, over(shortname) nooutsides
 
 
 local stats d3_rev d7_rev
-
+label var d3_rev "Discounted Revenue (3\%)"
+label var d7_rev "Discounted Revenue (7\%)"
+labmask sort_order, values(shortname)
 /*******************************************/
 /*******************************************/
 /*options for making tables */
@@ -204,22 +226,31 @@ esttab .,   `estab_opts_grand'
 
 
 
-estpost tabstat `stats2', `estpost_opts_grand'
-esttab .,   `estab_opts_grand_small'
-esttab . using ${my_tables}/first_stage_averages_pr_inter.tex, `estab_opts_grand_small'
-
-
-
-
-local  estpost_opts_by "statistics(mean sd) columns(statistics) listwise nototal quietly"
+local  estpost_opts_by "statistics(mean sd) columns(statistics) nototal "
 
 local estab_opts_by "main(mean %8.2gc ) aux(sd %8.2gc) nostar noobs nonote label replace nogaps unstack"
 
-local estab_opts_by_small "main(mean %03.2f) aux(sd %03.2f) nostar noobs nonote label replace nogaps unstack"
+local estab_opts_by_small "main(mean %03.2f) aux(sd %03.2f) nostar noobs nonote label replace nogaps unstack nomtitles nodepvars nonumbers "
 
 
 
-estpost tabstat `stats' transactions, by(fy)  `estpost_opts_by'
+estpost tabstat `stats' if alt==2, by(sort_order)  `estpost_opts_by'
+
+
+esttab .,   `estab_opts_by_small'
+
+
+esttab . using ${my_tables}/summary_stats_A2.tex, `estab_opts_by_small'
+
+
+
+estpost tabstat `stats' if alt==3, by(sort_order)  `estpost_opts_by'
+
+
+esttab .,   `estab_opts_by_small'
+
+
+esttab . using ${my_tables}/summary_stats_A3.tex, `estab_opts_by_small'
 
 
 
@@ -227,36 +258,6 @@ estpost tabstat `stats' transactions, by(fy)  `estpost_opts_by'
 
 
 
-
-*/
-
-
-
-
-/*
-The only two alternatives at this point are
- "7yrFconstant" with assumed average recruitment "F_CONSTANT_SEVENYR_REBUILD_STAGE"
- "ABC CR" with assumed average recruitment, "F40_ABC_CR_10YRFIXED_REBUILD_2BRG"
- 
- 
-  "7yrFconstant" with AR recruitment instead of average "F_CONSTANT_SEVENYR_REBUILD_AR_STAGE"
- "ABC CR" with AR recruitment instead of average, "F40_ABC_CR_10YRFIXED_REBUILD_AR_2BRG"
-
-  Any folder name ending in "...AVG_IN_AR" uses the projected catches based on assuming average recruitment in a projection where AR recruitment actually occurs;
-  and visa versa for "...AR_IN_AVG".
-
-Except for the "AVG_IN_AR" or "AR_IN_AVG" folders, the file you need ends with "...12.xx6". 
-
-for the "AVG_IN_AR" or "AR_IN_AVG" folders, the file you need ends with "...13.xx6". 
-
-
-Number of columns = number of years, with the first column being 2020.  We only need up to 2032. So drop ABC_2033.
-
-The number of rows = the number of stochastic realizations. There are 100,000
-
-The values equal the ABCs in metric tons
-
-*/
 
 
 
