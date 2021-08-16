@@ -31,11 +31,36 @@ forvalues i=1/`obs' {
 
 
 
+
+
+
+/*prepare to reshape */
+
+
+drop v15
+local yr 2020
+
+foreach i of numlist 1/14{
+
+rename v`i' ABC_`yr'
+label var ABC_`yr' "ABC in year `yr' (mt)"
+
+local ++yr	
+	
+}
+cap drop ABC_2033
+
+order full_filename replicate
+compress
+
+
+
 save "${data_raw}\ABC_full_${vintage_string}.dta"
+
+
+
+reshape long ABC_, i(full_filename replicate_number) j(year)
 gen markin=0
-
-
-
 
 /* 7 year rebuild with constant F*/
 replace markin=1 if strmatch(full_filename,"RUN_FCONSTANT_7YRREB_10YRFIXED_REB_STG12.xx6")
@@ -61,29 +86,10 @@ replace markin=1 if strmatch(full_filename,"FCONSTANT_7YRREB_AVG_IN_AR_3BRG13BMY
 replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_AR_IN_AVG13BMY.xx6")
 replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_AVG_IN_AR13BMY.xx6")
 
+keep if markin==1
 
 
 
-
-
-drop v15
-local yr 2020
-
-foreach i of numlist 1/14{
-
-rename v`i' ABC_`yr'
-label var ABC_`yr' "ABC in year `yr' (mt)"
-
-local ++yr	
-	
-}
-cap drop ABC_2033
-
-order full_filename replicate
-cap drop markin
-compress
-
-reshape long ABC_, i(full_filename replicate_number) j(year)
 
 save "${data_main}\ABCs_${vintage_string}.dta", replace
 
