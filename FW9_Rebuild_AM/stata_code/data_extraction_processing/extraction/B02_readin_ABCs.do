@@ -34,8 +34,10 @@ forvalues i=1/`obs' {
 save "${data_raw}\ABC_full_${vintage_string}.dta"
 gen markin=0
 
-/* 7 year rebuild with constant F
-*/
+
+
+
+/* 7 year rebuild with constant F*/
 replace markin=1 if strmatch(full_filename,"RUN_FCONSTANT_7YRREB_10YRFIXED_REB_STG12.xx6")
 
 /* ABCCR */
@@ -50,13 +52,18 @@ replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB_A
 
 /*Sensitivity - 7 year where we think it's AR when it's really AVG and vice versa */
 
-replace markin=1 if strmatch(full_filename,"RUN_FCONSTANT_7YRREB_AR_IN_AVG13.xx6")
-replace markin=1 if strmatch(full_filename,"RUN_FCONSTANT_7YRREB_AVG_IN_AR13.xx6")
+replace markin=1 if strmatch(full_filename,"FCONSTANT_7YRREB_AR_IN_AVG_3BRG13BMY.xx6")
+replace markin=1 if strmatch(full_filename,"FCONSTANT_7YRREB_AVG_IN_AR_3BRG13BMY.xx6")
 
 /*Sensitivity - ABC CR year where we think it's AR when it's really AVG and vice versa */
 
-replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_AR_IN_AVG13.xx6")
-replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_AVG_IN_AR13.xx6")
+
+replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_AR_IN_AVG13BMY.xx6")
+replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_AVG_IN_AR13BMY.xx6")
+
+
+
+
 
 
 drop v15
