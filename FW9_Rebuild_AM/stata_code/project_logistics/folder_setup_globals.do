@@ -59,6 +59,14 @@ global my_results "${my_projdir}/results";
 global my_images "${my_projdir}/images";
 global exploratory "${my_images}/exploratory";
 
+
+
+/* setup tables */
+
+global my_tables "${my_projdir}/tables";
+
+
+
 /* add the programs in mobility_ado to the adopath*/
 adopath + $my_adopath ;
 

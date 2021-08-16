@@ -92,15 +92,14 @@ cap mkdir $my_results;
 
 
 
-global hedonicR_results "${my_results}/hedonicR";
-cap mkdir $hedonicR_results;
-
 
 
 /* setup images folders */
 
 global my_images "${my_projdir}/images";
 cap mkdir $my_images;
+global my_tables "${my_projdir}/tables";
+cap mkdir $my_tables;
 
 
 global exploratory "${my_images}/exploratory";
