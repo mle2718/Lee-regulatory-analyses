@@ -1,6 +1,5 @@
 version 16.1
 clear
-global vintage_string 2021_05_27
 
 
 local data_in "${data_main}/ABCs_${vintage_string}.dta"
@@ -24,31 +23,71 @@ pricemt_re~P |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
        _cons |   774.5517   38.78819    19.97   0.000     692.3244     856.779
 ------------------------------------------------------------------------------
 
+
+
+
+
+. ivregress 2sls pricemt_realGDP (landings=l1.landings);
+
+Instrumental variables (2SLS) regression          Number of obs   =         17
+                                                  Wald chi2(1)    =      88.00
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.8607
+                                                  Root MSE        =     57.234
+
+------------------------------------------------------------------------------
+pricemt_re~P |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    landings |  -5.893482    .628265    -9.38   0.000    -7.124858   -4.662105
+       _cons |   815.0201    46.9175    17.37   0.000     723.0635    906.9767
+------------------------------------------------------------------------------
+
+
+
 */
 
-global cons 774.5517
-global beta_land -5.356439
+global cons 815.0201
+global beta_land -5.893482
 
 use `data_in', replace
 
 /* pretty up the scenario */
-gen strl=strlen(full_filename)
-gen sub=substr(full_filename,1,strl-6)
-replace sub=substr(sub,5,.)
-
+gen sub=subinstr(full_filename,"RUN_","",.)
+replace sub=subinstr(sub,".xx6","",.)
+compress
 
 gen str30 shortname=""
-replace shortname="Constant F" if strmatch(sub,"FCONSTANT_7YRREB_10YRFIXED_REB_STG")
-replace shortname="Constant F AR" if strmatch(sub,"FCONSTANT_7YRREB_10YRFIXED_REB_ARSTG")
-replace shortname="Constant F AR in AVG" if strmatch(sub,"FCONSTANT_7YRREB_AR_IN_AVG")
-replace shortname="Constant F AVG in AR" if strmatch(sub,"FCONSTANT_7YRREB_AVG_IN_AR")
+replace shortname="Constant F" if strmatch(sub,"FCONSTANT_7YRREB_10YRFIXED_REB_STG12")
+replace shortname="Constant F AR" if strmatch(sub,"FCONSTANT_7YRREB_10YRFIXED_REB_ARSTG12")
 
 
-replace shortname="ABC CR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB2")
-replace shortname="ABC CR AR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB_AR2")
-replace shortname="ABC CR AVG in AR" if strmatch(sub,"F40_ABC_CR_AVG_IN_AR")
-replace shortname="ABC CR AR in AVG" if strmatch(sub,"F40_ABC_CR_AR_IN_AVG")
-drop strl sub
+
+replace shortname="Constant F AR in AVG" if strmatch(sub,"FCONSTANT_7YRREB_AR_IN_AVG_3BRG13BMY")
+replace shortname="Constant F AVG in AR" if strmatch(sub,"FCONSTANT_7YRREB_AVG_IN_AR_3BRG13BMY")
+
+
+replace shortname="ABC CR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB212")
+replace shortname="ABC CR AR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB_AR212")
+replace shortname="ABC CR AVG in AR" if strmatch(sub,"F40_ABC_CR_AR_IN_AVG13BMY")
+replace shortname="ABC CR AR in AVG" if strmatch(sub,"F40_ABC_CR_AVG_IN_AR13BMY")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 gen mABC=ABC_
@@ -71,13 +110,23 @@ save "${data_main}/revenue_trajectory_${vintage_string}.dta", replace
 
 replace revenue=revenue/1000000
 drop if shortname==""
-collapse (mean) revenue (sd) sdrev=revenue (p50) median_rev=revenue (p25) p25_rev=revenue (p75) p75_rev=revenue, by(year shortname)
+collapse (mean) revenue (sd) sdrev=revenue (p50) median_rev=revenue (p25) p25_rev=revenue (p75) p75_rev=revenue  (p5) p5_rev=revenue (p95) p95_rev=revenue , by(year shortname)
 encode shortname, gen(mys)
 tsset mys year
 save "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
 
-/* more graphs here */
-tsline revenue p25 p75 if shortname=="Constant F"
+
+levelsof shortname, local(mys)
+
+local graphopts legend(order(1 "Mean" 2 "25th percentile" 3 "75th percentile ")  rows(1)) ytitle("Revenue (M nominal)") xtitle("Year") 
+local i=1
+foreach scenario of local mys{
+	tsline revenue p25 p75 if shortname=="`scenario'",  `graphopts' title("`scenario'") name(gr_`i', replace)
+	graph export  "${my_images}/timeseries_revenue_`i'.png", as(png) replace
+	local ++i
+}
+
+
 
 
 
@@ -96,7 +145,7 @@ label var d7_rev "Revenue discounted at 7% (M USD)"
 
 
 gen alt=.
-replace alt=1 if strmatch(shortname,"Constant F*")
+replace alt=3 if strmatch(shortname,"Constant F*")
 replace alt=2 if strmatch(shortname,"ABC CR*")
 
 keep if alt~=.
@@ -107,8 +156,23 @@ gen keep=0
 replace keep=1 if  shortname=="Constant F" | shortname=="Constant F AR" 
 replace keep=1 if  shortname=="ABC CR" | shortname=="ABC CR AR" 
 
-graph box d3_rev d7_rev if keep==1, over(shortname)  legend(rows(2))
-graph export "${my_images}/boxplot_discounted_rev.png", as(png) replace
+gen sort_order=0
+replace sort_order=1 if shortname=="ABC CR"
+replace sort_order=2 if shortname== "Constant F"
+replace sort_order=3 if shortname=="ABC CR AR"
+replace sort_order=4 if shortname=="Constant F AR"
+replace sort_order=5 if shortname=="ABC CR AR in AVG"
+replace sort_order=6 if shortname=="Constant F AR in AVG"
+replace sort_order=7 if shortname=="ABC CR AVG in AR"
+replace sort_order=8 if shortname=="Constant F AVG in AR"
+
+graph box d3_rev, over(shortname, label(angle(45)) sort(sort_order))
+
+graph export "${my_images}/boxplot_discounted_rev3.png", as(png) replace
+
+graph box d7_rev, over(shortname, label(angle(45)) sort(sort_order))
+
+graph export "${my_images}/boxplot_discounted_rev7.png", as(png) replace
 
 
 /*
