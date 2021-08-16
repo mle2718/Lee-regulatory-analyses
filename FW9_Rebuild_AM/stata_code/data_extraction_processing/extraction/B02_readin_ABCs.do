@@ -55,7 +55,7 @@ compress
 
 
 
-save "${data_raw}\ABC_full_${vintage_string}.dta"
+save "${data_raw}\ABC_full_${vintage_string}.dta", replace
 
 
 
