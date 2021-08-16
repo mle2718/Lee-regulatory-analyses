@@ -21,3 +21,5 @@ library.bib
 *.xlsx
 *.xls
 *.csv
+!scenario_key.csv
+
