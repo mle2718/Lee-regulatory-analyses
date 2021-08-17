@@ -4,20 +4,19 @@ author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`" 
 output:
   pdf_document: 
+    includes:
+      in_header: preamble-latex.tex
     keep_tex: yes
-    pandoc_args: --pdf-engine=xelatex
     number_sections: true
   html_document: null
   word_document: null
 fontsize: 12pt
-
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 my_projdir<-"C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-herring-analyses/FW9_Rebuild_AM"
 # This file needs to be run 1 time (ever). It sets up folders. After your first knit, you can comment it out (although leaving it in will not hurt
-setwd(my_projdir)
 
 my_images<-file.path(my_projdir,"images")
 my_tables<-file.path(my_projdir,"tables")
@@ -28,6 +27,7 @@ my_tables<-file.path(my_projdir,"tables")
 
 ## Impacts on Human Communities
 
+### Action 1 - Rebuilding Plan
 The general approach is describe the discounted projected revenues under the different rebuilding alternatives and sensitivity to different recruitment assumptions. To do this, we:
 
 1.  Use the projected ABCs described in section 6.1.  When ABCs are low, we assume landings are equal to ABCs.  However, when ABCs are higher than the highest observed US catch (124,100 mt in 1997), we set catch to this amount. 
@@ -41,7 +41,8 @@ We assume that the maximum catch is 124,100mt.  This is reasonable in this analy
 
 A projection of ABCs under Alterative 1 is difficult. As described in section 4.1.1, NEFMC would continue to use the ABC control rule to set fishery specifications two years at a time.  We assume this would produce the same set of ABCs as Alternative 2.
 
-### Prices
+#### Prices
+
 
 We use the results of a Instrumental Variables regression fit on annual herring landings and prices from 2003-2020 to predict prices corresponding to projected landings under different rebuilding plans and assumptions about recruitment.  We normalize to 2019 real US dollars using the GDP implicit price deflator.  Figure \ref{herring_iv} contains a scatterplot of real herring prices and landings, in 1000s of metric tons.    Data available after the Amendment 8 analysis is marked with squares. 
 
@@ -64,8 +65,12 @@ Table \ref{regression_results} contains the results of the IV estimator and leas
   \end{center}
 \end{table}
 
+\clearpage
 
-### Results Overview
+
+#### Results Overview
+
+
 We present a box plot of discounted revenues over the 2020-2032 time period using a 3\% discount rate and a 7\% discount rate in figures \ref{discount3} and  \ref{discount7}. The line inside the box represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
 
 From the first two boxplots in Figure \ref{discount3}, we find that the Alternative 2 (ABC CR) is likely to have lower revenues than Alternative 3 (Constant F) under baseline (average) recruitment. Alternative 2 is likely to have lower revenues under the Autocorrelated Recruitment and the "AR in AVG" scenarios as well.  Alternative 2 and 3 perform similarly in the "AVG in AR" scenario.  We discount at 3\% and 7\%.  Changes in the discount rate do not change the order of the scenarios.
@@ -114,11 +119,23 @@ Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard 
 \end{table}
 
 
-### Alternatives 1 and 2
+#### Alternatives 1 and 2
 
 Alternatives 1 and 2 are expected to result in discounted gross revenues of approximately \$200 M over the 2020-2032 time period.  
 
-### Alternative 3 
+#### Alternative 3 
 Alternative 3 is expected to result in discounted gross revenues of approximately \$230MM over the 2020-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
 
  
+### Action 2 - Overage AMs
+
+#### Alternative 1 -- no action
+Alternative 1 is expected to have no impacts relative to no action.
+
+#### Alternative 2 - Allowance for overage up to 10\%
+Alternative 2 will allow for overages of up to 10\% of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  This is expected to have small positive impacts on the herring fishery by not reducing future sub-ACLs if the overall ACL is not exceeded.   Note that catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of overages of sub-ACLs.
+
+#### Alternative 3 - Allowance for overages until total ACL is harvested
+Alternative 3 will allow for overages of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  This is expected to have small positive impacts on the herring fishery by not reducing future sub-ACLs if the overall ACL is not exceeded.  These impacts are expected to be larger than the impacts of Alternative 2. Note that catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of overages of sub-ACLs.
+
+
