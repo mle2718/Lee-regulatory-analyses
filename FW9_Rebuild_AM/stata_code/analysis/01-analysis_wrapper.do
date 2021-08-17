@@ -22,3 +22,8 @@ do "${analysis_code}/prices2019.do""
 do "${analysis_code}/average_prices.do""
 
 graph close _all
+
+do "${analysis_code}/rebuild_analysis/annual_price_regression.do""
+
+
+do "${analysis_code}/rebuild_analysis/A1_rebuild_analysis.do""
