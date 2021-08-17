@@ -11,15 +11,13 @@ use $RFA_dataset, clear
 use $RFA_dataset, clear
 
 
-/* For FW8, it's reasonable to assume HRG A,B,C, and E vessels OR SMB T1, T2, T3, 4
-we want to flag all the firms that had at least 1 of these 4 categories in the most recent year*/
+/* For FW9, we will only be affecting HRG ABCDE vessels. 
+we want to flag all the firms that had at least 1 of these in the most recent year*/
 
 /* ALL permitted */
-local keeplist HRG_A HRG_B HRG_C HRG_D HRG_E SMB_T1 SMB_T2 SMB_T3 SMB_4
+local keeplist HRG_A HRG_B HRG_C HRG_D HRG_E 
 
-/* Without HRG D permitted */
 
-local keeplist HRG_A HRG_B HRG_C HRG_E SMB_T1 SMB_T2 SMB_T3 SMB_4
 
 drop person*
 egen keep_flag=rowtotal(`keeplist')
