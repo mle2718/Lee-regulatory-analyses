@@ -1,9 +1,7 @@
 use $RFA_dataset, clear
 /* first, lets get total fishery value by year */
-
- collapse (sum) value168 value212, by(year)
-
- list
+collapse (sum) value168 value212, by(year)
+list
 
 
 
@@ -73,14 +71,16 @@ gen active=herring+mackerel
 replace active=active>=1
 
 /* histograms of dependence */
-hist herring_frac if ty==1 & year==2017 & small==1, width(.05)
-hist herring_frac if ty==1 & year==2018 & small==1, width(.05)
-hist herring_frac if ty==1 & year==2019 & small==1, width(.05)
+levelsof year, local(myyear)
+foreach y of local myyear{
+	hist herring_frac if ty==1 & year==`y' & small==1, width(.05) name(hist`y', replace)
+}
 
-summ herring_frac mackerel_frac if ty==1 & year==2019 & small==1
+
+summ herring_frac mackerel_frac if ty==1 & year==`maxy' & small==1
 
 
-centile herring_frac mackerel_frac if ty==1 & year==2019 & small==1 & active==1, centile(25 50 75) 
+centile herring_frac mackerel_frac if ty==1 & year==`maxy' & small==1 & active==1, centile(25 50 75) 
 
 
 
@@ -112,14 +112,14 @@ gen adj_affiliate_total=(affiliate_total*1000000)-herring+adj_herring
 replace adj_affiliate_total=adj_affiliate_total/1000000
 
 gen pct_change=(baseline_affiliate_total-adj_affiliate_total)/baseline_affiliate_total
-gen pct_change2019=(affiliate_total-adj_affiliate_total)/affiliate_total
+gen pct_change`maxy'=(affiliate_total-adj_affiliate_total)/affiliate_total
 
 
 order small affiliate_total adj_affiliate pct_change
 sort small pct_change
 
 
-export delimited small affiliate_total adj_affiliate_total pct_change pct_change2019 if active==1 & year==2019 using ${my_results}/RFApct_change.csv, replace
+export delimited small affiliate_total adj_affiliate_total pct_change pct_change`maxy' if active==1 & year==2019 using ${my_results}/RFApct_change.csv, replace
 
 
 
@@ -151,7 +151,7 @@ gen adj_affiliate_total=(affiliate_total*1000000)-herring+adj_herring
 replace adj_affiliate_total=adj_affiliate_total/1000000
 
 gen pct_change=(baseline_affiliate_total-adj_affiliate_total)/baseline_affiliate_total
-gen pct_change2019=(affiliate_total-adj_affiliate_total)/affiliate_total
+gen pct_change`maxy'=(affiliate_total-adj_affiliate_total)/affiliate_total
 
 order small affiliate_total adj_affiliate pct_change
 sort small pct_change
@@ -159,7 +159,7 @@ sort small pct_change
 
 
 
-export delimited small affiliate_total adj_affiliate_total pct_change pct_change2019 if active==1 & year==2019 using ${my_results}/RFA_hrg_only_pct_change.csv, replace
+export delimited small affiliate_total adj_affiliate_total pct_change pct_change`maxy' if active==1 & year==`maxy' using ${my_results}/RFA_hrg_only_pct_change.csv, replace
 
 
 
@@ -168,23 +168,23 @@ export delimited small affiliate_total adj_affiliate_total pct_change pct_change
 
 gen a2=herring+mackerel
 /* large firms */
-count  if year>=2019 & a2>=1 & small==0 & pct_change<=.02
-count  if year>=2019 & a2>=1 & small==0 & pct_change>.02 & pct_change<=.10 
+count  if year>=`maxy' & a2>=1 & small==0 & pct_change<=.02
+count  if year>=`maxy' & a2>=1 & small==0 & pct_change>.02 & pct_change<=.10 
 
 /* small firms */
 
-count  if year>=2019 & a2>=1 & small==1 & pct_change<=.02
+count  if year>=`maxy' & a2>=1 & small==1 & pct_change<=.02
 
-count  if year>=2019 & a2>=1 & small==1 & pct_change>.02 & pct_change<=.10 
-count  if year>=2019 & a2>=1 & small==1 & pct_change>.10 & pct_change<=.25 
-count  if year>=2019 & a2>=1 & small==1 & pct_change>.25 & pct_change<=.63 
+count  if year>=`maxy' & a2>=1 & small==1 & pct_change>.02 & pct_change<=.10 
+count  if year>=`maxy' & a2>=1 & small==1 & pct_change>.10 & pct_change<=.25 
+count  if year>=`maxy' & a2>=1 & small==1 & pct_change>.25 & pct_change<=.63 
 
 
-count  if year>=2019 & a2>=1 & small==1 & pct_change2019<=.02
+count  if year>=`maxy' & a2>=1 & small==1 & pct_change`maxy'<=.02
 
-count  if year>=2019 & a2>=1 & small==1 & pct_change2019>.02 & pct_change2019<=.10 
-count  if year>=2019 & a2>=1 & small==1 & pct_change2019>.10 & pct_change2019<=.25 
-count  if year>=2019 & a2>=1 & small==1 & pct_change2019>.25 & pct_change2019<=.67 
+count  if year>=`maxy' & a2>=1 & small==1 & pct_change`maxy'>.02 & pct_change`maxy'<=.10 
+count  if year>=`maxy' & a2>=1 & small==1 & pct_change`maxy'>.10 & pct_change`maxy'<=.25 
+count  if year>=`maxy' & a2>=1 & small==1 & pct_change`maxy'>.25 & pct_change`maxy'<=.67 
 
 
 
