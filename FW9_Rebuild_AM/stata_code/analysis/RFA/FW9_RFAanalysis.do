@@ -14,17 +14,24 @@ use $RFA_dataset, clear
 /* For FW9, we will only be affecting HRG ABCDE vessels. 
 we want to flag all the firms that had at least 1 of these in the most recent year*/
 
+/* STEP 1: Keep affiliate_id's that have at least one of the categorical variables in the keeplist ==1 in the most recent year*/
+
+
 /* ALL permitted */
 local keeplist HRG_A HRG_B HRG_C HRG_D HRG_E 
 
 
-
 drop person*
+
+/*Add up the number of herring permits help by a vp_num */
 egen keep_flag=rowtotal(`keeplist')
+
+/* zero out everything that is not the last year */
 qui summ year
 local maxy=`r(max)'
 replace keep_flag=0 if year~=`maxy'
 
+/* drop if the the affiliate did not have at least one of the permits */
 bysort affiliate_id : egen kf2=total(keep_flag)
 keep if kf2>=1
 drop kf2
