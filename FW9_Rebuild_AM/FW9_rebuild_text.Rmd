@@ -138,4 +138,35 @@ Alternative 2 will allow for overages of up to 10\% of a sub-ACL not to be deduc
 #### Alternative 3 - Allowance for overages until total ACL is harvested
 Alternative 3 will allow for overages of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  This is expected to have small positive impacts on the herring fishery by not reducing future sub-ACLs if the overall ACL is not exceeded.  These impacts are expected to be larger than the impacts of Alternative 2. Note that catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of overages of sub-ACLs.
 
+\clearpage
+
+# Regulatory Flexibility Act Analysis 
+
+Table \ref{RFA_characterization} describes the small and large directly regulated entities.  A firm is included if it owns at least one category A, B, C, D, or E Herring Permit in 2020. We summarize the average revenue for each firm over the past three years (2018-2020) and use this to make a size determiniation.  
+
+We characterize the small and large entities Revenues are average revenue over the three year period in millions of nominal USD.
+
+
+\begin{table}[htbp]
+  \begin{center}
+  \begin{scriptsize}
+    \input{./tables/RFA_small_large_firms.tex}
+  \end{scriptsize}
+    \caption{A characterization of the Small and Large firms.  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 20018-2020 time period and are in  millions of nominal US Dollars. \label{RFA_characterization}}
+  \end{center}
+\end{table}
+
+
+
+We also characterize just the firms that derived any revenue from herring in 2020:
+
+\begin{table}[htbp]
+  \begin{center}
+  \begin{scriptsize}
+    \input{./tables/RFA_small_large_active_firms.tex}
+  \end{scriptsize}
+    \caption{A characterization of the Small and Large firms.  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 20018-2020 time period and are in  millions of nominal US Dollars.  There were fewer than three large firms that derived revenue from herring in 2020, so these data are supressed. \label{RFA_characterization}}
+  \end{center}
+\end{table}
+
 
