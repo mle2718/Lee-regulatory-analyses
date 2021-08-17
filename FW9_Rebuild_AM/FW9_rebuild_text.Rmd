@@ -1,5 +1,5 @@
 ---
-title: "Herring FW9 Rebuild"
+title: "Herring Framework Adjustment 9 Economics"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`" 
 output:
@@ -23,16 +23,27 @@ my_images<-file.path(my_projdir,"images")
 my_tables<-file.path(my_projdir,"tables")
 
 ```
+\setcounter{section}{6}
+\setcounter{subsection}{4}
 
-# Prices
+## Impacts on Human Communities
 
-Figure \ref{herring_iv} contains a scatterplot of real herring prices and landings, in 1000s of metric tons.    Data available after the Amendment 8 analysis is marked with squares.  A least-squares regression will be biased if prices and quantities are simultaneously determined.  An IV estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  We have added an instrumental variables regression fit line that describes this relationship.   We use this equation to predict the real annual prices corresponding to different harvest levels projected under the rebuilding plan.  We use this equation, rather than the one developed in Amendment 8. 
+The general approach is describe the discounted projected revenues under the different rebuilding alternatives and sensitivity to different recruitment assumptions. To do this, we:
 
-This equation is:
-$$
-price\_ per\_mt =  815.02 -   5.89 landings + \varepsilon
-$$
+1.  Use the projected ABCs described in section 6.1.  When ABCs are low, we assume landings are equal to ABCs.  However, when ABCs are higher than the highest observed US catch (124,100 mt in 1997), we set catch to this amount. 
+1.  Construct predicted prices (in Real 2019 dollars) from the equation in the previous section. 
+1.  Multiply price by landings to construct revenue.
+1.  Discount by 7\% or 3\% as mandated by OMB Circular A-4.
+1.  Sum up the discounted yearly revenue.
 
+
+We assume that the maximum catch is 124,100mt.  This is reasonable in this analysis because the industry is unlikely to expand capacity above the highest historical level in the short run. However, if high ABCs persist it is  likely that capacity will also increase.
+
+A projection of ABCs under Alterative 1 is difficult. As described in section 4.1.1, NEFMC would continue to use the ABC control rule to set fishery specifications two years at a time.  We assume this would produce the same set of ABCs as Alternative 2.
+
+### Prices
+
+We use the results of a Instrumental Variables regression fit on annual herring landings and prices from 2003-2020 to predict prices corresponding to projected landings under different rebuilding plans and assumptions about recruitment.  We normalize to 2019 real US dollars using the GDP implicit price deflator.  Figure \ref{herring_iv} contains a scatterplot of real herring prices and landings, in 1000s of metric tons.    Data available after the Amendment 8 analysis is marked with squares. 
 
 
 ```{r foo, fig.show = "hold", out.width = "75%", fig.cap="\\label{herring_iv} Annual Herring Prices and Landings",  fig.align = "center", echo=FALSE}
@@ -40,20 +51,24 @@ knitr::include_graphics(file.path(my_images,c("herring_price_quantity_iv_scatter
 ```
 
 
+A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  We have added an instrumental variables regression fit line that describes this relationship.   We use this equation to predict the real annual prices corresponding to different harvest levels projected under the rebuilding plan.  We use this equation, rather than the one developed in Amendment 8. 
 
-# Rebuilding
+Table \ref{regression_results} contains the results of the IV estimator and least squares estimator.  We also estimate a log-transformed model. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.  The landings coefficient from the IV model in Table \ref{regression_results} implies that, on average, an increase in landings of 1,000 mt will reduce prices by \$5.893 per metric ton. The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.442\%.
 
-To describe the projected revenues under the different rebuilding trajectories, we:
 
-1.  Use the ABCs described in the various projections. When ABCs are low, we assume landings are equal to ABCs.  However, when ABCs are higher than higest observed US catch (124,100 mt in 1997), we set catch to this amount. 
-1.  Construct predicted prices (in Real 2019 dollars) from the equation in the previous section. 
-1.  Multiply price by landings to construct revenue.
-1.  Discount by 7\% or 3\% as mandated by OMB Circular A-4.
-1.  Sum up the discounted yearly revenue.
 
-## Figures
+\begin{table}[htbp]
+  \begin{center}
+    \input{./tables/regression_results.tex}
+     \caption{Regression results \label{regression_results}}
+  \end{center}
+\end{table}
+
+
+### Results Overview
 We present a box plot of discounted revenues over the 2020-2032 time period using a 3\% discount rate and a 7\% discount rate in figures \ref{discount3} and  \ref{discount7}. The line inside the box represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
 
+From the first two boxplots in Figure \ref{discount3}, we find that the Alternative 2 (ABC CR) is likely to have lower revenues than Alternative 3 (Constant F) under baseline (average) recruitment. Alternative 2 is likely to have lower revenues under the Autocorrelated Recruitment and the "AR in AVG" scenarios as well.  Alternative 2 and 3 perform similarly in the "AVG in AR" scenario.  We discount at 3\% and 7\%.  Changes in the discount rate do not change the order of the scenarios.
 
 ```{r discounted_rev3, fig.show = "hold", out.width = "75%", fig.cap="\\label{discount3} Boxplots of discounted (3\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev3.png")))
@@ -64,7 +79,6 @@ knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev3.png")))
 knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev7.png")))
 ```
 
-From the first two boxplots in Figure \ref{discount3}, we find that the Alternative 2 (ABC CR) is likely to have lower revenues than Alternative 3 (Constant F) under baseline (average) recruitment. Alternative 2 is likely to have lower revenues under the Autocorrelated Recruitment and the "AR in AVG" scenarios as well.  Alternative 2 and 3 perform similarly in the "AVG in AR" scenario.  We discount at 3\% and 7\%.  Changes in the discount rate do not change the order of the scenarios.
 
 \clearpage
 
@@ -72,8 +86,7 @@ From the first two boxplots in Figure \ref{discount3}, we find that the Alternat
 -->
 
 
-## Tables
-Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard deviation of the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). 
+Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard deviation of the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). Under baseline recruitment and discounting (upper left cell of both tables), discounted gross revenues are approximately \$29M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\% reduces the different to approximately \$26M (bottom left cells).  Under two alternative recruitment and management assumptions (AR and AR in AVG) the magnitude of the difference between the two alternatives changes.  Alternative 2 produces higher revenues than Alternative 3 by approximately \$9M in the AVG in AR recruitment scenario.   
 
 
 
@@ -99,3 +112,13 @@ Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard 
 
   \end{center}
 \end{table}
+
+
+### Alternatives 1 and 2
+
+Alternatives 1 and 2 are expected to result in discounted gross revenues of approximately \$200 M over the 2020-2032 time period.  
+
+### Alternative 3 
+Alternative 3 is expected to result in discounted gross revenues of approximately \$230MM over the 2020-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
+
+ 
