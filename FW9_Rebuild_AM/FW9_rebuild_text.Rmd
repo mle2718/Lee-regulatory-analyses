@@ -140,11 +140,45 @@ Alternative 3 will allow for overages of a sub-ACL not to be deducted from futur
 
 \clearpage
 
-# Regulatory Flexibility Act Analysis 
+\setcounter{section}{7}
+\setcounter{subsection}{0}
 
-Table \ref{RFA_characterization} describes the small and large directly regulated entities.  A firm is included if it owns at least one category A, B, C, D, or E Herring Permit in 2020. We summarize the average revenue for each firm over the past three years (2018-2020) and use this to make a size determiniation.  
 
-We characterize the small and large entities Revenues are average revenue over the three year period in millions of nominal USD.
+# Regulatory Flexibility Act Analysis - Initial Regulatory Flexibility Analysis
+
+The purpose of the RFA is to reduce the impacts of burdensome regulations and recordkeeping requirements on small businesses.  To achieve this goal, the RFA requires Federal agencies to describe and analyze the effects of proposed regulations, and possible alternatives, on small business entities.  To this end, this document contains an Initial Regulatory Flexibility Analysis (IRFA), found below, which includes an assessment of the effects that the Proposed Action and other alternatives are expected to have on small entities.
+
+Under section 603(b) of the RFA, an IRFA must describe the impact of the proposed rule on small entities and contain the following information: 
+
+1.	A description of the reasons why the action by the agency is being considered.
+2.	A succinct statement of the objectives of, and legal basis for, the proposed rule.
+3.	A description—and, where feasible, an estimate of the number—of small entities to which the proposed rule will apply.
+4.	A description of the projected reporting, recordkeeping, and other compliance requirements of the proposed rule, including an estimate of the classes of small entities that will be subject to the requirement and the types of professional skills necessary for preparation of the report or record.
+5.	 An identification, to the extent practicable, of all relevant federal rules that may duplicate, overlap, or conflict with the proposed rule.
+
+
+
+## Reasons for Considering the Action
+
+The purpose and need for this action are presented in section XX of this document. 
+
+## Objectives and Legal Basis for the Action
+
+The objectives for this action are presented in section XX of this document, and the legal basis is in section 8.0. 
+
+
+## Description and Estimate of Small Entities to Which the Rule Applies
+
+For RFA purposes only, NMFS has established a small business size standard for businesses, including their affiliates, whose primary industry is commercial fishing (see 50 CFR § 200.2).  A business primarily engaged in commercial fishing (NAICS code 11411) is classified as a small business if it is independently owned and operated, is not dominant in its field of operation (including its affiliates), and has combined annual receipts not in excess of $11 million for all its affiliated operations worldwide.
+
+For the purposes of this analysis, entities (firms) are defined as collections of fishing vessels with identical ownership personnel.  For example, if five permits have the same seven people listed as co-owners on their application paperwork, those seven people  form one ownership entity, covering those five permits.  If any of the individual people own additional vessels, either by themselves, with new co-owners, or with a subset of the seven, those vessels are separate entities for the purpose of this analysis.
+
+### Regulated Commercial Harvesting Entities
+This rule would affect all vessels with permits to fish in the herring fisheries; therefore, the direct regulated entity is a firm that owns at least one herring permit.  
+
+Table \ref{RFA_characterization} describes the small and large directly regulated entities.  A firm is included if it owns at least one category A, B, C, D, or E Herring Permit in 2020. We summarize the average revenue for each firm over the past three years (2018-2020) and use this to make a size determiniation.  There are 9 Large Entities and 1,213 small entities.
+
+The 9 large entities earned a combined \$189M in fishing revenue (an average of approximately \$21M per firm) over the trailing three years.  Approximately \$2M (an average of approximately \$225,000) of that revenue was derived from herring.  The 1,213 small entities earned a combined $665M in fishing revenue (an average of approximately \$504,000 per firm).  Approximately \$11M (an average of approximately \$9,000) of that revenue was derived from herring.
 
 
 \begin{table}[htbp]
@@ -152,21 +186,83 @@ We characterize the small and large entities Revenues are average revenue over t
   \begin{scriptsize}
     \input{./tables/RFA_small_large_firms.tex}
   \end{scriptsize}
-    \caption{A characterization of the Small and Large firms.  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 20018-2020 time period and are in  millions of nominal US Dollars. \label{RFA_characterization}}
+    \caption{A characterization of the Small and Large firms.  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 2018-2020 time period and are in  millions of nominal US Dollars. \label{RFA_characterization}}
   \end{center}
 \end{table}
 
 
+Many of the firms described in table \ref{RFA_characterization} hold  *only* a category D herring permit and no other herring permit.  Impacts of the proposed regulation are likely to be largest for the particpants in the directed fishery (holding at least one A, B, C, or E category permit).  Table \ref{RFA_characterization_ABCE} describes the directly regulated entities that hold at least one of these permits.   There are 6 Large Entities and  97 small entities that meet this criteria.
 
-We also characterize just the firms that derived any revenue from herring in 2020:
+The 6 large entities earned a combined \$129M in fishing revenue (an average of approximately \$21.5M per firm) over the trailing three years.  Approximately \$2M (an average of approximately \$333,000) of that revenue was derived from herring.  The 97 small entities earned a combined $131M in fishing revenue (an average of approximately \$1.4M per firm).  Approximately \$11M (an average of approximately \$111,000 per firm) of that revenue was derived from herring.
+
+
+\begin{table}[htbp]
+  \begin{center}
+  \begin{scriptsize}
+    \input{./tables/RFA_small_large_ABCE.tex}
+  \end{scriptsize}
+    \caption{A characterization of the Small and Large firms that hold at least one A, B, C, or E category permit.  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 20018-2020 time period and are in  millions of nominal US Dollars. \label{RFA_characterization_ABCE}}
+  \end{center}
+\end{table}
+
+
+Finally, we describe the "active and directed" fishery, defining active as deriving any revenue from herring in 2020 in Table \ref{RFA_characterization_directed_active} .  There are 2 Large and 41 small entities that meet this criteria.  Because there are only two large entities, revenue statistics for this class are not presented.  The 41 active small entities earned a combined $37.3M in fishing revenue (an average of approximately \$910,000 per firm).  Approximately \$11M (an average of approximately \$260,000 per firm) of that revenue was derived from herring.
+
 
 \begin{table}[htbp]
   \begin{center}
   \begin{scriptsize}
     \input{./tables/RFA_small_large_active_firms.tex}
   \end{scriptsize}
-    \caption{A characterization of the Small and Large firms.  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 20018-2020 time period and are in  millions of nominal US Dollars.  There were fewer than three large firms that derived revenue from herring in 2020, so these data are supressed. \label{RFA_characterization}}
+    \caption{A characterization of the small firms in the directed, active fishery. These firms hold at least one A,B, C, D, or E category permit and had revenue from herring in 2020.  Revenue figures represent aggregate revenue for the small classes of firms, averaged over the 20018-2020 time period and are in millions of nominal US Dollars.  There were fewer than three large firms that derived revenue from herring in 2020, so these data are not presented \label{RFA_characterization_directed_active}}
   \end{center}
 \end{table}
 
+## Record Keeping and Reporting Requirements
+
+There are no additional record keeping or reporting requirements associated with this action.
+
+## Duplication, Overlap, or Conflict with Other Federal Rules
+
+*I don't know *
+
+## Impacts of the Proposed Rule on Small Entities
+
+Action 1 (Rebuilding) of the proposed rule is likely to have the largest impact on fishing firms; Action 2 (AMs)  are likely to have a minimal impact on fishing firms.  **No action is the ABC control rule? Which means no action is pretty similar to the rebuilding plan??**
+
+
+# E.O. 12866 (Regulatory Planning and Review)
+The purpose of E.O 12866 is to enhance planning and coordination with respect to new and existing regulations.  This E.O. requires the Office of Management and Budget (OMB) to review regulatory programs that are considered to be “significant.”  E.O. 12866 requires a review of proposed regulations to determine whether or not the expected effects would be significant, where a significant action is any regulatory action that may:
+
+* Have an annual effect on the economy of $100 million or more, or adversely affect in a material way the economy, a sector of the economy, productivity, jobs, the environment, public health or safety, or State, local, or tribal governments or communities;
+*	Create a serious inconsistency or otherwise interfere with an action taken or planned by another agency;
+*	Materially alter the budgetary impact of entitlements, grants, user fees, or loan programs or the rights and obligations of recipients thereof; or
+*	Raise novel legal or policy issues arising out of legal mandates, the President’s priorities, of the principles set forth in the Executive Order.
+
+In deciding how whether and how to regulate, agencies should assess all costs and benefits of available regulatory alternatives, include the alternative of not regulating.  Costs and benefits shall be understood to include both quantifiable measures (to the fullest extent that these can be usefully estimated) and qualitative measures of costs and benefits that are difficult to quantify, but nevertheless essential to consider.
+
+## Statement of the Problem/Goals and Objectives
+
+Problem, goals, and objectives are explained in Section *YYY* 
+
+## Management Alternatives and Rationale
+
+The alternatives under consideration in this Framework are explained in Section *YYY*
+
+## Description of the Fishery
+
+A description of the fishery is available in Section *YYY*.
+
+
+## Summary of Impacts
+The expected effects of each the Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections X  and Z  of this document. 
+<!-- To summarize, the proposed regulation is expected to result in gross revenues that are approximately 63% percent lower than the no action alternative. If we assume total ACL will be caught in each year, total revenues over 3 years are expected to be $12.61M less than the no action alternative. 
+-->
+
+## Determination of Significance
+<!--
+Not sure about this. I've copied it in from FW8, in case this is true.
+
+Based on the analyses provided in this document, the proposed regulation is not expected to constitute a “significant regulatory action.”  This action is not expected to have an impact of $100M or more on the economy, or adversely affect in a material way the economy, a sector of the economy, productivity, jobs, the environment, public health or safety, or State, local, or tribal governments or communities.  They are not expected to raise novel legal and policy issues.  The proposed action also does not interfere with an action taken or planned by another agency.  It does not materially alter the budgetary impact of entitlements, grants, user fees, or loan programs, or the rights and obligations of recipients.
+-->
 
