@@ -3,13 +3,13 @@ title: "Herring Framework Adjustment 9 Economics"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`" 
 output:
+  word_document: null
+  html_document: null
   pdf_document: 
     includes:
       in_header: preamble-latex.tex
     keep_tex: yes
     number_sections: true
-  html_document: null
-  word_document: null
 fontsize: 12pt
 ---
 
@@ -30,14 +30,14 @@ my_tables<-file.path(my_projdir,"tables")
 ### Action 1 - Rebuilding Plan
 The general approach is describe the discounted projected revenues under the different rebuilding alternatives and sensitivity to different recruitment assumptions. To do this, we:
 
-1.  Use the projected ABCs described in section 6.1.  When ABCs are low, we assume landings are equal to ABCs.  However, when ABCs are higher than the highest observed US catch (124,100 mt in 1997), we set catch to this amount. 
+1.  Use the projected ABCs described in section 6.1.  When ABCs are low, we assume landings are equal to ABCs.  However, when ABCs are higher than the highest observed US catch (124,100 mt in 1997), we set catch to this amount. Ideally, this simulation would be a closed-loop simulation and the stock projections would account for the possiblity that catch would be less than the ABC.  Unfortunately, this was not possible.
 1.  Construct predicted prices (in Real 2019 dollars) from the equation in the previous section. 
 1.  Multiply price by landings to construct revenue.
 1.  Discount by 7\% or 3\% as mandated by OMB Circular A-4.
 1.  Sum up the discounted yearly revenue.
 
 
-We assume that the maximum catch is 124,100mt.  This is reasonable in this analysis because the industry is unlikely to expand capacity above the highest historical level in the short run. However, if high ABCs persist it is  likely that capacity will also increase.
+We assume that the maximum catch is 124,100mt.  This is reasonable in this analysis because the industry is unlikely to expand capacity above the highest historical level in the short run. However, if high ABCs persist it is likely that capacity will also increase.  
 
 A projection of ABCs under Alterative 1 is difficult. As described in section 4.1.1, NEFMC would continue to use the ABC control rule to set fishery specifications two years at a time.  We assume this would produce the same set of ABCs as Alternative 2.
 
@@ -230,6 +230,17 @@ There are no additional record keeping or reporting requirements associated with
 
 Action 1 (Rebuilding) of the proposed rule is likely to have the largest impact on fishing firms; Action 2 (AMs)  are likely to have a minimal impact on fishing firms.  **No action is the ABC control rule? Which means no action is pretty similar to the rebuilding plan??**
 
+General Approach
+<!-- \analysis\RFA\FW9_RFAanalysis_projections.do -->
+1.  Compute affiliate's average revenue, average herring revenue, and average non-herring revenue for trailing 3 years.
+1.  Compute affiliate's fraction of herring fishery (herring rev divided by all herring rev).
+1.  Construct affiliate's projected herring revenue by multiplying fleetwide revenue (from previous section) by affiliate's fraction of herring fishery
+1.  Construct affiliate's revenue and the change in revenue, relative to 2018-2020 average.
+
+This assumes that fishing in the future in the "other fisheries" is similar to the 2018-2020 average.  We also are assuming proportional expansions or decreases at the firm level relative to the 2018-2020 average. So, if a firm "exited" prior to 2018, it will not have any revenue if even if conditions improve.  
+
+<!--Do we want to filter on just "active" in 2020 to match the entities description? Or just leave it the way it is.-->
+
 
 # E.O. 12866 (Regulatory Planning and Review)
 The purpose of E.O 12866 is to enhance planning and coordination with respect to new and existing regulations.  This E.O. requires the Office of Management and Budget (OMB) to review regulatory programs that are considered to be “significant.”  E.O. 12866 requires a review of proposed regulations to determine whether or not the expected effects would be significant, where a significant action is any regulatory action that may:
@@ -255,8 +266,22 @@ A description of the fishery is available in Section *YYY*.
 
 
 ## Summary of Impacts
-The expected effects of each the Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections X  and Z  of this document. 
-<!-- To summarize, the proposed regulation is expected to result in gross revenues that are approximately 63% percent lower than the no action alternative. If we assume total ACL will be caught in each year, total revenues over 3 years are expected to be $12.61M less than the no action alternative. 
+The expected effects of each the Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections X  and Z  of this document. Action 2 is expected to have minimal impacts on the fishery, so we focus on Action 1.  
+<!-- To summarize, the proposed regulation is expected to result in gross revenues that are approximately XX% percent lower than the no action alternative. 
+
+Both policies result in similar resource conditions in 2032 under the baseline recruitment scenario, although using the ABC Control Rule is expected to result in faster rebuilding of the herring stock.  In the autocorrelated recruitment scenario, the ABC Control Rule is expected to result in slower rebuilding.  In the AVG in AR scenario, neither the ABC conrol rule not the constant F policy are expected to achieve rebuilding. And in the AR in AVG scenario, both are expected to rebuild in the same year.  Other stock metrics (P-Rebuild and SSB in 2032) are very similar for both Alternatives.
+
+Scenario|Recruitment  |		SSB_in_2032|	Rebuild year|	P Rebuild in 2032|
+ABC CR|	BASE|	293798|	2026|	0.61|
+7 yr cons|	BASE|	292429|	2028|	0.603|
+ABC CR|	AR|	278533	|2030	|0.522|
+7 yr cons|	AR|	283861	|2028	|0.536|
+ABC CR|	AVG in AR|	254394|	X|	0.482|
+7 yr cons|	AVG in AR|	236123|	X|	0.46|
+ABC CR|	AR in AVG	|344071	|2025	|0.692|
+7 yr cons|	AR in AVG|	338942	|2025	|0.679|
+
+
 -->
 
 ## Determination of Significance
