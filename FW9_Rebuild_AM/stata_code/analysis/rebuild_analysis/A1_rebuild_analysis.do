@@ -128,9 +128,13 @@ gen d7_rev=discount_factor7*revenue
 save "${data_main}/revenue_trajectory_${vintage_string}.dta", replace
 /* you might want to plot mean revenue for each shortname over time.*/
 
-replace revenue=revenue/1000000
 drop if shortname==""
-collapse (mean) revenue (sd) sdrev=revenue (p50) median_rev=revenue (p25) p25_rev=revenue (p75) p75_rev=revenue  (p5) p5_rev=revenue (p95) p95_rev=revenue , by(year shortname)
+encode full_filename, gen(myf)
+drop full_filename
+rename myf full_filename
+rename ABC_ ABC
+
+collapse (mean) mean_revenue =revenue mean_ABC=ABC mean_mABC=mABC (sd) sdrev=revenue (p50) median_rev=revenue (p25) p25_rev=revenue (p75) p75_rev=revenue  (p5) p5_rev=revenue (p95) p95_rev=revenue , by(year shortname full_filename)
 encode shortname, gen(mys)
 tsset mys year
 save "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
@@ -141,7 +145,7 @@ levelsof shortname, local(mys)
 local graphopts legend(order(1 "Mean" 2 "25th percentile" 3 "75th percentile ")  rows(1)) ytitle("Revenue (M nominal)") xtitle("Year") 
 local i=1
 foreach scenario of local mys{
-	tsline revenue p25 p75 if shortname=="`scenario'",  `graphopts' title("`scenario'") name(gr_`i', replace)
+	tsline mean_revenue p25_rev p75_rev if shortname=="`scenario'",  `graphopts' title("`scenario'") name(gr_`i', replace)
 	graph export  "${my_images}/timeseries_revenue_`i'.png", as(png) replace
 	local ++i
 }
