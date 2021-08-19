@@ -8,7 +8,7 @@ global vintage_string 2021_08_16
 
 use $RFA_dataset, clear
 
-/* For FW9, we will affecting HRG ABCDE vessels. 
+/* For FW9, we will look at just  HRG ABCDE vessels. 
 we want to flag all the firms that had at least 1 of these in the most recent year
 
 You might want to use 
