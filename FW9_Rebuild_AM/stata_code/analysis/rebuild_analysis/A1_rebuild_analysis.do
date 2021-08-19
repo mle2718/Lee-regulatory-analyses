@@ -140,12 +140,19 @@ tsset mys year
 save "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
 
 
-levelsof shortname, local(mys)
 
-local graphopts legend(order(1 "Mean" 2 "25th percentile" 3 "75th percentile ")  rows(1)) ytitle("Revenue (M nominal)") xtitle("Year") 
+foreach var of varlist mean_revenue sdrev median_rev p25_rev p75_rev p5_rev p95_rev{
+	replace `var'=`var'/1000000
+}
+
+local labelopts legend(order(1 "Mean" 2 "25th percentile" 3 "75th percentile ") rows(1)) ylabel(5(5)30)
+local axisopts ytitle("Revenue (M nominal)") xtitle("Year")  
+local addlines tline(2022, lcolor(black) lpattern(dash)) tmtick(##5) text(30 2022 "Rebuilding starts", placement(e)) 
+ levelsof shortname, local(mys)
+
 local i=1
 foreach scenario of local mys{
-	tsline mean_revenue p25_rev p75_rev if shortname=="`scenario'",  `graphopts' title("`scenario'") name(gr_`i', replace)
+	tsline mean_revenue p25_rev p75_rev if shortname=="`scenario'",  `labelopts' `axisopts' `addlines' title("`scenario'") name(gr_`i', replace)
 	graph export  "${my_images}/timeseries_revenue_`i'.png", as(png) replace
 	local ++i
 }
