@@ -100,6 +100,70 @@ twoway ( lfit pricemt_realGDP landings,range(0 120)) (scatter pricemt_realGDP la
 graph export ${my_images}/herring_price_quantity_scatter.png, replace as(png);
 
 
+
+
+
+
+
+
+
+
+
+
+
+/* plot the iv- regression fit */ 
+ 
+gen lnpricemt_realGDP=ln(pricemt_realGDP);
+gen lnlandings=ln(landings);
+
+
+ivregress 2sls lnpricemt_realGDP (lnlandings=l1.lnlandings);
+
+
+
+
+
+// find the dependt variable
+ local eq3 `"`e(depvar)' ="';
+ 
+ // choose a nice display format for the constant
+ local eq3 "`eq3' `: di  %7.2f _b[_cons]'";
+ 
+ // should we add or subtract
+ local eq3 `"`eq3' `=cond(_b[lnlandings]>0, "+", "-")'"';
+ 
+ // we already chose the plus or minus sign
+ // so we need to strip a minus sign when it is there
+ local eq3 `"`eq3' `:di %6.2f abs(_b[lnlandings])' lnlandings"';
+ 
+ // add the error term
+ local eq3 `"`eq3' + {&epsilon}"';
+
+ 
+ local rmse=e(rmse);
+ di "`eq3'";
+
+
+ 
+
+local scatter_opts  ylabel(0(200)1000) ymtick(##4)  xlabel(0(40)120) xmtick(##4) legend(off)  ytitle("Price per Metric Ton (Real 2019)") xtitle("Herring Landings ('000s of mt)") legend(off);
+
+
+twoway (function y=exp(_b[_cons] + _b[lnlandings]*ln(x) + (`rmse'^2)/2), range(5 120)) (scatter pricemt_realGDP landings if year<=2016, mlabel(year)) (scatter pricemt_realGDP landings if year>=2017, mlabel(year)), `scatter_opts' note("`eq3'");
+
+graph export ${my_images}/herring_price_quantity_lniv_scatter.png, replace as(png);
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 local graph_subset mymonth<=monthly("2020m07","YM") & mymonth>=monthly("2015m1", "YM");
 local graph_subset mymonth<=monthly("2019m12","YM") & mymonth>=monthly("2015m1", "YM");
