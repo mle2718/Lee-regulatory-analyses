@@ -3,13 +3,13 @@ title: "Herring Framework Adjustment 9 Economics"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`" 
 output:
+  word_document: null
+  html_document: null
   pdf_document: 
     includes:
       in_header: preamble-latex.tex
     keep_tex: yes
     number_sections: true
-  html_document: null
-  word_document: null
 fontsize: 12pt
 ---
 
@@ -125,6 +125,7 @@ Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard 
 Alternatives 1 and 2 are expected to result in discounted gross revenues of approximately \$200 M over the 2020-2032 time period.  
 
 Figure \ref{fig:ABC_CR_traj} shows the time series trajectory of revenues corresponding to the ABC CR. This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
+*NOTE for Deirdre/Rachel: I'm not quite sure why the AR in AVG and AVG in AR projections have differences for the 2020 and 2021 fishing years.  I would have thought they would have the same ABCs (the 2020 and 2021 actuals).  I don't think this causes much of a change in the results.  Particularly since it's the same for Alt 3.  But something to be aware of. *
 
 ```{r ABC_CR_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for the four ABC Control Rule Scenarios",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("1","2","3","4"),".png")))
