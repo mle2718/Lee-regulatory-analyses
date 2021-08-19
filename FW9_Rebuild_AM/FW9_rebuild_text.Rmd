@@ -3,13 +3,13 @@ title: "Herring Framework Adjustment 9 Economics"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`" 
 output:
-  word_document: null
-  html_document: null
   pdf_document: 
     includes:
       in_header: preamble-latex.tex
     keep_tex: yes
     number_sections: true
+  html_document: null
+  word_document: null
 fontsize: 12pt
 ---
 
@@ -51,6 +51,8 @@ The methods used to model prices are slighly different that those used in Deroba
 
 In Amendment 8, an elasticity of -0.50 was assumed. By coincidence, this assumption turned out to be fairly close to both the estimates in Deroba *et al* (2019) and the estimates in Table \ref{regression_results}.  
 
+
+
 \begin{table}[htbp]
   \begin{center}
     \input{./tables/regression_results.tex}
@@ -59,10 +61,10 @@ In Amendment 8, an elasticity of -0.50 was assumed. By coincidence, this assumpt
 \end{table}
 
 
-Figure \ref{herring_iv} contains a scatterplot of real herring prices and landings, in 1000s of metric tons along with the IV and Log-Log IV fit lines derived from the first and third columns of Table \ref{regression_results}. Data available after the Amendment 8 analysis is marked with triangles. 
+Figure \ref{fig:herring_iv} contains a scatterplot of real herring prices and landings, in 1000s of metric tons along with the IV and Log-Log IV fit lines derived from the first and third columns of Table \ref{regression_results}. Data available after the Amendment 8 analysis is marked with triangles. 
 
 
-```{r foo, fig.show = "hold", out.width = "75%", fig.cap="\\label{herring_iv} Annual Herring Prices and Landings",  fig.align = "center", echo=FALSE}
+```{r herring_iv, fig.show = "hold", out.width = "75%", fig.cap="Annual Herring Prices and Landings",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,c("herring_price_quantity_iv_both_scatter.png")))
 ```
 
@@ -73,24 +75,23 @@ knitr::include_graphics(file.path(my_images,c("herring_price_quantity_iv_both_sc
 #### Results Overview
 
 
-We present a box plot of discounted revenues over the 2020-2032 time period using a 3\% discount rate and a 7\% discount rate in figures \ref{discount3} and  \ref{discount7}. The line inside the box represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
+We present a box plot of discounted revenues over the 2020-2032 time period using a 3\% discount rate and a 7\% discount rate in figures \ref{fig:discounted_rev3} and  \ref{fig:discounted_rev7}. The line inside the box represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
 
-From the first two boxplots in Figure \ref{discount3}, we find that the Alternative 2 (ABC CR) is likely to have lower revenues than Alternative 3 (Constant F) under baseline (average) recruitment. Alternative 2 is likely to have lower revenues under the Autocorrelated Recruitment and the "AR in AVG" scenarios as well.  Alternative 2 and 3 perform similarly in the "AVG in AR" scenario.  We discount at 3\% and 7\%.  Changes in the discount rate do not change the order of the scenarios.
+From the first two boxplots in Figure \ref{fig:discounted_rev3}, we find that the Alternative 2 (ABC CR) is likely to have lower revenues than Alternative 3 (Constant F) under baseline (average) recruitment. Alternative 2 is likely to have lower revenues under the Autocorrelated Recruitment and the "AR in AVG" scenarios as well.  Alternative 2 and 3 perform similarly in the "AVG in AR" scenario.  We discount at 3\% and 7\%.  Changes in the discount rate do not change the order of the scenarios.
 
-```{r discounted_rev3, fig.show = "hold", out.width = "75%", fig.cap="\\label{discount3} Boxplots of discounted (3\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
+```{r discounted_rev3, fig.show = "hold", out.width = "75%", fig.cap="Boxplots of discounted (3\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev3.png")))
 ```
 
 
-```{r discounted_rev7, fig.show = "hold", out.width = "75%", fig.cap="\\label{discount7} Boxplots of discounted (7\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
+```{r discounted_rev7, fig.show = "hold", out.width = "75%", fig.cap="Boxplots of discounted (7\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev7.png")))
 ```
 
 
-\clearpage
+\newpage
 
-<!--We also present a time series of the mean revenue and the 25th and 75th percentiles (in each year) -- not done yet
--->
+
 
 
 Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard deviation of the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). Under baseline recruitment and discounting (upper left cell of both tables), discounted gross revenues are approximately \$29M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\% reduces the different to approximately \$26M (bottom left cells).  Under two alternative recruitment and management assumptions (AR and AR in AVG) the magnitude of the difference between the two alternatives changes.  Alternative 2 produces higher revenues than Alternative 3 by approximately \$9M in the AVG in AR recruitment scenario.   
@@ -108,8 +109,6 @@ Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard 
 \end{table}
 
 
-
-
 \begin{table}[htbp]
   \begin{center}
   \begin{scriptsize}
@@ -125,8 +124,25 @@ Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard 
 
 Alternatives 1 and 2 are expected to result in discounted gross revenues of approximately \$200 M over the 2020-2032 time period.  
 
+Figure \ref{fig:ABC_CR_traj} shows the time series trajectory of revenues corresponding to the ABC CR. This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
+
+```{r ABC_CR_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for the four ABC Control Rule Scenarios",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("1","2","3","4"),".png")))
+```
+
+
 #### Alternative 3 
 Alternative 3 is expected to result in discounted gross revenues of approximately \$230MM over the 2020-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
+
+Figure \ref{fig:constant_traj} shows the time series trajectory of revenues corresponding to the ABC CR. This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
+
+*NOTE for Deirdre/Rachel: I'm still waiting on a couple things from Jon before I have the figures ready for the constant catch and constant catch AR scenarios*
+
+```{r constant_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for two of the constant catch Scenarios",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("7","8"),".png")))
+```
+ 
+ \newpage
 
  
 ### Action 2 - Overage AMs
@@ -135,11 +151,14 @@ Alternative 3 is expected to result in discounted gross revenues of approximatel
 Alternative 1 is expected to have no impacts relative to no action.
 
 #### Alternative 2 - Allowance for overage up to 10\%
-Alternative 2 would allow for overages of up to 10\% of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  This is expected to have small positive impacts on the herring fishery by not reducing future sub-ACLs if the overall ACL is not exceeded.   Note that catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of overages of sub-ACLs.
+Alternative 2 would allow for overages of up to 10\% of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  This is expected to have small positive impacts on the herring fishery by not reducing future sub-ACLs if the overall ACL is not exceeded.   Note that catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of overages of sub-ACLs.  
+
+We also note that there are positive impacts that are likely to accrue to users of areas that have gone over the ACLs; historical data suggest that this is likely to be Area 1B.  Area 1B sub-ACLs are often quite small relative to the capacity of vessels to catch herring.  This meams that in-season closures that are designed to meet, but not exceed a sub-ACL are difficult to implement. However, current low sub-ACLs for all areas make in-season quota monitoring more difficult and in the near term it is much more difficult to predict if which, if any, any sub-ACLs might be exceeded.
 
 #### Alternative 3 - Allowance for overages until total ACL is harvested
 Alternative 3 would allow for overages of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  This is expected to have small positive impacts on the herring fishery by not reducing future sub-ACLs if the overall ACL is not exceeded.  These impacts are expected to be larger than the impacts of Alternative 2. Note that catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of overages of sub-ACLs.
 
+As with alternative 2, positive impacts that are likely to accrue to users of areas that have gone over the ACLs; historical data suggest that this is likely to be Area 1B.  Area 1B sub-ACLs are often quite small relative to the capacity of vessels to catch herring.  This meams that in-season closures that are designed to meet, but not exceed a sub-ACL are difficult to implement. However, current low sub-ACLs for all areas make in-season quota monitoring more difficult and in the near term it is much more difficult to predict if which, if any, any sub-ACLs might be exceeded.
 \newpage
 
 \setcounter{section}{7}
