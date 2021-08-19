@@ -30,11 +30,13 @@ gen price_real=pricemt_realGDP/$lbs_to_mt;
 local species_pick nespp3==168 ;
 local graph_subset year<=2020;
 
+replace value=value/1000000;
+replace value_realGDP=value_realGDP/1000000;
+
+
 tsline pricemt  pricemt_realGDP if `species_pick' & `graph_subset', `graphopts' cmissing(n)  tlabel(2004(2)2020) tmtick(##2) ymtick(##4) ytitle("Annual Average Price per metric ton") legend(order(1 "Nominal" 2 "Real 2019 dollars")) ;
 graph export ${my_images}/herring_prices_real.tif, replace as(tif);
 
-replace value=value/1000000;
-replace value_realGDP=value_realGDP/1000000;
 
 label var value "Nominal Value $M";
 label var value_realGDP "Real Value 2019$M";
