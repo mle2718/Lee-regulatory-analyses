@@ -87,8 +87,13 @@ ivregress 2sls pricemt_realGDP (landings=l1.landings);
 
 
  
+ local liv_cons=_b[_cons];
+ 
+ local liv_beta=_b[landings];
+ 
+ 
 
-local scatter_opts  ylabel(0(200)1000) ymtick(##4)  xlabel(0(40)120) xmtick(##4) legend(off)  ytitle("Price per Metric Ton (Real 2019)") xtitle("Herring Landings ('000s of mt)") legend(off);
+local scatter_opts  ylabel(0(200)1000) ymtick(##4)  xlabel(0(40)120) xmtick(##4)  ytitle("Price per Metric Ton (Real 2019)") xtitle("Herring Landings ('000s of mt)") legend(off);
 
 
 twoway (function y=_b[_cons] + _b[landings]*x, range(0 120)) (scatter pricemt_realGDP landings if year<=2016, mlabel(year)) (scatter pricemt_realGDP landings if year>=2017, mlabel(year)), `scatter_opts' note("`eq2'");
@@ -146,17 +151,19 @@ ivregress 2sls lnpricemt_realGDP (lnlandings=l1.lnlandings);
 
  
 
-local scatter_opts  ylabel(0(200)1000) ymtick(##4)  xlabel(0(40)120) xmtick(##4) legend(off)  ytitle("Price per Metric Ton (Real 2019)") xtitle("Herring Landings ('000s of mt)") legend(off);
+local scatter_opts  ylabel(0(200)1000) ymtick(##4)  xlabel(0(40)120) xmtick(##4)   ytitle("Price per Metric Ton (Real 2019)") xtitle("Herring Landings ('000s of mt)");
 
 
-twoway (function y=exp(_b[_cons] + _b[lnlandings]*ln(x) + (`rmse'^2)/2), range(5 120)) (scatter pricemt_realGDP landings if year<=2016, mlabel(year)) (scatter pricemt_realGDP landings if year>=2017, mlabel(year)), `scatter_opts' note("`eq3'");
+twoway (function y=exp(_b[_cons] + _b[lnlandings]*ln(x) + (`rmse'^2)/2), range(5 120)) (scatter pricemt_realGDP landings if year<=2016, mlabel(year)) (scatter pricemt_realGDP landings if year>=2017, mlabel(year)), `scatter_opts' note("`eq3'") legend(off);
 
 graph export ${my_images}/herring_price_quantity_lniv_scatter.png, replace as(png);
 
 
 
 
+twoway (function y=exp(_b[_cons] + _b[lnlandings]*ln(x) + (`rmse'^2)/2), range(5 120)) (function y=`liv_cons' + `liv_beta'*x, range(5 120)) (scatter pricemt_realGDP landings if year<=2016, mlabel(year)) (scatter pricemt_realGDP landings if year>=2017, mlabel(year)), `scatter_opts' note("`eq3'" "`eq2'") legend(order(1 "log fit" 2 "linear fit"));
 
+graph export ${my_images}/herring_price_quantity_iv_both_scatter.png, replace as(png);
 
 
 
