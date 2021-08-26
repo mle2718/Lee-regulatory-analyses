@@ -94,7 +94,7 @@ knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev7.png")))
 
 
 
-Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard deviation of the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). Under baseline recruitment and discounting (upper left cell of both tables), discounted gross revenues are approximately \$29M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\% reduces the different to approximately \$26M (bottom left cells).  Under two alternative recruitment and management assumptions (AR and AR in AVG) the magnitude of the difference between the two alternatives changes.  Alternative 2 produces higher revenues than Alternative 3 by approximately \$9M in the AVG in AR recruitment scenario.   
+Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard deviation of the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). Under baseline recruitment and discounting (upper left cell of both tables), discounted gross revenues are approximately \$17M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\% reduces the different to approximately \$15M (bottom left cells).  Under two alternative recruitment and management assumptions (AR and AR in AVG) the magnitude of the difference between the two alternatives changes.  Alternative 2 produces higher revenues than Alternative 3 by approximately \$7M in the AVG in AR recruitment scenario.   
 
 
 
@@ -133,14 +133,12 @@ knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("1","
 
 
 #### Alternative 3 
-Alternative 3 is expected to result in discounted gross revenues of approximately \$230MM over the 2020-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
+Alternative 3 is expected to result in discounted gross revenues of approximately \$217MM over the 2020-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
 
 Figure \ref{fig:constant_traj} shows the time series trajectory of revenues corresponding to the ABC CR. This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
 
-*NOTE for Deirdre/Rachel: I'm still waiting on a couple things from Jon before I have the figures ready for the constant catch and constant catch AR scenarios*
-
-```{r constant_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for two of the constant catch Scenarios",  fig.align = "center", echo=FALSE}
-knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("7","8"),".png")))
+```{r constant_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for the constant catch Scenarios",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("5","6","7","8"),".png")))
 ```
  
  \newpage

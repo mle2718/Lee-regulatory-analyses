@@ -21,7 +21,10 @@ local stepno=1
 foreach folder of local mm{
 	di "Working on Folder `folder'.  This is folder number `stepno'."
 	local getme 
-	local getme : dir "$deroba_full/`folder'" files "*12.xx6", respectcase
+	local getmeA : dir "$deroba_full/`folder'" files "*12.xx6", respectcase
+	local getme2BMY : dir "$deroba_full/`folder'" files "*12BMY.xx6", respectcase
+    local getme `getme' `getmeA' `getme2BMY'
+
 	local getme :subinstr local getme `"""' "", all
 
 	/*some folders have no 12.xx6 files */
@@ -130,7 +133,11 @@ replace sensitivity_shorthand = "AR" if recruitment_belief=="AR" & recruitment_t
 
 gen obsolete=0
 replace obsolete=1 if strmatch(alternative,"F Zero")
-replace obsolete=1 if inlist(filename13,"RUN_F40_ABC_CR_AR_IN_AVG13.xx6","RUN_F40_ABC_CR_AVG_IN_AR13.xx6", "FCONSTANT_7YRREB_AR_IN_AVG_3BRG13.xx6","FCONSTANT_7YRREB_AVG_IN_AR_3BRG13.xx6")
+replace obsolete=1 if inlist(filename13,"RUN_F40_ABC_CR_AR_IN_AVG13.xx6","RUN_F40_ABC_CR_AVG_IN_AR13.xx6", "FCONSTANT_7YRREB_AR_IN_AVG_3BRG13.xx6","FCONSTANT_7YRREB_AVG_IN_AR_3BRG13.xx6","RUN_FCONSTANT_7YRREB_10YRFIXED_REB_STG12","RUN_FCONSTANT_7YRREB_10YRFIXED_REB_ARSTG12")
+/*
+...F_CONSTANT_SEVENYR_REBUILD_3BRG / FCONSTANT_7YRREB_3STG12BMY.xx6
+...F_CONSTANT_SEVENYR_REBUILD_3BRG_AR / FCONSTANT_7YRREB_3STG_AR12BMY.xx6
+*/
 
 rename filename12 filename
 replace filename=filename13 if filename==""
@@ -146,14 +153,14 @@ drop strl
 
 gen markin=0
 /* 7 year rebuild with constant F*/
-replace markin=1 if strmatch(filename,"RUN_FCONSTANT_7YRREB_10YRFIXED_REB_STG12.xx6")
+replace markin=1 if strmatch(filename,"FCONSTANT_7YRREB_3STG12BMY.xx6")
 
 /* ABCCR */
 replace markin=1 if strmatch(filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB212.xx6")
 
 
 /*Sensitivity - 7 year rebuild under autocorrelated something */
-replace markin=1 if strmatch(filename,"RUN_FCONSTANT_7YRREB_10YRFIXED_REB_ARSTG12.xx6")
+replace markin=1 if strmatch(filename,"FCONSTANT_7YRREB_3STG_AR12BMY.xx6")
 /*Sensitivity - ABC CR rebuild under autocorrelated something */
 replace markin=1 if strmatch(filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB_AR212.xx6")
 

@@ -1,7 +1,7 @@
 version 16.1
 clear
 set scheme s2color
-global vintage_string 2021_08_16
+*global vintage_string 2021_08_16
 local data_in "${data_main}/ABCs_${vintage_string}.dta"
 
 
@@ -77,8 +77,8 @@ replace sub=subinstr(sub,".xx6","",.)
 compress
 
 gen str30 shortname=""
-replace shortname="Constant F" if strmatch(sub,"FCONSTANT_7YRREB_10YRFIXED_REB_STG12")
-replace shortname="Constant F AR" if strmatch(sub,"FCONSTANT_7YRREB_10YRFIXED_REB_ARSTG12")
+replace shortname="Constant F" if strmatch(sub,"FCONSTANT_7YRREB_3STG12BMY")
+replace shortname="Constant F AR" if strmatch(sub,"FCONSTANT_7YRREB_3STG_AR12BMY")
 
 
 
@@ -90,16 +90,6 @@ replace shortname="ABC CR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB212")
 replace shortname="ABC CR AR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB_AR212")
 replace shortname="ABC CR AVG in AR" if strmatch(sub,"F40_ABC_CR_AR_IN_AVG13BMY")
 replace shortname="ABC CR AR in AVG" if strmatch(sub,"F40_ABC_CR_AVG_IN_AR13BMY")
-
-
-
-
-
-
-
-
-
-
 
 
 

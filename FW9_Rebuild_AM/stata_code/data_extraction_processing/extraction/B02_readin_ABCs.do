@@ -63,14 +63,15 @@ reshape long ABC_, i(full_filename replicate_number) j(year)
 gen markin=0
 
 /* 7 year rebuild with constant F*/
-replace markin=1 if strmatch(full_filename,"RUN_FCONSTANT_7YRREB_10YRFIXED_REB_STG12.xx6")
+replace markin=1 if strmatch(full_filename,"FCONSTANT_7YRREB_3STG12BMY.xx6")
 
 /* ABCCR */
 replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB212.xx6")
 
 
 /*Sensitivity - 7 year rebuild under autocorrelated something */
-replace markin=1 if strmatch(full_filename,"RUN_FCONSTANT_7YRREB_10YRFIXED_REB_ARSTG12.xx6")
+replace markin=1 if strmatch(full_filename,"FCONSTANT_7YRREB_3STG_AR12BMY.xx6")
+
 /*Sensitivity - ABC CR rebuild under autocorrelated something */
 replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB_AR212.xx6")
 
@@ -97,11 +98,10 @@ save "${data_main}\ABCs_${vintage_string}.dta", replace
 
 /*
 The only two alternatives at this point are
- "7yrFconstant" with assumed average recruitment "F_CONSTANT_SEVENYR_REBUILD_STAGE"
- "ABC CR" with assumed average recruitment, "F40_ABC_CR_10YRFIXED_REBUILD_2BRG"
+ "7yrFconstant" with assumed average recruitment "FCONSTANT_7YRREB_3STG12BMY"
+ "ABC CR" with assumed average recruitment, "FCONSTANT_7YRREB_3STG_AR12BMY"
  
- 
-  "7yrFconstant" with AR recruitment instead of average "F_CONSTANT_SEVENYR_REBUILD_AR_STAGE"
+  "7yrFconstant" with AR recruitment instead of average "FCONSTANT_7YRREB_3STG_AR12BMY"
  "ABC CR" with AR recruitment instead of average, "F40_ABC_CR_10YRFIXED_REBUILD_AR_2BRG"
 
   Any folder name ending in "...AVG_IN_AR" uses the projected catches based on assuming average recruitment in a projection where AR recruitment actually occurs;
