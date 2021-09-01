@@ -27,3 +27,4 @@ do "${analysis_code}/rebuild_analysis/annual_price_regression.do"
 
 
 do "${analysis_code}/rebuild_analysis/A1_rebuild_analysis.do"
+do "${analysis_code}/rebuild_analysis/A2_rebuild_annual_revenues.do"
