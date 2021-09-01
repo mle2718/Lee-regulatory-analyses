@@ -15,11 +15,11 @@ quietly forvalues i=1/`obs' {
 		
 		import delimited using "`f'", clear delimit(" ", collapse)
 		gen str100 full_filename="`myfilename'"
- 		gen replicate_number=_n
+		gen replicate_number=_n
 		tempfile savefile_`i'
 	      
-	   
-			save "`savefile_`i''"
+	    compress
+		save "`savefile_`i''"
 
 	}
 clear
@@ -28,7 +28,6 @@ clear
 forvalues i=1/`obs' {
            append using "`savefile_`i''"
 }
-
 
 
 
@@ -73,8 +72,7 @@ replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB21
 replace markin=1 if strmatch(full_filename,"FCONSTANT_7YRREB_3STG_AR12BMY.xx6")
 
 /*Sensitivity - ABC CR rebuild under autocorrelated something */
-replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB_AR212.xx6")
-
+replace markin=1 if strmatch(full_filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_AR_3BRG12.xx6")
 
 /*Sensitivity - 7 year where we think it's AR when it's really AVG and vice versa */
 

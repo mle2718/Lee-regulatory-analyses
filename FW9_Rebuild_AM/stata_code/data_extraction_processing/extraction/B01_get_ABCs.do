@@ -137,6 +137,9 @@ replace obsolete=1 if inlist(filename13,"RUN_F40_ABC_CR_AR_IN_AVG13.xx6","RUN_F4
 /*
 ...F_CONSTANT_SEVENYR_REBUILD_3BRG / FCONSTANT_7YRREB_3STG12BMY.xx6
 ...F_CONSTANT_SEVENYR_REBUILD_3BRG_AR / FCONSTANT_7YRREB_3STG_AR12BMY.xx6
+
+F40_ABC_CR_10YRFIXED_REBUILD_2BRG \\ RUN_F40_ABC_CR_MULTI_10YRFIXED_REB212.xx6
+F40_ABC_CR_10YRFIXED_REBUILD_AR_3BRG \\ RUN_F40_ABC_CR_MULTI_10YRFIXED_AR_3BRG12.xx6
 */
 
 rename filename12 filename
@@ -158,12 +161,10 @@ replace markin=1 if strmatch(filename,"FCONSTANT_7YRREB_3STG12BMY.xx6")
 /* ABCCR */
 replace markin=1 if strmatch(filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB212.xx6")
 
-
 /*Sensitivity - 7 year rebuild under autocorrelated something */
 replace markin=1 if strmatch(filename,"FCONSTANT_7YRREB_3STG_AR12BMY.xx6")
 /*Sensitivity - ABC CR rebuild under autocorrelated something */
-replace markin=1 if strmatch(filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_REB_AR212.xx6")
-
+replace markin=1 if strmatch(filename,"RUN_F40_ABC_CR_MULTI_10YRFIXED_AR_3BRG12.xx6")
 
 /*Sensitivity - 7 year where we think it's AR when it's really AVG and vice versa */
 
