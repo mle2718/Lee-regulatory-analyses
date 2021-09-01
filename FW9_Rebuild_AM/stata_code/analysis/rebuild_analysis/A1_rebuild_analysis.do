@@ -1,7 +1,7 @@
 version 16.1
 clear
 set scheme s2color
-*global vintage_string 2021_08_16
+*global vintage_string 2021_08_26
 local data_in "${data_main}/ABCs_${vintage_string}.dta"
 
 
@@ -70,7 +70,6 @@ global cons 815.0201
 global beta_land -5.893482
 
 use `data_in', replace
-
 /* pretty up the scenario */
 gen sub=subinstr(full_filename,"RUN_","",.)
 replace sub=subinstr(sub,".xx6","",.)
@@ -87,7 +86,7 @@ replace shortname="Constant F AVG in AR" if strmatch(sub,"FCONSTANT_7YRREB_AVG_I
 
 
 replace shortname="ABC CR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB212")
-replace shortname="ABC CR AR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB_AR212")
+replace shortname="ABC CR AR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_AR_3BRG12")
 replace shortname="ABC CR AVG in AR" if strmatch(sub,"F40_ABC_CR_AR_IN_AVG13BMY")
 replace shortname="ABC CR AR in AVG" if strmatch(sub,"F40_ABC_CR_AVG_IN_AR13BMY")
 
@@ -97,14 +96,23 @@ replace shortname="ABC CR AR in AVG" if strmatch(sub,"F40_ABC_CR_AVG_IN_AR13BMY"
 
 
 
-
+pause
 
 
 gen mABC=ABC_
 replace mABC=124100 if mABC>=124100
 gen price=$cons + mABC/1000*$beta_land
 gen revenue=mABC*price
+/* Previously showing all, now we'll show starting at 2021, for consistency with the rest of the doc
 gen running_yr=year-2020
+*/
+/* Previously showing all, now we'll show starting at 2021, for consistency with the rest of the doc
+gen running_yr=year-2020
+*/
+
+keep if year>=2021
+gen running_yr=year-2021
+
 
 gen discount_factor3=1/((1+.03)^running_yr)
 gen discount_factor7=1/((1+.07)^running_yr)
@@ -135,9 +143,9 @@ foreach var of varlist mean_revenue sdrev median_rev p25_rev p75_rev p5_rev p95_
 	replace `var'=`var'/1000000
 }
 
-local labelopts legend(order(1 "Mean" 2 "25th percentile" 3 "75th percentile ") rows(1)) ylabel(5(5)30)
+local labelopts legend(order(1 "Mean" 2 "25th percentile" 3 "75th percentile ") rows(1)) ylabel(5(5)30)  tlabel(2021(2)2033)
 local axisopts ytitle("Revenue (M nominal)") xtitle("Year")  
-local addlines tline(2022, lcolor(black) lpattern(dash)) tmtick(##5) text(30 2022 "Rebuilding starts", placement(e)) 
+local addlines tline(2022, lcolor(black) lpattern(dash)) tmtick(##2) text(30 2022 "Rebuilding F starts", placement(e)) 
  levelsof shortname, local(mys)
 
 local i=1
@@ -148,6 +156,7 @@ foreach scenario of local mys{
 }
 
 
+pause
 
 
 
@@ -255,11 +264,18 @@ esttab . using ${my_tables}/summary_stats_A3.tex, `estab_opts_by_small'
 
 
 
-
-
-
-
-
-
-
 save "${data_main}/discounted_revenues_${vintage_string}.dta", replace
+
+
+
+
+
+
+
+
+
+
+
+
+
+
