@@ -43,7 +43,12 @@ A projection of ABCs under Alterative 1 is difficult. As described in section 4.
 
 #### Prices
 
-We estimate a Instrumental Variables regression using  annual herring landings and prices from 2003-2020.   We normalize to 2019 real US dollars using the GDP implicit price deflator.  A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.
+<!-- 
+D asked for a less technical overview of this 
+-->
+
+
+We estimate a Instrumental Variables regression using annual herring landings and prices from 2003-2020.   We normalize to 2019 real US dollars using the GDP implicit price deflator.  A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.
 
 Table \ref{regression_results} contains the results of the IV estimator and least squares estimator.  We also estimate a pair of log-transformed models. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.  The landings coefficient from the IV model in Table \ref{regression_results} implies that, on average, an increase in landings of 1,000 mt will reduce prices by \$5.89 per metric ton. The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.44\%.
 
@@ -74,36 +79,36 @@ knitr::include_graphics(file.path(my_images,c("herring_price_quantity_iv_both_sc
 
 #### Results Overview
 
-
-We present a box plot of discounted revenues over the 2020-2032 time period using a 3\% discount rate and a 7\% discount rate in figures \ref{fig:discounted_rev3} and  \ref{fig:discounted_rev7}. The line inside the box represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
+<!--
+We present a box plot of discounted revenues over the 2021-2032 time period using a 3\% discount rate and a 7\% discount rate in figures \ref{fig:discounted_rev3} and  \ref{fig:discounted_rev7}. The line inside the box represents the median outcome.  The upper and lower boxes edges of the boxes are the 25th and 75th percentile of total revenue.  The "whiskers" give some idea of the undertainty outside the 25th and 75th percentile.  Wider whiskers indicate more uncertainty. The dots given some idea about the uncertainty outside even those whiskers. 
 
 From the first two boxplots in Figure \ref{fig:discounted_rev3}, we find that the Alternative 2 (ABC CR) is likely to have lower revenues than Alternative 3 (Constant F) under baseline (average) recruitment. Alternative 2 is likely to have lower revenues under the Autocorrelated Recruitment and the "AR in AVG" scenarios as well.  Alternative 2 and 3 perform similarly in the "AVG in AR" scenario.  We discount at 3\% and 7\%.  Changes in the discount rate do not change the order of the scenarios.
+\newpage
 
-```{r discounted_rev3, fig.show = "hold", out.width = "75%", fig.cap="Boxplots of discounted (3\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
+You have to do eval=FALSE to code snippets, even if they are in an html comment.
+```{r discounted_rev3, fig.show = "hold", out.width = "75%", fig.cap="Boxplots of discounted (3\\%) Herring Revenue",  fig.align = "center", echo=FALSE, eval=FALSE}
 knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev3.png")))
 ```
 
 
-```{r discounted_rev7, fig.show = "hold", out.width = "75%", fig.cap="Boxplots of discounted (7\\%) Herring Revenue",  fig.align = "center", echo=FALSE}
+```{r discounted_rev7, fig.show = "hold", out.width = "75%", fig.cap="Boxplots of discounted (7\\%) Herring Revenue",  fig.align = "center", echo=FALSE, eval=FALSE}
 knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev7.png")))
 ```
 
-
-\newpage
-
+-->
 
 
+Tables \ref{A2_summary} and \ref{A3_summary} summarize the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). Under baseline recruitment and discounting (upper left cell of both tables), discounted gross revenues are approximately \$17M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\% reduces the difference to approximately \$15M (bottom left cells).  Under two alternative recruitment and management assumptions (AR and AR in AVG) the magnitude of the difference between the two alternatives changes.  Alternative 2 produces higher revenues than Alternative 3 by approximately \$7M in the AVG in AR recruitment scenario.
 
-Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard deviation of the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). Under baseline recruitment and discounting (upper left cell of both tables), discounted gross revenues are approximately \$17M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\% reduces the difference to approximately \$15M (bottom left cells).  Under two alternative recruitment and management assumptions (AR and AR in AVG) the magnitude of the difference between the two alternatives changes.  Alternative 2 produces higher revenues than Alternative 3 by approximately \$7M in the AVG in AR recruitment scenario.   
 
-
+<!-- Need to update text to match newly generated tables -->
 
 \begin{table}[htbp]
   \begin{center}
   \begin{scriptsize}
     \input{./tables/summary_stats_A2.tex}
   \end{scriptsize}
-    \caption{Mean (\$M USD) and standard deviation of discounted revenues using a 3\% and 7\% discount rates for Alternative 2.  \label{A2_summary}}
+    \caption{Projected discounted revenues (\$M USD)over the 2021-2032 time period using a 3\% and 7\% discount rates for Alternative 2.  \label{A2_summary}}
 
   \end{center}
 \end{table}
@@ -114,15 +119,17 @@ Tables \ref{A2_summary} and \ref{A3_summary} summarize the average and standard 
   \begin{scriptsize}
     \input{./tables/summary_stats_A3.tex}
   \end{scriptsize}
-    \caption{Mean (\$M USD) and standard deviation of discounted revenues using a 3\% and 7\% discount rates for Alternative 3.  \label{A3_summary}}
+    \caption{Projected discounted revenues(\$M USD) over the 2021-2032 time period using a 3\% and 7\% discount rates for Alternative 3.  \label{A3_summary}}
 
   \end{center}
 \end{table}
 
 
+
+
 #### Alternatives 1 and 2
 
-Alternatives 1 and 2 are expected to result in discounted gross revenues of approximately \$200 M over the 2020-2032 time period.  
+Alternatives 1 and 2 are expected to result in discounted gross revenues of approximately \$200 M over the 2021-2032 time period.  
 
 Figure \ref{fig:ABC_CR_traj} shows the time series trajectory of (non-discounted) revenues corresponding to the ABC CR. This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
 *NOTE for Deirdre/Rachel: I'm not quite sure why the AR in AVG and AVG in AR projections have differences for the 2020 and 2021 fishing years.  I would have thought they would have the same ABCs (the 2020 and 2021 actuals).  I don't think this causes much of a change in the results.  Particularly since it's the same for Alt 3.  But something to be aware of. *
@@ -132,14 +139,45 @@ knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("1","
 ```
 
 
+Table \ref{yearly_trajectoryA2} summarizes average revenue, by year, for Alternatives 2 along with the sensitivity analysis.
+
+
+
+\begin{table}[htbp]
+  \begin{center}
+  \begin{scriptsize}
+    \input{./tables/yearly_revenue_trajectoryA2.tex}
+  \end{scriptsize}
+    \caption{Mean (\$M USD) revenue by year for Alternative 2 under different recruitment assumptions \label{yearly_trajectoryA2}}
+
+  \end{center}
+\end{table}
+
+
+
 #### Alternative 3 
-Alternative 3 is expected to result in discounted gross revenues of approximately \$217MM over the 2020-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
+Alternative 3 is expected to result in discounted gross revenues of approximately \$217MM over the 2021-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
 
 Figure \ref{fig:constant_traj} shows the time series trajectory of (non-discounted) revenues corresponding to the 7-year constant F rebuilding plan.  This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
 
 ```{r constant_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for the constant catch Scenarios",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("5","6","7","8"),".png")))
 ```
+ 
+ Table \ref{yearly_trajectoryA3} summarizes average revenue, by year, for Alternative 3 along with the sensitivity analysis.
+
+ 
+
+\begin{table}[htbp]
+  \begin{center}
+  \begin{scriptsize}
+    \input{./tables/yearly_revenue_trajectoryA3.tex}
+  \end{scriptsize}
+    \caption{Mean (\$M USD) revenue by year for Alternative 3 under different recruitment assumptions \label{yearly_trajectoryA3}}
+
+  \end{center}
+\end{table}
+
  
  \newpage
 
@@ -318,11 +356,14 @@ The alternatives under consideration in this Framework are explained in Section 
 
 ## Description of the Fishery
 
-A description of the fishery is available in Section *YYY*.
+A description of the fishery is available in Section *YYY*
 
 
 ## Summary of Impacts
-The expected effects of each the Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections Y  and Z  of this document. Action 2 is expected to have minimal impacts on the fishery, so we focus on Action 1.  
+The expected economics effects (benefits/costs) of each the Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections Y  and Z  of this document. Action 2 is expected to have minimal impacts on the fishery, so we focus on Action 1.
+
+Section Z describes the expected benefits to the participants in the directed herring fishery. Due to slightly higher catches, *de minimus* negative effects on the herring stock are expected.  However, Alternative 2/3 of Action 2 would not increase catch above ACLs, it is not expected to have an impact on stock status.
+
 <!-- To summarize, the proposed regulation is expected to result in gross revenues that are approximately XX% percent lower than the no action alternative. 
 
 Both policies result in similar resource conditions in 2032 under the baseline recruitment scenario, although using the ABC Control Rule is expected to result in faster rebuilding of the herring stock.  In the autocorrelated recruitment scenario, the ABC Control Rule is expected to result in slower rebuilding.  In the AVG in AR scenario, neither the ABC conrol rule not the constant F policy are expected to achieve rebuilding. And in the AR in AVG scenario, both are expected to rebuild in the same year.  Other stock metrics (P-Rebuild and SSB in 2032) are very similar for both Alternatives.

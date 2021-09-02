@@ -135,32 +135,9 @@ rename ABC_ ABC
 collapse (mean) mean_revenue =revenue mean_ABC=ABC mean_mABC=mABC (sd) sdrev=revenue (p50) median_rev=revenue (p25) p25_rev=revenue (p75) p75_rev=revenue  (p5) p5_rev=revenue (p95) p95_rev=revenue , by(year shortname full_filename)
 encode shortname, gen(mys)
 tsset mys year
+
+notes: the means here are not quite right and should be updated.
 save "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
-
-
-
-foreach var of varlist mean_revenue sdrev median_rev p25_rev p75_rev p5_rev p95_rev{
-	replace `var'=`var'/1000000
-}
-
-local labelopts legend(order(1 "Mean" 2 "25th percentile" 3 "75th percentile ") rows(1)) ylabel(5(5)30)  tlabel(2021(2)2033)
-local axisopts ytitle("Revenue (M nominal)") xtitle("Year")  
-local addlines tline(2022, lcolor(black) lpattern(dash)) tmtick(##2) text(30 2022 "Rebuilding F starts", placement(e)) 
- levelsof shortname, local(mys)
-
-local i=1
-foreach scenario of local mys{
-	tsline mean_revenue p25_rev p75_rev if shortname=="`scenario'",  `labelopts' `axisopts' `addlines' title("`scenario'") name(gr_`i', replace)
-	graph export  "${my_images}/timeseries_revenue_`i'.png", as(png) replace
-	local ++i
-}
-
-
-pause
-
-
-
-
 
 
 
@@ -198,11 +175,11 @@ replace sort_order=8 if shortname=="Constant F AVG in AR"
 
 graph box d3_rev, over(shortname, label(angle(45)) sort(sort_order))
 
-graph export "${my_images}/boxplot_discounted_rev3.png", as(png) replace
+*graph export "${my_images}/boxplot_discounted_rev3.png", as(png) replace
 
 graph box d7_rev, over(shortname, label(angle(45)) sort(sort_order))
 
-graph export "${my_images}/boxplot_discounted_rev7.png", as(png) replace
+*graph export "${my_images}/boxplot_discounted_rev7.png", as(png) replace
 
 
 /*
@@ -250,7 +227,7 @@ estpost tabstat `stats' if alt==2, by(sort_order)  `estpost_opts_by'
 esttab .,   `estab_opts_by_small'
 
 
-esttab . using ${my_tables}/summary_stats_A2.tex, `estab_opts_by_small'
+*esttab . using ${my_tables}/summary_stats_A2.tex, `estab_opts_by_small'
 
 
 
@@ -260,7 +237,7 @@ estpost tabstat `stats' if alt==3, by(sort_order)  `estpost_opts_by'
 esttab .,   `estab_opts_by_small'
 
 
-esttab . using ${my_tables}/summary_stats_A3.tex, `estab_opts_by_small'
+*esttab . using ${my_tables}/summary_stats_A3.tex, `estab_opts_by_small'
 
 
 
