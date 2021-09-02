@@ -30,14 +30,11 @@ my_tables<-file.path(my_projdir,"tables")
 ### Action 1 - Rebuilding Plan
 The general approach used in this analysis is to describe the discounted projected revenues under the different rebuilding alternatives and sensitivity to different recruitment assumptions. To do this, we:
 
-1.  Use the projected ABCs described in section 6.1.  When ABCs are higher than the highest observed US catch (124,100 mt in 1997), we set catch to this amount. Otherise, we assume landings are equal to the ABC.  Ideally, this simulation would be a closed-loop simulation and the stock projections would account for the possiblity that catch would be less than the ABC. 
-1.  Simulate predicted prices (in Real 2019 dollars) corresponding to that level of landings. 
+1.  We assume that landings are equal to the projected ABCs described in section 6.1. 
+1.  Predict prices using a simple model of prices corresponding to that level of landings. 
 1.  Multiply price by landings to construct revenue.
 1.  Discount by 7\% or 3\% per year as mandated by OMB Circular A-4.
 1.  Sum up the discounted yearly revenue.
-
-
-We assume that the maximum catch is 124,100mt.  This is reasonable in this analysis because the industry is unlikely to expand capacity above the highest historical level in the short run. However, if high ABCs persist it is likely that capacity will also increase.  
 
 A projection of ABCs under Alterative 1 is difficult. As described in section 4.1.1, NEFMC would continue to use the ABC control rule to set fishery specifications two years at a time.  We assume this would produce the same set of ABCs as Alternative 2.
 
@@ -46,13 +43,15 @@ A projection of ABCs under Alterative 1 is difficult. As described in section 4.
 <!-- 
 D asked for a less technical overview of this 
 -->
+We estimate various econometric models using annual herring landings and prices from 2003-2020.   We normalize to 2019 real US dollars using the GDP implicit price deflator.  Prices per metric ton and landings are expressed in thousands of metric tons.  The first column of Table \ref{regression_results} contains the model of prices that we use to predict future prices^[A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  We also estimate a pair of log-transformed models. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.   The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.44\%.].  
 
+\begin{equation}
+\mbox{Predicted Price} = 815 - 5.893*\mbox{landings}
+\end{equation}
 
-We estimate a Instrumental Variables regression using annual herring landings and prices from 2003-2020.   We normalize to 2019 real US dollars using the GDP implicit price deflator.  A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.
+The landings coefficient implies that, on average, an increase in landings of 1,000 mt will reduce prices by \$5.89 per metric ton.
 
-Table \ref{regression_results} contains the results of the IV estimator and least squares estimator.  We also estimate a pair of log-transformed models. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.  The landings coefficient from the IV model in Table \ref{regression_results} implies that, on average, an increase in landings of 1,000 mt will reduce prices by \$5.89 per metric ton. The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.44\%.
-
-The methods used to model prices are slighly different that those used in Deroba *et al* (2019).  In Deroba *et al* (2019), an autoregressive distributed lag model was used.  The authors find that the an increase in landings of 1,000 mt will reduce prices by \$1.19 per metric to; alternatively, an increase in landings of 1\% will reduce prices by 0.395\%.  We note that the elasticity estimates in Deroba *et al* (2019) are comparable to elasticities in Table \ref{regression_results}.  However, the marginal effects are quite different. 
+The methods used to model prices are slighly different that those used in Deroba *et al* (2019).  In Deroba *et al* (2019), an autoregressive distributed lag model was used.  The authors find that the an increase in landings of 1,000 mt will reduce prices by \$1.19 per metric to; alternatively, an increase in landings of 1\% will reduce prices by 0.395\%.  We note that the elasticity estimates in Deroba *et al* (2019) are comparable to elasticities in Table \ref{regression_results}.
 
 In Amendment 8, an elasticity of -0.50 was assumed. By coincidence, this assumption turned out to be fairly close to both the estimates in Deroba *et al* (2019) and the estimates in columns 3 and 4 of Table \ref{regression_results}.  
 
@@ -70,7 +69,7 @@ Figure \ref{fig:herring_iv} contains a scatterplot of real herring prices and la
 
 
 ```{r herring_iv, fig.show = "hold", out.width = "75%", fig.cap="Annual Herring Prices and Landings",  fig.align = "center", echo=FALSE}
-knitr::include_graphics(file.path(my_images,c("herring_price_quantity_iv_both_scatter.png")))
+knitr::include_graphics(file.path(my_images,c("herring_price_quantity_iv_scatter.png")))
 ```
 
 
@@ -98,17 +97,18 @@ knitr::include_graphics(file.path(my_images,c("boxplot_discounted_rev7.png")))
 -->
 
 
-Tables \ref{A2_summary} and \ref{A3_summary} summarize the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). Under baseline recruitment and discounting (upper left cell of both tables), discounted gross revenues are approximately \$17M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\% reduces the difference to approximately \$15M (bottom left cells).  Under two alternative recruitment and management assumptions (AR and AR in AVG) the magnitude of the difference between the two alternatives changes.  Alternative 2 produces higher revenues than Alternative 3 by approximately \$7M in the AVG in AR recruitment scenario.
+Tables \ref{A2_summary} and \ref{A3_summary} summarize the discounted gross revenue for Alternative 2 (ABC Control Rule) and Alternative 3 (Constant F). Under baseline recruitment and discounting (upper left cell of both tables), discounted gross revenues are approximately \$16M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\% reduces the difference to approximately \$13M (bottom left cells).  
 
+Under autocorrelated recruitment, discounted gross revenues are approximately \$5M less under Alternative 2 compared to Alternative 3.  Changing the discount rate to 7\%, the difference between the two is still approximately \$5M.  
 
-<!-- Need to update text to match newly generated tables -->
-
+The ABC CR AR in AVG sensitivity analysis uses the same ABCs as derived from the ABC CR AR, so revenues in columns 2 and 3 of table \ref{A2_summary} are the same. The ABC CR AVG in AR sensitivity analysis uses the same ABCs as derived from the ABC CR, so revenues in columns 1 and 4 of \ref{A2_summary} are the same.   The same is true for table \ref{A3_summary}.
+  
 \begin{table}[htbp]
   \begin{center}
-  \begin{scriptsize}
+  \begin{footnotesize}
     \input{./tables/summary_stats_A2.tex}
-  \end{scriptsize}
-    \caption{Projected discounted revenues (\$M USD)over the 2021-2032 time period using a 3\% and 7\% discount rates for Alternative 2.  \label{A2_summary}}
+  \end{footnotesize}
+    \caption{Projected discounted revenues (\$M USD) over the 2021-2032 time period using a 3\% and 7\% discount rates for Alternative 2.  \label{A2_summary}}
 
   \end{center}
 \end{table}
@@ -116,9 +116,9 @@ Tables \ref{A2_summary} and \ref{A3_summary} summarize the discounted gross reve
 
 \begin{table}[htbp]
   \begin{center}
-  \begin{scriptsize}
+  \begin{footnotesize}
     \input{./tables/summary_stats_A3.tex}
-  \end{scriptsize}
+  \end{footnotesize}
     \caption{Projected discounted revenues(\$M USD) over the 2021-2032 time period using a 3\% and 7\% discount rates for Alternative 3.  \label{A3_summary}}
 
   \end{center}
@@ -129,10 +129,9 @@ Tables \ref{A2_summary} and \ref{A3_summary} summarize the discounted gross reve
 
 #### Alternatives 1 and 2
 
-Alternatives 1 and 2 are expected to result in discounted gross revenues of approximately \$200 M over the 2021-2032 time period.  
+Alternatives 1 and 2 are expected to result in discounted gross revenues of approximately \$213 M over the 2021-2032 time period.  Sensitiviy analysis regarding the type of recruitment 
 
-Figure \ref{fig:ABC_CR_traj} shows the time series trajectory of (non-discounted) revenues corresponding to the ABC CR. This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
-*NOTE for Deirdre/Rachel: I'm not quite sure why the AR in AVG and AVG in AR projections have differences for the 2020 and 2021 fishing years.  I would have thought they would have the same ABCs (the 2020 and 2021 actuals).  I don't think this causes much of a change in the results.  Particularly since it's the same for Alt 3.  But something to be aware of. *
+Figure \ref{fig:ABC_CR_traj} shows the time series trajectory of (non-discounted) revenues corresponding to the ABC CR. This provides some insight into the yearly projected fishing revenues.   The first year in which the Rebuilding F starts (2022) is marked with a vertical dashed line. 
 
 ```{r ABC_CR_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for the four ABC Control Rule Scenarios",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("1","2","3","4"),".png")))
@@ -145,10 +144,10 @@ Table \ref{yearly_trajectoryA2} summarizes average revenue, by year, for Alterna
 
 \begin{table}[htbp]
   \begin{center}
-  \begin{scriptsize}
+  \begin{footnotesize}
     \input{./tables/yearly_revenue_trajectoryA2.tex}
-  \end{scriptsize}
-    \caption{Mean (\$M USD) revenue by year for Alternative 2 under different recruitment assumptions \label{yearly_trajectoryA2}}
+  \end{footnotesize}
+    \caption{Projected annual revenue (\$M USD) revenue for Alternative 2 under different assumptions \label{yearly_trajectoryA2}}
 
   \end{center}
 \end{table}
@@ -156,7 +155,7 @@ Table \ref{yearly_trajectoryA2} summarizes average revenue, by year, for Alterna
 
 
 #### Alternative 3 
-Alternative 3 is expected to result in discounted gross revenues of approximately \$217MM over the 2021-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
+Alternative 3 is expected to result in discounted gross revenues of approximately \$228M over the 2021-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
 
 Figure \ref{fig:constant_traj} shows the time series trajectory of (non-discounted) revenues corresponding to the 7-year constant F rebuilding plan.  This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
 
@@ -170,10 +169,10 @@ knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("5","
 
 \begin{table}[htbp]
   \begin{center}
-  \begin{scriptsize}
+  \begin{footnotesize}
     \input{./tables/yearly_revenue_trajectoryA3.tex}
-  \end{scriptsize}
-    \caption{Mean (\$M USD) revenue by year for Alternative 3 under different recruitment assumptions \label{yearly_trajectoryA3}}
+  \end{footnotesize}
+    \caption{Projected annual revenue (\$M USD) revenue for Alternative 3 under different assumptions \label{yearly_trajectoryA3}}
 
   \end{center}
 \end{table}
@@ -184,27 +183,19 @@ knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("5","
  
 ### Action 2 - Overage AMs
 
-Since 2009, there have been 11 overages of a sub-ACL, although only 3 have occurred in the last 5 years.  Improvements to the quota monitoring system make overages less likely.  See Table \ref{fig:overages}.  ACLs for the entire fishery were not exceeded in any of these years. Low sub-ACLs (relative to the fleet's daily ability to catch herring) make in-season management that is designed to achieve, but not exceed a sub-ACL, logistically difficult.
+Since 2009, there have been 11 overages of a sub-ACL, although only 3 have occurred in the last 5 years (Table \ref{tab:overages}).   Improvements to the quota monitoring system make overages less likely. ACLs for the entire fishery were not exceeded in any of these years. Low sub-ACLs (relative to the fleet's daily ability to catch herring) make in-season management that is designed to achieve, but not exceed a sub-ACL, logistically difficult.
 
-
+<!-- this is so janky -->
 
 ```{r overages, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- "
-| Year  | Area   | sub-ACL  | Catch| Overage(%)|
-|-------|--------|------:|-----:|-----:|
-| 2009| 1A|43,650|44,088|1%
-| 2010| 1A|26,546|28,424|7%
-| 2010| 1B|4,362|6,001|38%
-| 2011| 1A|29,251|30,676|5%
-| 2012| 1B|2,723|4,307|58%
-| 2012| 2|22,146|22,482|2%
-| 2012| 3| 38,146|39,471|3%
-| 2014| 1B|2,878|4,399|53%
-| 2016| 1B |2,844 | 3,657 | 29%
-| 2019| 2 |4,061 | 4,758 |17%
-| 2020| 1B |483 | 831 |72%
-"
-cat(tabl)
+overages<-as.data.frame(rbind(c(2009,"1A", 43650, 44088,"1%"),c(2010,"1A", 26546, 28424,"7%"),c(2010,"1B", 4362, 6001,"38%"),c(2011,"1A", 29251,30676,"5%"),c(2012,"1B", 2723, 4307,"58%"),c(2012,"2", 22146, 22482,"2%"),c(2012,"3",  38146, 39471,"3%"),c(2014,"1B", 2878, 4399,"53%"),c(2016,"1B", 2844,  3657 ,"29%"),c(2019,"2", 4061 ,  4758 ,"17%"),c(2020,"1B", 483 ,  831 ,"72%")))
+
+#overages[,1]<-as.numeric(as.character(overages[,1]))
+overages[,3]<-as.numeric(as.character(overages[,3]))
+overages[,4]<-as.numeric(as.character(overages[,4]))
+
+colnames(overages)<-c("Year","Area", "sub-ACL", "Catch","Overage(%)")
+knitr::kable(overages, "pipe", caption="Sub-ACL overages since 2009 \\label{tab:overages}",align="lrrrr", format.args = list(big.mark = ","))
 ```
 The general approach to examining the impacts of these alternatives is to compute the change in revenues that would have been caused by the  overage deductions over the last five years.    In 2020, herring prices were approximately \$710 per metric ton (real 2019 USD); this is used to compute revenue.  3 overages have occurred in the last 5 years; total overage was 1,858mt.  
 
