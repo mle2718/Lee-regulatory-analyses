@@ -27,4 +27,10 @@ do "${analysis_code}/rebuild_analysis/annual_price_regression.do"
 
 
 do "${analysis_code}/rebuild_analysis/A1_rebuild_analysis.do"
+do "${analysis_code}/rebuild_analysis/A3_rebuild_analysis_mean_ABCs.do"
+
+
+/*needs to go after the rebuild_mean */
 do "${analysis_code}/rebuild_analysis/A2_rebuild_annual_revenues.do"
+
+do "${analysis_code}/rebuild_analysis/A4_rebuild_analysis_stacked.do"
