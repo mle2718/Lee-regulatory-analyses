@@ -90,7 +90,7 @@ local stats d3_rev d7_rev
 local  estpost_opts_by "statistics(mean) columns(statistics) nototal "
 
 local estab_opts_by_small "main(mean %03.2f )nostar noobs nonote label replace  unstack nomtitles nodepvars nonumbers compress nogaps"
-estpost tabstat `stats'  if inlist(sort_order,2,4,6,8), by(sort_order) `estpost_opts_by'
+estpost tabstat `stats'  if inlist(sort_order,1,3,5,7), by(sort_order) `estpost_opts_by'
 esttab . ,  `estab_opts_by_small'
 
 esttab . using ${my_tables}/summary_stats_A2.tex, `estab_opts_by_small'
