@@ -34,3 +34,6 @@ do "${analysis_code}/rebuild_analysis/A3_rebuild_analysis_mean_ABCs.do"
 do "${analysis_code}/rebuild_analysis/A2_rebuild_annual_revenues.do"
 
 do "${analysis_code}/rebuild_analysis/A4_rebuild_analysis_stacked.do"
+
+
+do "${analysis_code}/rebuild_analysis/A5_graph_predicted_rev.do"
