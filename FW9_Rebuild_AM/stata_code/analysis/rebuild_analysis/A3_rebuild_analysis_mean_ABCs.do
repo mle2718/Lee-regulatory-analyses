@@ -3,7 +3,7 @@
 
 version 16.1
 clear
-set scheme s2color
+set scheme s2mono
 *global vintage_string 2021_08_26
 local data_in "${data_raw}/herring_mean_ABCs.csv"
 

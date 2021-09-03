@@ -1,6 +1,6 @@
 version 16.1
 clear
-set scheme s2color
+set scheme s2mono
 *global vintage_string 2021_09_01
 
 
