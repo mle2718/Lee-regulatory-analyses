@@ -1,6 +1,6 @@
 version 16.1
 clear
-set scheme s2color
+set scheme s2mono
 *global vintage_string 2021_08_26
 local data_in "${data_main}/ABCs_${vintage_string}.dta"
 
@@ -131,13 +131,24 @@ encode full_filename, gen(myf)
 drop full_filename
 rename myf full_filename
 rename ABC_ ABC
-
+preserve
 collapse (mean) mean_revenue =revenue mean_ABC=ABC mean_mABC=mABC (sd) sdrev=revenue (p50) median_rev=revenue (p25) p25_rev=revenue (p75) p75_rev=revenue  (p5) p5_rev=revenue (p95) p95_rev=revenue , by(year shortname full_filename)
 encode shortname, gen(mys)
 tsset mys year
 
 notes: the means here are not quite right and should be updated.
 save "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
+
+
+restore
+/*
+collapse (mean) mean_revenue =revenue mean_ABC=ABC mean_mABC=mABC (sd) sdrev=revenue (p50) median_rev=revenue (p10) p10_rev=revenue (p90) p90_rev=revenue  (p5) p5_rev=revenue (p95) p95_rev=revenue , by(year shortname full_filename)
+encode shortname, gen(mys)
+tsset mys year
+
+save "${data_main}/revenue_yearly_outlier_stats_${vintage_string}.dta", replace
+*/
+
 
 
 
