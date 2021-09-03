@@ -3,13 +3,13 @@ title: "Herring Framework Adjustment 9 Economics"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`" 
 output:
-  word_document: null
-  html_document: null
   pdf_document: 
     includes:
       in_header: preamble-latex.tex
     keep_tex: yes
     number_sections: true
+  word_document: null
+  html_document: null
 fontsize: 12pt
 ---
 
@@ -140,8 +140,8 @@ Alternatives 1 and 2 are expected to result in discounted gross revenues of appr
 
 Figure \ref{fig:ABC_CR_traj} shows the time series trajectory of (non-discounted) revenues corresponding to the ABC CR. This provides some insight into the yearly projected fishing revenues.   The first year in which the Rebuilding F starts (2022) is marked with a vertical dashed line. 
 
-```{r ABC_CR_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for the four ABC Control Rule Scenarios",  fig.align = "center", echo=FALSE}
-knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("1","2","3","4"),".png")))
+```{r ABC_CR_traj, fig.show = "hold", out.width = "48%", fig.cap="Projected revenue at mean ABCs for the four ABC Control Rule Scenarios",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("1","3","5","7"),".png")))
 ```
 
 
@@ -166,8 +166,8 @@ Alternative 3 is expected to result in discounted gross revenues of approximatel
 
 Figure \ref{fig:constant_traj} shows the time series trajectory of (non-discounted) revenues corresponding to the 7-year constant F rebuilding plan.  This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
 
-```{r constant_traj, fig.show = "hold", out.width = "48%", fig.cap="Mean, 25th and 75th percentiles of revenue for the constant catch Scenarios",  fig.align = "center", echo=FALSE}
-knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("5","6","7","8"),".png")))
+```{r constant_traj, fig.show = "hold", out.width = "48%", fig.cap="Projected revenue at mean ABCs for the constant catch Scenarios",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("2","4","6","8"),".png")))
 ```
  
  Table \ref{yearly_trajectoryA3} summarizes average revenue, by year, for Alternative 3 along with the sensitivity analysis.  In all four plots, revenue decreases towards the end of the rebuilding period. This occurs because the ABC are above the 69,000mt critical point described in Section \ref{sec:prices}.
