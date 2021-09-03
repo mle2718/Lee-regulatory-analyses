@@ -3,13 +3,13 @@ title: "Herring Framework Adjustment 9 Economics"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`" 
 output:
+  word_document: null
+  html_document: null
   pdf_document: 
     includes:
       in_header: preamble-latex.tex
     keep_tex: yes
     number_sections: true
-  html_document: null
-  word_document: null
 fontsize: 12pt
 ---
 
@@ -28,30 +28,37 @@ my_tables<-file.path(my_projdir,"tables")
 ## Impacts on Human Communities
 
 ### Action 1 - Rebuilding Plan
-The general approach used in this analysis is to describe the discounted projected revenues under the different rebuilding alternatives and sensitivity to different recruitment assumptions. To do this, we:
+The general approach used in this analysis is to describe the discounted projected revenues under the different rebuilding alternatives and recruitment assumptions. To do this:
 
-1.  We assume that landings are equal to the projected ABCs described in section 6.1. 
-1.  Predict prices using a simple model of prices corresponding to that level of landings. 
+1.  Landings are assumed to be equal to the projected ABCs described in section 6.1. 
+1.  Predict prices corresponding to that level of landings using the results of a simple  model of prices. 
 1.  Multiply price by landings to construct revenue.
 1.  Discount by 7\% or 3\% per year as mandated by OMB Circular A-4.
 1.  Sum up the discounted yearly revenue.
 
-A projection of ABCs under Alterative 1 is difficult. As described in section 4.1.1, NEFMC would continue to use the ABC control rule to set fishery specifications two years at a time.  We assume this would produce the same set of ABCs as Alternative 2.
+A projection of ABCs under Alterative 1 is difficult. As described in section 4.1.1, NEFMC would continue to use the ABC control rule to set fishery specifications two years at a time.  This is assumed to would produce the same set of ABCs as Alternative 2.
 
-#### Prices
+#### Prices\label{sec:prices}
 
 <!-- 
 D asked for a less technical overview of this 
 -->
-We estimate various econometric models using annual herring landings and prices from 2003-2020.   We normalize to 2019 real US dollars using the GDP implicit price deflator.  Prices per metric ton and landings are expressed in thousands of metric tons.  The first column of Table \ref{regression_results} contains the model of prices that we use to predict future prices^[A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  We also estimate a pair of log-transformed models. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.   The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.44\%.].  
+Annual herring landings and price data from 2003-2020 to estimate a relationship between prices and landings.   Prices are normalized to 2019 real US dollars using the GDP implicit price deflator.  Prices per metric ton and landings are expressed in thousands of metric tons.  The first column of Table \ref{regression_results} contains the model of prices that are used to predict future prices^[A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  A pair of log-transformed models are also estimated. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.   The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.44\%.].  Based on the econometric model of prices, predicted prices and revenues are calcluated according to:
 
-\begin{equation}
-\mbox{Predicted Price} = 815 - 5.893*\mbox{landings}
-\end{equation}
+\begin{align}
+\mbox{Predicted Price} &= 815 - 5.893*\mbox{landings}\label{eq:predicted_price}\\
+\mbox{Predicted Revenue} &=  (815 - 5.893*\mbox{landings}) *\mbox{landings}\label{eq:predicted_landings}
+\end{align}
 
-The landings coefficient implies that, on average, an increase in landings of 1,000 mt will reduce prices by \$5.89 per metric ton.
+The landings coefficient implies that, on average, an increase in landings of 1,000 mt will reduce prices by \$5.89 per metric ton.  The predicted revenue equation is quadratic in landings.  According to this model of prices, the maximum revenue is approximately \$28M, which occurs at landings of approximately 69,000mt.  Increases in landings beyond this point will decrease gross revenues.  See figure \ref{fig:predicted_rev} below for a graphical illustration.
 
-The methods used to model prices are slighly different that those used in Deroba *et al* (2019).  In Deroba *et al* (2019), an autoregressive distributed lag model was used.  The authors find that the an increase in landings of 1,000 mt will reduce prices by \$1.19 per metric to; alternatively, an increase in landings of 1\% will reduce prices by 0.395\%.  We note that the elasticity estimates in Deroba *et al* (2019) are comparable to elasticities in Table \ref{regression_results}.
+
+```{r predicted_rev, fig.show = "hold", out.width = "75%", fig.cap="Relationship Between Landings and Predicted Revenue",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,c("graph_predicted_rev.png")))
+```
+
+
+The methods used to model prices are slighly different that those used in Deroba *et al* (2019).  In Deroba *et al* (2019), an autoregressive distributed lag model was used.  The authors find that the an increase in landings of 1,000 mt will reduce prices by \$1.19 per metric to; alternatively, an increase in landings of 1\% will reduce prices by 0.395\%.  Note that the elasticity estimates in Deroba *et al* (2019) are comparable to elasticities in Table \ref{regression_results}.
 
 In Amendment 8, an elasticity of -0.50 was assumed. By coincidence, this assumption turned out to be fairly close to both the estimates in Deroba *et al* (2019) and the estimates in columns 3 and 4 of Table \ref{regression_results}.  
 
@@ -65,7 +72,7 @@ In Amendment 8, an elasticity of -0.50 was assumed. By coincidence, this assumpt
 \end{table}
 
 
-Figure \ref{fig:herring_iv} contains a scatterplot of real herring prices and landings, in 1000s of metric tons along with the IV and Log-Log IV fit lines derived from the first and third columns of Table \ref{regression_results}. Data available after the Amendment 8 analysis is marked with triangles. 
+Figure \ref{fig:herring_iv} contains a scatterplot of real herring prices and landings, in 1000s of metric tons.   A  line representing equation \ref{eq:predicted_price}, which derived from the first columns of Table \ref{regression_results}, is also added. Data available after the Amendment 8 analysis is marked with triangles. 
 
 
 ```{r herring_iv, fig.show = "hold", out.width = "75%", fig.cap="Annual Herring Prices and Landings",  fig.align = "center", echo=FALSE}
@@ -138,7 +145,7 @@ knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("1","
 ```
 
 
-Table \ref{yearly_trajectoryA2} summarizes average revenue, by year, for Alternatives 2 along with the sensitivity analysis.
+Table \ref{yearly_trajectoryA2} summarizes average revenue, by year, for Alternatives 2 along with the sensitivity analysis.  In all four plots, revenue decreases towards the end of the rebuilding period. This occurs because the ABC are above the 69,000mt critical point described in Section \ref{sec:prices}.
 
 
 
@@ -163,7 +170,7 @@ Figure \ref{fig:constant_traj} shows the time series trajectory of (non-discount
 knitr::include_graphics(file.path(my_images,paste0("timeseries_revenue_",c("5","6","7","8"),".png")))
 ```
  
- Table \ref{yearly_trajectoryA3} summarizes average revenue, by year, for Alternative 3 along with the sensitivity analysis.
+ Table \ref{yearly_trajectoryA3} summarizes average revenue, by year, for Alternative 3 along with the sensitivity analysis.  In all four plots, revenue decreases towards the end of the rebuilding period. This occurs because the ABC are above the 69,000mt critical point described in Section \ref{sec:prices}.
 
  
 
@@ -199,7 +206,7 @@ knitr::kable(overages, "pipe", caption="Sub-ACL overages since 2009 \\label{tab:
 ```
 The general approach to examining the impacts of these alternatives is to compute the change in revenues that would have been caused by the  overage deductions over the last five years.    In 2020, herring prices were approximately \$710 per metric ton (real 2019 USD); this is used to compute revenue.  3 overages have occurred in the last 5 years; total overage was 1,858mt.  
 
-Under the *status quo* the 1,858mt overages are deducted from a future catch limit. Therefore, the overages would reduce fishery revenue by \$1.3M.  Because overages do not occur ever year, we expect annual foregone revenues of approximately \$264,000 per year. 
+Under the *status quo* the 1,858mt overages are deducted from a future catch limit. Therefore, the overages would reduce fishery revenue by \$1.3M.  Because overages do not occur ever year, annual foregone revenues of approximately \$264,000 per year are expected. 
 
 #### Alternative 1 -- no action
  Alternative 1 is the status quo; therefore, the expected changes in revenues, relative to the *status quo* are zero.
@@ -207,12 +214,12 @@ Under the *status quo* the 1,858mt overages are deducted from a future catch lim
 #### Alternative 2 - Allowance for overage up to 10\%
 Alternative 2 would allow for overages of up to 10\% of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  If this alternative had been in place over the 2016-2020 time period, the three overages would have resulted in reduction of 1,120mt to future catch limits.  This would have reduced fishery revenue by \$0.8M or \$160,000  per year.  Therefore, relative to the *status quo*, we expect approximately $104,000 in additional revenue per year to accrue to the fishery under the Alternative 2. 
 
-Catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of any overages of a sub-ACLs.  We also note that the positive impacts  are likely to accrue to users of areas that have gone over the ACLs; historical data suggest that this is likely to be Area 1B.  Area 1B sub-ACLs are often quite small relative to the capacity of vessels to catch herring.  This meams that in-season closures that are designed to meet, but not exceed a sub-ACL are difficult to implement. However, current low sub-ACLs for all areas make in-season quota monitoring more difficult and in the near term it is much more difficult to predict if which, if any, any sub-ACLs might be exceeded.
+Catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of any overages of a sub-ACLs.  Note that the positive impacts  are likely to accrue to users of areas that have gone over the ACLs; historical data suggest that this is likely to be Area 1B.  Area 1B sub-ACLs are often quite small relative to the capacity of vessels to catch herring.  This meams that in-season closures that are designed to meet, but not exceed a sub-ACL are difficult to implement. However, current low sub-ACLs for all areas make in-season quota monitoring more difficult and in the near term it is much more difficult to predict if which, if any, any sub-ACLs might be exceeded.
 
 
 
 #### Alternative 3 - Allowance for overages until total ACL is harvested
-Alternative 3 would allow for overages of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL. If this alternative had been in place over the 2016-2020 time period, the three overages would have resulted in no reductions to future catch limits.  Therefore, relative to the status quo, we expect approximately \$1.3M over this time period, or approximately $264,000 in additional revenue per year to accrue to the fishery under the Alternative 2.  Note that catch monitoring and in-season closures to the directed fishery would still be in place; this limits the magnitude of any overages of sub-ACLs.
+Alternative 3 would allow for overages of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL. If this alternative had been in place over the 2016-2020 time period, the three overages would have resulted in no reductions to future catch limits.  Therefore, relative to the status quo, approximately \$1.3M over this time period, or approximately $264,000 in additional revenue per year, is expcted to accrue to the fishery under the Alternative 2.  Note that catch monitoring and in-season closures to the directed fishery would still be in place; this limits the magnitude of any overages of sub-ACLs.
 
 As with Alternative 2, positive impacts that are likely to accrue to users of areas that have gone over the ACLs; historical data suggest that this is likely to be Area 1B.  Area 1B sub-ACLs are often quite small relative to the capacity of vessels to catch herring.  This meams that in-season closures that are designed to meet, but not exceed a sub-ACL are difficult to implement. However, current low sub-ACLs for all areas make in-season quota monitoring more difficult and in the near term it is much more difficult to predict if which, if any, any sub-ACLs might be exceeded.
 
@@ -254,7 +261,7 @@ For the purposes of this analysis, entities (firms) are defined as collections o
 ### Regulated Commercial Harvesting Entities
 This rule would affect all vessels with permits to fish in the herring fisheries; therefore, the direct regulated entity is a firm that owns at least one herring permit.  
 
-Table \ref{RFA_characterization} describes the small and large directly regulated entities.  A firm is included if it owned at least one category A, B, C, D, or E Herring Permit on July 1, 2021. We summarize the average revenue for each firm over the past three years (2018-2020) and use this to make a size determiniation.  There are 9 Large Entities and 1,213 small entities.
+Table \ref{RFA_characterization} describes the small and large directly regulated entities.  A firm is included if it owned at least one category A, B, C, D, or E Herring Permit on July 1, 2021. Average revenue for each firm over the past three years (2018-2020) is summarized and used  to make a size determiniation.  There are 9 Large Entities and 1,213 small entities.
 
 The 9 large entities earned a combined \$189M in fishing revenue (an average of approximately \$21M per firm) over the trailing three years.  Approximately \$2M (an average of approximately \$225,000) of that revenue was derived from herring.  The 1,213 small entities earned a combined $665M in fishing revenue (an average of approximately \$504,000 per firm).  Approximately \$11M (an average of approximately \$9,000) of that revenue was derived from herring.
 
@@ -284,7 +291,7 @@ The 6 large entities earned a combined \$129M in fishing revenue (an average of 
 \end{table}
 
 
-Finally, we describe the "active and directed" fishery, defining active as deriving any revenue from herring in 2020 in Table \ref{RFA_characterization_directed_active} .  There are 2 Large and 41 small entities that meet this criteria.  Because there are only two large entities, revenue statistics for this class are not presented.  The 41 active small entities earned a combined $37.3M in fishing revenue (an average of approximately \$910,000 per firm).  Approximately \$11M (an average of approximately \$260,000 per firm) of that revenue was derived from herring.
+The "active and directed" fishery, active is defined as deriving any revenue from herring in 2020, is described in Table \ref{RFA_characterization_directed_active} .  There are 2 Large and 41 small entities that meet this criteria.  Because there are only two large entities, revenue statistics for this class are not presented.  The 41 active small entities earned a combined $37.3M in fishing revenue (an average of approximately \$910,000 per firm).  Approximately \$11M (an average of approximately \$260,000 per firm) of that revenue was derived from herring.
 
 
 \begin{table}[htbp]
@@ -320,7 +327,7 @@ General Approach
 1.  Construct affiliate's projected herring revenue by multiplying fleetwide revenue (from previous section) by affiliate's fraction of herring fishery
 1.  Construct affiliate's revenue and the change in revenue, relative to 2018-2020 average.
 
-This assumes that fishing in the future in the "other fisheries" is similar to the 2018-2020 average.  We also are assuming proportional expansions or decreases at the firm level relative to the 2018-2020 average. So, if a firm "exited" prior to 2018, it will not have any revenue if even if conditions improve.  
+This assumes that fishing in the future in the "other fisheries" is similar to the 2018-2020 average and that  proportional expansions or decreases at the firm level would occur relative to the 2018-2020 average. So, if a firm "exited" prior to 2018, it will not have any revenue if even if conditions improve.  
 
 <!--Not sure of best way to summarize these.  Discounted total revenues.  And then do means/median/percentiles (across individuals) for large and small. Everything can be evaluated relative to no action.-->
 
@@ -351,7 +358,7 @@ A description of the fishery is available in Section *YYY*
 
 
 ## Summary of Impacts
-The expected economics effects (benefits/costs) of each the Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections Y  and Z  of this document. Action 2 is expected to have minimal impacts on the fishery, so we focus on Action 1.
+The expected economics effects (benefits/costs) of each the Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections Y  and Z  of this document. <!--Action 2 is expected to have minimal impacts on the fishery, so attention is focused on Action 1. maybe-->
 
 Section Z describes the expected benefits to the participants in the directed herring fishery. Due to slightly higher catches, *de minimus* negative effects on the herring stock are expected.  However, Alternative 2/3 of Action 2 would not increase catch above ACLs, it is not expected to have an impact on stock status.
 
