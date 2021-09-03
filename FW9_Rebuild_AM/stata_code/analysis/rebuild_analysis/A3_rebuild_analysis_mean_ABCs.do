@@ -79,7 +79,8 @@ destring abc ofl, replace
 
 rename abc ABC
 
-
+replace shortname="ABC CR AVG" if strmatch(shortname, "ABC CR")
+replace shortname="Constant F AVG" if strmatch(shortname, "Constant F")
 
 pause
 

@@ -18,8 +18,8 @@ forvalues yr=2021(1)2032{
 
 
 gen sort_order=0
-replace sort_order=1 if shortname=="ABC CR"
-replace sort_order=2 if shortname== "Constant F"
+replace sort_order=1 if shortname=="ABC CR AVG"
+replace sort_order=2 if shortname== "Constant F AVG"
 replace sort_order=3 if shortname=="ABC CR AR"
 replace sort_order=4 if shortname=="Constant F AR"
 replace sort_order=5 if shortname=="ABC CR AR in AVG"

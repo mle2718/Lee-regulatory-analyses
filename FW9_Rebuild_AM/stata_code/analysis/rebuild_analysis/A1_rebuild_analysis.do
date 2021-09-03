@@ -2,7 +2,7 @@ version 16.1
 clear
 set scheme s2mono
 *global vintage_string 2021_08_26
-local data_in "${data_main}/ABCs_${vintage_string}.dta"
+local data_in ${data_main}/ABCs_${vintage_string}.dta
 
 
 
@@ -69,14 +69,14 @@ pricemt_re~P |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 global cons 815.0201
 global beta_land -5.893482
 
-use `data_in', replace
+use "`data_in'", replace
 /* pretty up the scenario */
 gen sub=subinstr(full_filename,"RUN_","",.)
 replace sub=subinstr(sub,".xx6","",.)
 compress
 
 gen str30 shortname=""
-replace shortname="Constant F" if strmatch(sub,"FCONSTANT_7YRREB_3STG12BMY")
+replace shortname="Constant F AVG" if strmatch(sub,"FCONSTANT_7YRREB_3STG12BMY")
 replace shortname="Constant F AR" if strmatch(sub,"FCONSTANT_7YRREB_3STG_AR12BMY")
 
 
@@ -85,7 +85,7 @@ replace shortname="Constant F AR in AVG" if strmatch(sub,"FCONSTANT_7YRREB_AR_IN
 replace shortname="Constant F AVG in AR" if strmatch(sub,"FCONSTANT_7YRREB_AVG_IN_AR_3BRG13BMY")
 
 
-replace shortname="ABC CR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB212")
+replace shortname="ABC CR AVG" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB212")
 replace shortname="ABC CR AR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_AR_3BRG12")
 replace shortname="ABC CR AVG in AR" if strmatch(sub,"F40_ABC_CR_AR_IN_AVG13BMY")
 replace shortname="ABC CR AR in AVG" if strmatch(sub,"F40_ABC_CR_AVG_IN_AR13BMY")
@@ -171,12 +171,12 @@ keep if alt~=.
 
 
 gen keep=0
-replace keep=1 if  shortname=="Constant F" | shortname=="Constant F AR" 
-replace keep=1 if  shortname=="ABC CR" | shortname=="ABC CR AR" 
+replace keep=1 if  shortname=="Constant F AVG" | shortname=="Constant F AR" 
+replace keep=1 if  shortname=="ABC CR AVG" | shortname=="ABC CR AR" 
 
 gen sort_order=0
-replace sort_order=1 if shortname=="ABC CR"
-replace sort_order=2 if shortname== "Constant F"
+replace sort_order=1 if shortname=="ABC CR AVG"
+replace sort_order=2 if shortname== "Constant F AVG"
 replace sort_order=3 if shortname=="ABC CR AR"
 replace sort_order=4 if shortname=="Constant F AR"
 replace sort_order=5 if shortname=="ABC CR AR in AVG"
