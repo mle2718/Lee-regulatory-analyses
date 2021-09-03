@@ -1,4 +1,4 @@
-
+pause off
 /* annual prices and revenue */
 do "${analysis_code}/annual_revenue_grapher.do"
 

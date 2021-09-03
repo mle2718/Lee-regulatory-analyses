@@ -1,6 +1,5 @@
 #delimit ;
 set scheme s2color;
-pause on;
 local data_in "${data_intermediate}/monthly_util_herring.dta";
 use `data_in', replace;
 /*
