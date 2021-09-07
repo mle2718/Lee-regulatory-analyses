@@ -69,6 +69,8 @@ pricemt_re~P |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 
 */
 import delimited `data_in' 
+/*drop 2020 rows, which have some funky non-numerics.*/
+keep if year>=2021
 
 global cons 815.0201
 global beta_land -5.893482
@@ -95,7 +97,6 @@ gen revenue=mABC*price
 
 
 /*construct a yearly variable that denotes years since 2021*/
-keep if year>=2021
 gen running_yr=year-2021
 
 
