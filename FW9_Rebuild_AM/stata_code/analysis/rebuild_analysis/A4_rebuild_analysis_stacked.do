@@ -1,3 +1,19 @@
+/*****************************************************/
+/*
+This is a piece of code that joins in the values "at mean ABC" with the raw projection prediction
+
+Ultimately, much of this is not used for the FW9 Analysis.
+
+
+*/
+/*****************************************************/
+
+
+
+
+
+
+
 version 16.1
 clear
 set scheme s2mono

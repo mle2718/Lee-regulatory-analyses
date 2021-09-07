@@ -1,3 +1,15 @@
+/*****************************************************/
+/*
+This is a small piece of code to graph gross revenue as a function of landings.  
+An equation from prices comes from 
+
+/$analysis_code/annual_price_regression.do
+
+and is copied in below
+
+
+*/
+/*****************************************************/
 version 16.1
 clear
 set scheme s2mono
@@ -43,15 +55,28 @@ pricemt_re~P |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 
 */
 
+/* pass in the coefficients */
+
 global cons 815.0201
 global beta_land -5.893482
 
-global lmax=-1*$cons/(2*$beta_land)
-global xmax=2*$lmax
 
+/* find the landings that maximize revenue and the maximized value of revenues*/
+global lmax=-1*$cons/(2*$beta_land)
 global ymax= ($cons + $beta_land*$lmax)*$lmax/1000
 
-twoway function y=($cons + $beta_land*x)*x/1000, range(0 $xmax) xtitle("Landings (000mt)") ytitle("Predicted Revenues (Million USD)") ylabel(0(5)30) xlabel(0(25)150)  xmtick(##5) xline($lmax) text(29.4 $lmax "  Maximum Revenue", size(vsmall) placement(e))
+/*graph options */
+/* upper bound for the range of x to graph */
+local  x_upper=2*$lmax
+local axis_opts ylabel(0(5)30) xlabel(0(25)150)  xmtick(##5)
+local add_line_options  xline($lmax) text(29.4 $lmax "  Maximum Revenue", size(vsmall) placement(e))
+
+
+
+
+
+
+twoway function y=($cons + $beta_land*x)*x/1000, range(0 `x_upper') xtitle("Landings (000mt)") ytitle("Predicted Revenues (Million USD)") `axis_opts' `add_line_options'
 
 graph export "${my_images}/graph_predicted_rev.png", as(png) replace
 

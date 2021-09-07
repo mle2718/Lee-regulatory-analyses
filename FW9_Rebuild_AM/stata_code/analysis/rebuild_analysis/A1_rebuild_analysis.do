@@ -1,3 +1,22 @@
+/*****************************************************/
+/*
+This is a piece of code that matches predicted prices to the projection models. 
+An equation from prices comes from 
+
+/$analysis_code/annual_price_regression.do
+
+and is copied in below
+
+Ultimately, much of this is not used for the FW9 Analysis.
+
+
+*/
+/*****************************************************/
+
+
+
+
+
 version 16.1
 clear
 set scheme s2mono
@@ -7,26 +26,6 @@ local data_in ${data_main}/ABCs_${vintage_string}.dta
 
 
 /* get the equation for the linear fit 
-> reg pricemt_realGDP landings ;
-
-      Source |       SS           df       MS      Number of obs   =        18
--------------+----------------------------------   F(1, 16)        =    114.90
-       Model |  376930.924         1  376930.924   Prob > F        =    0.0000
-    Residual |  52488.3832        16  3280.52395   R-squared       =    0.8778
--------------+----------------------------------   Adj R-squared   =    0.8701
-       Total |  429419.307        17  25259.9593   Root MSE        =    57.276
-
-------------------------------------------------------------------------------
-pricemt_re~P |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
--------------+----------------------------------------------------------------
-    landings |  -5.356439   .4997087   -10.72   0.000    -6.415774   -4.297104
-       _cons |   774.5517   38.78819    19.97   0.000     692.3244     856.779
-------------------------------------------------------------------------------
-
-
-
-
-
 . ivregress 2sls pricemt_realGDP (landings=l1.landings), first;
 
 
@@ -70,20 +69,21 @@ global cons 815.0201
 global beta_land -5.893482
 
 use "`data_in'", replace
-/* pretty up the scenario */
+/*****************************************************/
+/* pretty up the scenario name.  Trim off "RUN_ where it exists. Trim off the file extention.*/
+/*****************************************************/
 gen sub=subinstr(full_filename,"RUN_","",.)
 replace sub=subinstr(sub,".xx6","",.)
 compress
+
+
 
 gen str30 shortname=""
 replace shortname="Constant F AVG" if strmatch(sub,"FCONSTANT_7YRREB_3STG12BMY")
 replace shortname="Constant F AR" if strmatch(sub,"FCONSTANT_7YRREB_3STG_AR12BMY")
 
-
-
 replace shortname="Constant F AR in AVG" if strmatch(sub,"FCONSTANT_7YRREB_AR_IN_AVG_3BRG13BMY")
 replace shortname="Constant F AVG in AR" if strmatch(sub,"FCONSTANT_7YRREB_AVG_IN_AR_3BRG13BMY")
-
 
 replace shortname="ABC CR AVG" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_REB212")
 replace shortname="ABC CR AR" if strmatch(sub,"F40_ABC_CR_MULTI_10YRFIXED_AR_3BRG12")
@@ -93,27 +93,26 @@ replace shortname="ABC CR AR in AVG" if strmatch(sub,"F40_ABC_CR_AVG_IN_AR13BMY"
 
 
 
-
-
-
-pause
-
+/*****************************************************/
+/* construct the modified ABC (landings).  Cap landings at 124,100mt, which is the maximum historical */
+/*****************************************************/
 
 gen mABC=ABC_
 replace mABC=124100 if mABC>=124100
 gen price=$cons + mABC/1000*$beta_land
 gen revenue=mABC*price
-/* Previously showing all, now we'll show starting at 2021, for consistency with the rest of the doc
-gen running_yr=year-2020
-*/
-/* Previously showing all, now we'll show starting at 2021, for consistency with the rest of the doc
-gen running_yr=year-2020
-*/
 
+
+/*construct a yearly variable that denotes years since 2021*/
+/* Previously showing all, now we'll show starting at 2021, for consistency with the rest of the doc
+	gen running_yr=year-2020
+*/
 keep if year>=2021
 gen running_yr=year-2021
 
 
+
+/* discount at 3% and 7% */
 gen discount_factor3=1/((1+.03)^running_yr)
 gen discount_factor7=1/((1+.07)^running_yr)
 
@@ -124,7 +123,11 @@ gen d7_rev=discount_factor7*revenue
 
 
 save "${data_main}/revenue_trajectory_${vintage_string}.dta", replace
-/* you might want to plot mean revenue for each shortname over time.*/
+/*****************************************************/
+/*****************************************************/
+/* Construct various summary statistics of revenue and landings at the yearly level*/
+/*****************************************************/
+/*****************************************************/
 
 drop if shortname==""
 encode full_filename, gen(myf)
@@ -139,18 +142,11 @@ tsset mys year
 notes: the means here are not quite right and should be updated.
 save "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
 
-
-restore
-/*
-collapse (mean) mean_revenue =revenue mean_ABC=ABC mean_mABC=mABC (sd) sdrev=revenue (p50) median_rev=revenue (p10) p10_rev=revenue (p90) p90_rev=revenue  (p5) p5_rev=revenue (p95) p95_rev=revenue , by(year shortname full_filename)
-encode shortname, gen(mys)
-tsset mys year
-
-save "${data_main}/revenue_yearly_outlier_stats_${vintage_string}.dta", replace
-*/
-
-
-
+/*******************************************/
+/*******************************************/
+/*Box plots of total revenue for each of the scenarios */
+/*******************************************/
+/*******************************************/
 
 use "${data_main}/revenue_trajectory_${vintage_string}.dta", replace
 
@@ -168,11 +164,9 @@ replace alt=2 if strmatch(shortname,"ABC CR*")
 
 keep if alt~=.
 
-
-
-gen keep=0
-replace keep=1 if  shortname=="Constant F AVG" | shortname=="Constant F AR" 
-replace keep=1 if  shortname=="ABC CR AVG" | shortname=="ABC CR AR" 
+/*******************************************/
+/* construct a variable that will put the box plots in a reasonable order*/
+/*******************************************/
 
 gen sort_order=0
 replace sort_order=1 if shortname=="ABC CR AVG"
@@ -193,27 +187,21 @@ graph box d7_rev, over(shortname, label(angle(45)) sort(sort_order))
 *graph export "${my_images}/boxplot_discounted_rev7.png", as(png) replace
 
 
-/*
-graph box d3_rev if alt==1, over(shortname) nooutsides
 
-*/
-
-
-
-/* summary stats */
-
-
-
+/*******************************************/
+/*******************************************/
+/* Make some tables containg summary stats */
+/*******************************************/
+/*******************************************/
 
 local stats d3_rev d7_rev
 label var d3_rev "Discounted Revenue (3\%)"
 label var d7_rev "Discounted Revenue (7\%)"
 labmask sort_order, values(shortname)
 /*******************************************/
-/*******************************************/
 /*options for making tables */
 /*******************************************/
-/*******************************************/
+
 local estpost_opts_grand "statistics(mean sd) columns(statistics) quietly"
 local estab_opts_grand "cells("mean(fmt(%8.0fc)) sd(fmt(%8.0fc))") label replace nogaps"
 
@@ -222,12 +210,12 @@ esttab .,   `estab_opts_grand'
 
 *esttab . using ${my_tables}/first_stage_averages.tex, `estab_opts_grand'
 
-
+/*******************************************/
+/* options for making tables that are grouped */
+/*******************************************/
 
 local  estpost_opts_by "statistics(mean sd) columns(statistics) nototal "
-
 local estab_opts_by "main(mean %8.2gc ) aux(sd %8.2gc) nostar noobs nonote label replace nogaps unstack"
-
 local estab_opts_by_small "main(mean %03.2f) aux(sd %03.2f) nostar noobs nonote label replace nogaps unstack nomtitles nodepvars nonumbers "
 
 
@@ -253,16 +241,6 @@ esttab .,   `estab_opts_by_small'
 
 
 save "${data_main}/discounted_revenues_${vintage_string}.dta", replace
-
-
-
-
-
-
-
-
-
-
 
 
 

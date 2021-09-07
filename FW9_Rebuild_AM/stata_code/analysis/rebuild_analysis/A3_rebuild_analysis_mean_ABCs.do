@@ -1,4 +1,24 @@
-/* use the mean ABC's from the FW9 doc to deal with the variation caused in the "specify a fishing mortality rate (F) that "on average" among stochastic realizations will produce the desired ABC" process*/
+/*****************************************************/
+/*
+This is a piece of code that matches predicted prices 
+
+ the mean ABC's from the FW9 doc to deal with the variation caused in the "specify a fishing mortality rate (F) that "on average" among stochastic realizations will produce the desired ABC" process
+
+ An equation from prices comes from 
+
+/$analysis_code/annual_price_regression.do
+
+and is copied in below
+
+Ultimately, much of this is not used for the FW9 Analysis.
+
+
+*/
+/*****************************************************/
+
+
+
+/**/
 
 
 version 16.1
@@ -9,27 +29,8 @@ local data_in "${data_raw}/herring_mean_ABCs.csv"
 
 
 /* get the equation for the linear fit 
-> reg pricemt_realGDP landings ;
 
-      Source |       SS           df       MS      Number of obs   =        18
--------------+----------------------------------   F(1, 16)        =    114.90
-       Model |  376930.924         1  376930.924   Prob > F        =    0.0000
-    Residual |  52488.3832        16  3280.52395   R-squared       =    0.8778
--------------+----------------------------------   Adj R-squared   =    0.8701
-       Total |  429419.307        17  25259.9593   Root MSE        =    57.276
-
-------------------------------------------------------------------------------
-pricemt_re~P |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
--------------+----------------------------------------------------------------
-    landings |  -5.356439   .4997087   -10.72   0.000    -6.415774   -4.297104
-       _cons |   774.5517   38.78819    19.97   0.000     692.3244     856.779
-------------------------------------------------------------------------------
-
-
-
-
-
-. ivregress 2sls pricemt_realGDP (landings=l1.landings), first;
+ivregress 2sls pricemt_realGDP (landings=l1.landings), first;
 
 
 -----------------------
@@ -71,8 +72,6 @@ import delimited `data_in'
 
 global cons 815.0201
 global beta_land -5.893482
-keep if year>=2021
-gen running_yr=year-2021
 
 drop rebuild_year
 destring abc ofl, replace
@@ -85,17 +84,23 @@ replace shortname="Constant F AVG" if strmatch(shortname, "Constant F")
 pause
 
 
+
+/*****************************************************/
+/* construct the modified ABC (landings).  Cap landings at 124,100mt, which is the maximum historical */
+/*****************************************************/
 gen mABC=ABC
 replace mABC=124100 if mABC>=124100
 gen price=$cons + mABC/1000*$beta_land
 gen revenue=mABC*price
-/* Previously showing all, now we'll show starting at 2021, for consistency with the rest of the doc
-gen running_yr=year-2020
-*/
+
+
+/*construct a yearly variable that denotes years since 2021*/
+keep if year>=2021
+gen running_yr=year-2021
 
 
 
-
+/* discount at 3% and 7% */
 gen discount_factor3=1/((1+.03)^running_yr)
 gen discount_factor7=1/((1+.07)^running_yr)
 
