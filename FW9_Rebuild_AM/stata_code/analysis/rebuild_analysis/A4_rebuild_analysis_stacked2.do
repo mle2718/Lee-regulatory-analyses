@@ -20,7 +20,7 @@ use "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
 rename mean_revenue mean_rev1
 
 merge 1:1 shortname year using "${data_main}/mean_revenue_yearly_stats_${vintage_string}.dta"
-assert _merge==3
+assert _merge==3 | _merge==2 & strmatch(shortname,"Alt 3A*")
 
 rename mean_revenue rev_at_mean
 
@@ -38,6 +38,11 @@ replace sort_order=6 if shortname=="Constant F AR in AVG"
 replace sort_order=7 if shortname=="ABC CR AVG in AR"
 replace sort_order=8 if shortname=="Constant F AVG in AR"
 
+replace sort_order=9 if shortname=="Alt 3A lower F AVG"
+replace sort_order=10 if shortname=="Alt 3A lower F AVG in AR"
+
+/* I don't have the full set of results for 9 and 10, so drop them here */
+drop if inlist(sort_order,9,10)
 
 
 

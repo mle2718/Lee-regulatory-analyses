@@ -71,6 +71,7 @@ pricemt_re~P |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 import delimited `data_in' 
 /*drop 2020 rows, which have some funky non-numerics.*/
 keep if year>=2021
+keep if year<=2032
 
 global cons 815.0201
 global beta_land -5.893482

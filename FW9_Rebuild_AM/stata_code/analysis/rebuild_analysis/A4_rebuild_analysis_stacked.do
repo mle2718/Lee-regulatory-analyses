@@ -24,7 +24,7 @@ use "${data_main}/revenue_yearly_stats_${vintage_string}.dta", replace
 drop mean_revenue
 
 merge 1:1 shortname year using "${data_main}/mean_revenue_yearly_stats_${vintage_string}.dta"
-assert _merge==3
+assert _merge==3 | _merge==2 & strmatch(shortname,"Alt 3A*")
 
 
 gen sort_order=0
@@ -38,6 +38,8 @@ replace sort_order=7 if shortname=="ABC CR AVG in AR"
 replace sort_order=8 if shortname=="Constant F AVG in AR"
 
 
+replace sort_order=9 if shortname=="Alt 3A lower F AVG"
+replace sort_order=10 if shortname=="Alt 3A lower F AVG in AR"
 
 
 foreach var of varlist mean_revenue sdrev median_rev p25_rev p75_rev p5_rev p95_rev{
@@ -69,6 +71,7 @@ use "${data_main}/mean_revenue_trajectory_${vintage_string}.dta", replace
 gen alt=.
 replace alt=3 if strmatch(shortname,"Constant F*")
 replace alt=2 if strmatch(shortname,"ABC CR*")
+replace alt=4 if strmatch(shortname,"Alt 3A*")
 
 keep if alt~=.
 gen sort_order=0
@@ -82,6 +85,8 @@ replace sort_order=7 if shortname=="ABC CR AVG in AR"
 replace sort_order=8 if shortname=="Constant F AVG in AR"
 
 
+replace sort_order=9 if shortname=="Alt 3A lower F AVG"
+replace sort_order=10 if shortname=="Alt 3A lower F AVG in AR"
 
 replace d3_rev=d3_rev/1000000
 replace d7_rev=d7_rev/1000000
@@ -135,6 +140,8 @@ esttab . using ${my_tables}/summary_stats_A3.tex, `estab_opts_by_small'
 
 
 
+estpost tabstat `stats' if inlist(sort_order,9,10), by(sort_order) `estpost_opts_by'
+esttab . using ${my_tables}/summary_stats_Alt3A.tex, `estab_opts_by_small'
 
 
 

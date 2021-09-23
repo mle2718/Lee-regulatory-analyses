@@ -39,6 +39,10 @@ replace sort_order=6 if shortname=="Constant F AR in AVG"
 replace sort_order=7 if shortname=="ABC CR AVG in AR"
 replace sort_order=8 if shortname=="Constant F AVG in AR"
 
+
+replace sort_order=9 if shortname=="Alt 3A lower F AVG"
+replace sort_order=10 if shortname=="Alt 3A lower F AVG in AR"
+
 labmask sort_order, values(shortname)
 
 
@@ -69,4 +73,11 @@ esttab . using ${my_tables}/yearly_revenue_trajectoryA2.tex, `estab_opts_by_smal
 
 estpost tabstat revenue* if inlist(sort_order,2,4,6,8), by(sort_order) `estpost_opts_by'
 esttab . using ${my_tables}/yearly_revenue_trajectoryA3.tex, `estab_opts_by_small'
+
+
+
+
+estpost tabstat revenue* if inlist(sort_order,9,10), by(sort_order) `estpost_opts_by'
+esttab . using ${my_tables}/yearly_revenue_trajectoryAlt_3A.tex, `estab_opts_by_small'
+
 
