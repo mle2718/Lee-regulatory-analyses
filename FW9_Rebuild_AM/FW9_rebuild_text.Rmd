@@ -27,6 +27,8 @@ my_tables<-file.path(my_projdir,"tables")
 
 ## Impacts on Human Communities
 
+Note: Some of this text was revised in Word around Sept 7 (See email from Deirdre : updated eco impacts).  These have not been integrated into this document. 
+
 ### Action 1 - Rebuilding Plan
 The general approach used in this analysis is to describe the discounted projected revenues under the different rebuilding alternatives and recruitment assumptions. To do this:
 
@@ -259,7 +261,7 @@ Under the *status quo* the 1,858mt overages are deducted from a future catch lim
  Alternative 1 is the status quo; therefore, the expected changes in revenues, relative to the *status quo* are zero.
 
 #### Alternative 2 - Allowance for overage up to 10\%
-Alternative 2 would allow for overages of up to 10\% of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  If this alternative had been in place over the 2016-2020 time period, the three overages would have resulted in reduction of 1,120mt to future catch limits.  This would have reduced fishery revenue by \$0.8M or \$160,000  per year.  Therefore, relative to the *status quo*, we expect approximately $104,000 in additional revenue per year to accrue to the fishery under the Alternative 2. 
+Alternative 2 would allow for overages of up to 10\% of a sub-ACL not to be deducted from future sub-ACLs unless the total catch is also greater than the ACL.  If this alternative had been in place over the 2016-2020 time period, the three overages would have resulted in reduction of 1,120mt to future catch limits.  This would have reduced fishery revenue by \$0.8M or \$160,000  per year.  Therefore, relative to the *status quo*, we expect approximately $160,000 in additional revenue per year to accrue to the fishery under the Alternative 2. 
 
 Catch monitoring and in-season closures to the directed fishery would still be in place; this should limit the magnitude of any overages of a sub-ACLs.  Note that the positive impacts  are likely to accrue to users of areas that have gone over the ACLs; historical data suggest that this is likely to be Area 1B.  Area 1B sub-ACLs are often quite small relative to the capacity of vessels to catch herring.  This meams that in-season closures that are designed to meet, but not exceed a sub-ACL are difficult to implement. However, current low sub-ACLs for all areas make in-season quota monitoring more difficult and in the near term it is much more difficult to predict if which, if any, any sub-ACLs might be exceeded.
 
@@ -350,6 +352,8 @@ The "active and directed" fishery, active is defined as deriving any revenue fro
   \end{center}
 \end{table}
 
+
+
 ## Record Keeping and Reporting Requirements
 
 There are no additional record keeping or reporting requirements associated with this action.
@@ -359,26 +363,37 @@ There are no additional record keeping or reporting requirements associated with
 
 ## Impacts of the Proposed Rule on Small Entities
 
+The proposed regulation would establish a rebuilding plan for herring and adopt the ABC control rule from Amendment 8 as the rebulding plan. Under the status quo, the fishery would be managed with the ABC control rule from Amendment 8.  Therefore, the rebuilding plan component of the proposed regulation would have no direct economic impacts on the small entities.  
 
-<!-- 
+The proposed regulation would also change the accountability measures in the herring fishery; allowing for up to 10\% overage of a sub-ACL before payback provisions reduce future sub-ACLs, provided the total ACL is not exceeded.  This is expected to increase This would have reduced fishery revenue by \$0.8M or \$160,000  per year.  Therefore, relative to the *status quo*, we expect approximately $160,000 in additional revenue per year to accrue to the fishery under the Alternative 2. 
 
-Action 1 (Rebuilding) 
-   **No action is the ABC control rule? Which means no action is pretty similar to the rebuilding plan??**  
+In order to examine the effects of the proposed rule on small entities, we allocate the additional expected revenue to fishing firms in proportion to their share of the herring fishery over the trailing three years.  We then construct the change in gross reciepts, in both dollar and percentage terms, for each of the  firms.  This analysis assumes that fishing in the future in the "other fisheries" is similar to the 2018-2020 average and that proportional expansions or decreases at the firm level would occur relative to the 2018-2020 average. So, if a firm "exited" prior to 2018, it will not have any revenue if even if conditions improve.  
 
-Action 2 (AMs)  are likely to have a minimal impact on fishing firms. 
- -->
-General Approach
-<!-- \analysis\RFA\FW9_RFAanalysis_projections.do -->
-1.  Compute affiliate's average revenue, average herring revenue, and average non-herring revenue for trailing 3 years.
-1.  Compute affiliate's fraction of herring fishery (herring rev divided by all herring rev).
-1.  Construct affiliate's projected herring revenue by multiplying fleetwide revenue (from previous section) by affiliate's fraction of herring fishery
-1.  Construct affiliate's revenue and the change in revenue, relative to 2018-2020 average.
+Table \ref{RFA_all_revenue_changes_all} illustrates the expected changes in receipts. Most of the additional revenue accrues to small firms; however, the increase in gross receipts from fishing is quite small in magnitude.  Figure \ref{fig:Gross_Rec_Active}} is histogram of the change in gross receipts for the small firms that are active in the fishery[^fn_inactive]. There are only nine large firms, therefore a histogram of the changes in their revenues is not useful. Note that the large firms are projected to have an additional $26,000 in combined revenue. 
 
-This assumes that fishing in the future in the "other fisheries" is similar to the 2018-2020 average and that  proportional expansions or decreases at the firm level would occur relative to the 2018-2020 average. So, if a firm "exited" prior to 2018, it will not have any revenue if even if conditions improve.  
+[^fn_inactive]:Because of the way additional revenue is allocated to the firms, the gross reciepts of the inactive firms cannot increase.  
 
-<!--Not sure of best way to summarize these.  Discounted total revenues.  And then do means/median/percentiles (across individuals) for large and small. Everything can be evaluated relative to no action.-->
+\begin{table}[htbp]
+  \begin{center}
+  \begin{scriptsize}
+    \input{./tables/RFA_all_revenue_changes_all.tex}
+  \end{scriptsize}
+    \caption{Expected Changes in Receipts (Millions of nominal USD) \label{RFA_all_revenue_changes_all}}
+  \end{center}
+\end{table}
 
-<!--Do we want to filter on just "active" in 2020 to match the entities description? Or just leave it the way it is.-->
+
+```{r Gross_Rec_Active, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for the Small Active Firms",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,paste0("RFA_active_change_in_gross_receipts.png")))
+```
+ 
+ Figure \ref{fig:Gross_Rec_Active_Pct} is histogram of the percentage change in gross receipts for the small firms that are active in the fishery. Most firms will experience an increase of less than 0.5\% of gross receipts.
+ 
+ 
+```{r Gross_Rec_Active_Pct, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts in Percentage terms for the small Active Firms",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,paste0("RFA_active_pct_change_in_gross_receipts.png")))
+```
+ 
 
 
 # E.O. 12866 (Regulatory Planning and Review)
@@ -403,33 +418,19 @@ The alternatives under consideration in this Framework are explained in Section 
 
 A description of the fishery is available in Section *YYY*
 
-
 ## Summary of Impacts
-The expected economics effects (benefits/costs) of each the Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections Y  and Z  of this document. <!--Action 2 is expected to have minimal impacts on the fishery, so attention is focused on Action 1. maybe-->
+The expected economics effects (benefits/costs) of the preferred alternative for  Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections Y  and Z  of this document. Action 1 has no economic impacts on the directed herring fishery; the ABC control rule selected for rebuilding is identical to the ABC control rule currently in place. 
 
-Section Z describes the expected benefits to the participants in the directed herring fishery. Due to slightly higher catches, *de minimus* negative effects on the herring stock are expected.  However, Alternative 2/3 of Action 2 would not increase catch above ACLs, it is not expected to have an impact on stock status.
-
-<!-- To summarize, the proposed regulation is expected to result in gross revenues that are approximately XX% percent lower than the no action alternative. 
-
-Both policies result in similar resource conditions in 2032 under the baseline recruitment scenario, although using the ABC Control Rule is expected to result in faster rebuilding of the herring stock.  In the autocorrelated recruitment scenario, the ABC Control Rule is expected to result in slower rebuilding.  In the AVG in AR scenario, neither the ABC conrol rule not the constant F policy are expected to achieve rebuilding. And in the AR in AVG scenario, both are expected to rebuild in the same year.  Other stock metrics (P-Rebuild and SSB in 2032) are very similar for both Alternatives.
-
-Scenario|Recruitment  |		SSB_in_2032|	Rebuild year|	P Rebuild in 2032|
-ABC CR|	BASE|	293798|	2026|	0.61|
-7 yr cons|	BASE|	292429|	2028|	0.603|
-ABC CR|	AR|	278533	|2030	|0.522|
-7 yr cons|	AR|	283861	|2028	|0.536|
-ABC CR|	AVG in AR|	254394|	X|	0.482|
-7 yr cons|	AVG in AR|	236123|	X|	0.46|
-ABC CR|	AR in AVG	|344071	|2025	|0.692|
-7 yr cons|	AR in AVG|	338942	|2025	|0.679|
+The Atlantic herring fishery is overfished; however, overfishing is not occurring. A rebuilding plan must be developed and implemented within two years (by October, 2022).  If the proposed regulations are not implemented by then, the herring fishery management plan would not be in compliance with the MSFCMA as of that date. This is likely to result in costly litigation; the remedy of the deficiency would be to consider and develop a rebuilding plan. 
+Due to slightly higher catches, an increase in revenue of approximately $160,000 per year is expected to accrue to the participants in the herring fishery.  Due to slightly higher catches, *de minimus* negative effects on the herring stock are expected.  The preferred alternative for Action 2 would not increase catch above ACLs and is not expected to have an impact on future stock status.
 
 
--->
+
 
 ## Determination of Significance
 <!--
-Not sure about this yet. I've copied it in from FW8, in case this is true.  It's looking like not a significant regulatory action.
+I now think it's not a significant regulatory action.
+-->
 
 Based on the analyses provided in this document, the proposed regulation is not expected to constitute a “significant regulatory action.”  This action is not expected to have an impact of $100M or more on the economy, or adversely affect in a material way the economy, a sector of the economy, productivity, jobs, the environment, public health or safety, or State, local, or tribal governments or communities.  They are not expected to raise novel legal and policy issues.  The proposed action also does not interfere with an action taken or planned by another agency.  It does not materially alter the budgetary impact of entitlements, grants, user fees, or loan programs, or the rights and obligations of recipients.
--->
 
