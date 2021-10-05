@@ -89,13 +89,13 @@ rename total_value total
 order size firms vessels total herring mackerel menhaden squid other
 label variable firms "Firms"
 
-label variable herring "Herring Revenue"
-label variable mackerel "Mackerel Revenue"
-label variable menhaden "Menhaden Revenue"
-label variable squid "Squid Revenue"
-label variable other "Other Revenue"
+label variable herring "Herring Receipts"
+label variable mackerel "Mackerel Receipts"
+label variable menhaden "Menhaden Receipts"
+label variable squid "Squid Receipts"
+label variable other "Other Receipts"
 label variable vessels "Total Vessels"
-label variable total "Total Revenue"
+label variable total "Total Receipts"
 
 
 
