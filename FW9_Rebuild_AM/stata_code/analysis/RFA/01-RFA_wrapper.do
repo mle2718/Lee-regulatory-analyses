@@ -22,3 +22,11 @@ requires A1_rebuild_analysis.do to have been done already
 
 do "${analysis_code}/RFA/FW9_RFAanalysis_projections.do"
  */
+ 
+ 
+ /*Revenue changes for Active firms */
+do "${analysis_code}/RFA/FW9_RFAanalysis_active_firms_revenue_change.do"
+
+
+ /*Revenue changes for All firms */
+do "${analysis_code}/RFA/FW9_RFAanalysis_all_firms_revenue_change.do"
