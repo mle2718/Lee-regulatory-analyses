@@ -115,7 +115,7 @@ local stats firms vessels total herring mackerel menhaden squid other
 
 local  estpost_opts_by "statistics(mean sd) columns(statistics) nototal "
 
-local estab_opts_by_small "main(mean %6.2fc) aux(sd %6.2fc) unstack nogaps label nomtitles nonumbers noobs nostar nonote compress"
+local estab_opts_by_small "main(mean %6.2fc) unstack nogaps label nomtitles nonumbers noobs nostar nonote compress"
 
 
 
