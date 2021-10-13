@@ -132,9 +132,9 @@ estpost tabstat `stats', by(size)  `estpost_opts_by'
 
 esttab ., `estab_opts_by_small'
 
-
-esttab .  using ${my_tables}/RFA_small_large_active_firms.tex, `estab_opts_by_small' replace
-
+/*
+esttab .  using ${my_tables}/RFA_active_ABCDE_firms.tex, `estab_opts_by_small' replace
+*/
 
 
 /* turns out there are only 2 large firms, so we can only report the small ones*/
@@ -146,7 +146,7 @@ estpost tabstat `stats' if size==1, by(size)  `estpost_opts_by'
 esttab ., `estab_opts_by_small'
 
 
-esttab .  using ${my_tables}/RFA_small_large_active_firms.tex, `estab_opts_by_small' replace
+esttab .  using ${my_tables}/RFA_ABCDE_active_small.tex, `estab_opts_by_small' replace
 
 
 
@@ -159,5 +159,5 @@ collapse (mean) herring mackerel menhaden squid other total firms vessels, by(si
 
 
 
-export delimited size firms vessels total herring mackerel squid menhaden other using ${my_results}/RFAspecies_comp_active_firms.csv , replace
+export delimited size firms vessels total herring mackerel squid menhaden other using ${my_results}/RFA_ABCDE_active_small.csv , replace
 

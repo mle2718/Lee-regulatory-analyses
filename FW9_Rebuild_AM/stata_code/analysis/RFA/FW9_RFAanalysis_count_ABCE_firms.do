@@ -117,7 +117,7 @@ estpost tabstat `stats', by(size)  `estpost_opts_by'
 esttab ., `estab_opts_by_small'
 
 
-esttab .  using ${my_tables}/RFA_small_large_ABCE.tex, `estab_opts_by_small' replace
+esttab .  using ${my_tables}/RFA_ABCE.tex, `estab_opts_by_small' replace
 
 
 
@@ -136,5 +136,5 @@ collapse (mean) herring mackerel menhaden squid other total firms vessels, by(si
 
 
 
-export delimited size firms vessels total herring mackerel squid menhaden other using ${my_results}/RFA_small_large_ABCE.csv , replace
+export delimited size firms vessels total herring mackerel squid menhaden other using ${my_results}/RFA_ABCE.csv , replace
 
