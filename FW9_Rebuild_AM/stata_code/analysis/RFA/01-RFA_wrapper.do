@@ -23,10 +23,20 @@ requires A1_rebuild_analysis.do to have been done already
 do "${analysis_code}/RFA/FW9_RFAanalysis_projections.do"
  */
  
+ set scheme s2color
  
- /*Revenue changes for Active firms */
-do "${analysis_code}/RFA/FW9_RFAanalysis_active_firms_revenue_change.do"
 
-
- /*Revenue changes for All firms */
+ /*Revenue changes for All firms (Tier 1)*/
 do "${analysis_code}/RFA/FW9_RFAanalysis_all_firms_revenue_change.do"
+
+
+/*Revenue changes for  ABCE firms (Tier 2)*/
+do "${analysis_code}/RFA/FW9_RFAanalysis_ABCE_firms_revenue_change.do"
+ 
+
+/*Revenue changes for Active ABCE firms (tier 3)*/
+do "${analysis_code}/RFA/FW9_RFAanalysis_active_ABCE_firms_revenue_change.do"
+
+
+ /*Revenue changes for Active firms (not presented)*/
+do "${analysis_code}/RFA/FW9_RFAanalysis_active_firms_revenue_change.do"
