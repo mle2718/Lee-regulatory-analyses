@@ -1,6 +1,7 @@
 use $RFA_dataset, clear
 
 /* For FW9, we will only be affecting HRG ABCDE vessels. 
+
 we want to flag all the firms that had at least 1 of these in the most recent year*/
 
 /* STEP 1: Keep affiliate_id's that have at least one of the categorical variables in the keeplist ==1 in the most recent year*/

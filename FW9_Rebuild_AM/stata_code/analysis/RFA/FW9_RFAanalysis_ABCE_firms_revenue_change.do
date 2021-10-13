@@ -1,13 +1,13 @@
 use $RFA_dataset, clear
 
-/* Examine all permitted vessels vessels. 
+/* Examine the ABCE vessels.
 we want to flag all the firms that had at least 1 of these in the most recent year*/
 
 /* STEP 1: Keep affiliate_id's that have at least one of the categorical variables in the keeplist ==1 in the most recent year*/
 
 
 /* ALL permitted */
-local keeplist HRG_A HRG_B HRG_C HRG_D HRG_E 
+local keeplist HRG_A HRG_B HRG_C HRG_E 
 
 
 drop person*
@@ -101,12 +101,12 @@ label variable pct_delta_rev "Change in Gross Receipts"
 
 hist pct_delta_rev if pct_delta_rev>0 & small==1, frequency ytitle("Number of Small Firms")
 
-graph export ${my_images}/RFA_all_pct_change_in_gross_receipts.png, replace as(png)
+graph export ${my_images}/RFA_ABCE_pct_change_in_gross_receipts.png, replace as(png)
 
 
 hist delta_rev if delta_rev>0 & small==1, frequency ytitle("Number of Small Firms")
 
-graph export ${my_images}/RFA_all_change_in_gross_receipts.png, replace as(png)
+graph export ${my_images}/RFA_ABCE_change_in_gross_receipts.png, replace as(png)
 
 
 restore
@@ -161,6 +161,9 @@ label variable delta_herring "Change in Herring Receipts"
 
 
 
+
+
+
 pause
 
 
@@ -196,7 +199,7 @@ estpost tabstat `stats', by(size)  `estpost_opts_by'
 esttab ., `estab_opts_by_small'
 
 
-esttab .  using ${my_tables}/RFA_all_revenue_changes_all.tex, `estab_opts_by_small' replace
+esttab .  using ${my_tables}/RFA_ABCE_revenue_changes_all.tex, `estab_opts_by_small' replace
 
 
 
@@ -212,6 +215,7 @@ collapse (mean) adj_total_value adj_herring mackerel menhaden squid other firms 
 
 
 
-export delimited size adj_total_value adj_herring mackerel menhaden squid other firms vessels using ${my_results}/RFAspecies_all_revenue_changes.csv , replace
+
+export delimited size adj_total_value adj_herring mackerel menhaden squid other firms vessels using ${my_results}/RFAspecies_ABCE_revenue_changes.csv , replace
 
 restore
