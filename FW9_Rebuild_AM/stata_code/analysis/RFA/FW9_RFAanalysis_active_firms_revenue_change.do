@@ -108,7 +108,7 @@ label variable delta_rev "Change in Gross Receipts"
 
 label variable pct_delta_rev "Change in Gross Receipts"
 
-hist pct_delta_rev if pct_delta_rev>0 & small==1, frequency ytitle("Number of Small Firms")
+hist pct_delta_rev if pct_delta_rev>0 & small==1, frequency ytitle("Number of Small Firms")  xtitle("Percentage Change in Gross Receipts")
 
 graph export ${my_images}/RFA_active_pct_change_in_gross_receipts.png, replace as(png)
 
