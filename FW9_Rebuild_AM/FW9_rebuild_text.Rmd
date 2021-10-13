@@ -419,16 +419,12 @@ knitr::include_graphics(file.path(my_images,"RFA_ABCE_pct_change_in_gross_receip
 
 
 ### Tier 3 Active Directly Regulated Firms with a Limited Access Herring Permit
+Figure \ref{fig:Tier3_pct_change} is histogram of the change in gross receipts for small firms in the fishery in percentage terms; because there are relatively few firms, we do not report a histogram of the change in gross receipts (analogous to Figures \ref{fig:Tier1_change} and \ref{fig:Tier2_change})
 
-Figure \ref{fig:Tier3_change} is histogram of the change in gross receipts for small firms in the fishery. Figure \ref{fig:Tier3_pct_change} is histogram of the change in gross receipts for small firms in the fishery in percentage terms.
-
-
-
-```{r Tier3_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for the Small, Active Directly Regulated Firms with a Limited Access Herring Permit (Tier 3)",  fig.align = "center", echo=FALSE}
+```{r Tier3_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for the Small, Active Directly Regulated Firms with a Limited Access Herring Permit (Tier 3)",  fig.align = "center", echo=FALSE, eval=FALSE}
 knitr::include_graphics(file.path(my_images,"RFA_active_ABCE_change_in_gross_receipts.png"))
 ```
  
-
 
 ```{r Tier3_pct_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for Directly Regulated Firms with a Limited Access Herring Permit (Tier 2)",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,"RFA_active_ABCE_pct_change_in_gross_receipts.png"))
@@ -436,7 +432,17 @@ knitr::include_graphics(file.path(my_images,"RFA_active_ABCE_pct_change_in_gross
 
 
 ## Impacts of the non-preferred measures on Small Entities
-While The economic analysis of section \ref{sec:A3_economic} suggests that Action 1, Alternative 3, in combination with the preferred AM alternative, would result in higher net benefits (or lower cost) to small entities.  
+<!--
+Check with Eric to make sure I understand properly. 
+1. The proposed action is extremely unlikely to have a significant impact on a substantial number of small entities.  We're looking at increases in gross reciepts of around \$100k per year.
+
+I should write the analysis to lead to a certification of no sig impact.
+
+Therefore, no analysis is needed of other alternatives, in particular, alts that woudl achieve the objectives at lower cost (higher net benefits) to small firms.
+
+no signif impact is really no siginficant adverse impact.
+
+-->
 
 
 # E.O. 12866 (Regulatory Planning and Review)
@@ -465,7 +471,7 @@ A description of the fishery is available in Section *YYY*
 The expected economics effects (benefits/costs) of the preferred alternative for  Action 1 and 2, relative to the no action baseline for the herring fishery, are discussed throughout Sections Y  and Z  of this document. Action 1 has no economic impacts on the directed herring fishery; the ABC control rule selected for rebuilding is identical to the ABC control rule currently in place. 
 
 The Atlantic herring fishery is overfished; however, overfishing is not occurring. A rebuilding plan must be developed and implemented within two years (by October, 2022).  If the proposed regulations are not implemented by then, the herring fishery management plan would not be in compliance with the MSFCMA as of that date. This is likely to result in costly litigation; the remedy of the deficiency would be to consider and develop a rebuilding plan. 
-Due to slightly higher catches, an increase in revenue of approximately $160,000 per year is expected to accrue to the participants in the herring fishery.  Due to slightly higher catches, *de minimus* negative effects on the herring stock are expected.  The preferred alternative for Action 2 would not increase catch above ACLs and is not expected to have an impact on future stock status.
+Action 2 would likely lead to slightly higher catches; an increase in revenue of approximately $160,000 per year is expected to accrue to the participants in the herring fishery.  Due to slightly higher catches, *de minimus* negative effects on the herring stock are expected.  The preferred alternative for Action 2 would not increase catch above ACLs and is not expected to have an impact on future stock status.
 
 
 
