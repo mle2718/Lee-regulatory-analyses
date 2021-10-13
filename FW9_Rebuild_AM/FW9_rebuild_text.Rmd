@@ -175,7 +175,7 @@ Table \ref{yearly_trajectoryA2} summarizes average revenue, by year, for Alterna
 
 
 
-#### Alternative 3 
+#### Alternative 3 \label{sec:A3_economic}
 Alternative 3 is expected to result in discounted gross revenues of approximately \$228M over the 2021-2032 time period. Alternative 3 is expected to have moderate positive impacts on human communities relative to the Alternative 1. 
 
 Figure \ref{fig:constant_traj} shows the time series trajectory of (non-discounted) revenues corresponding to the 7-year constant F rebuilding plan.  This provides some insight into the yearly projected fishing revenues and uncertainity about those projections. The first year the rebuilding plan (2022) is marked with a vertical dashed line. 
@@ -308,51 +308,52 @@ For RFA purposes only, NMFS has established a small business size standard for b
 For the purposes of this analysis, entities (firms) are defined as collections of fishing vessels with identical ownership personnel.  For example, if five permits have the same seven people listed as co-owners on their application paperwork, those seven people  form one ownership entity, covering those five permits.  If any of the individual people own additional vessels, either by themselves, with new co-owners, or with a subset of the seven, those vessels are separate entities for the purpose of this analysis.
 
 ### Regulated Commercial Harvesting Entities
-This rule would affect all vessels with permits to fish in the herring fisheries; therefore, the direct regulated entity is a firm that owns at least one herring permit.  
 
-Table \ref{RFA_characterization} describes the small and large directly regulated entities.  A firm is included if it owned at least one category A, B, C, D, or E Herring Permit on July 1, 2021. Average revenue for each firm over the past three years (2018-2020) is summarized and used  to make a size determiniation.  There are 9 Large Entities and 1,213 small entities.
+#### Tier 1 All Directly Regulated Fishing Firms
+
+This rule would affect all vessels with permits to fish in the herring fisheries; therefore, the direct regulated entity is a firm that controls at least one herring permit.  Table \ref{RFA_characterization} describes the small and large directly regulated fishing entities.  A firm is included if it owned at least one category A, B, C, D, or E Herring Permit on July 1, 2021. Average revenue for each firm over the past three years (2018-2020) is summarized and used  to make a size determiniation.  There are 9 large entities and 1,213 small entities.
 
 The 9 large entities earned a combined \$189M in fishing revenue (an average of approximately \$21M per firm) over the trailing three years.  Approximately \$2M (an average of approximately \$225,000) of that revenue was derived from herring.  The 1,213 small entities earned a combined $665M in fishing revenue (an average of approximately \$504,000 per firm).  Approximately \$11M (an average of approximately \$9,000) of that revenue was derived from herring.
 
 
-\begin{table}[htbp]
+\begin{table}[p]
   \begin{center}
   \begin{scriptsize}
-    \input{./tables/RFA_small_large_firms.tex}
+    \input{./tables/RFA_ABCDE.tex}
   \end{scriptsize}
-    \caption{A characterization of the Small and Large firms.  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 2018-2020 time period and are in  millions of nominal US Dollars. \label{RFA_characterization}}
+    \caption{A characterization of the Directly Regulated Fishing Firms (Tier 1).   Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 2018-2020 time period and are in  millions of nominal US Dollars. \label{RFA_characterization}}
   \end{center}
 \end{table}
 
-
-Many of the firms described in table \ref{RFA_characterization} hold  *only* a category D herring permit and no other herring permit.  Impacts of the proposed regulation are likely to be largest for the particpants in the directed fishery (holding at least one A, B, C, or E category permit).  Table \ref{RFA_characterization_ABCE} describes the directly regulated entities that hold at least one of these permits.   There are 6 Large Entities and  97 small entities that meet this criteria.
+#### Tier 2 Directly Regulated Firms with a Limited Access Herring Permit
+Many of the firms described in Table \ref{RFA_characterization} hold  *only* an (open-access) category D herring permit and no other herring permit.  Impacts of the proposed regulation are likely to be largest for the particpants in the directed fishery (holding at least one A, B, C, or E category permit).  Table \ref{RFA_characterization_ABCE} describes the directly regulated entities that hold at least one of these permits.   There are 6 Large Entities and  97 small entities that meet this criteria.
 
 The 6 large entities earned a combined \$129M in fishing revenue (an average of approximately \$21.5M per firm) over the trailing three years.  Approximately \$2M (an average of approximately \$333,000) of that revenue was derived from herring.  The 97 small entities earned a combined $131M in fishing revenue (an average of approximately \$1.4M per firm).  Approximately \$11M (an average of approximately \$111,000 per firm) of that revenue was derived from herring.
 
 
-\begin{table}[htbp]
+\begin{table}[p]
   \begin{center}
   \begin{scriptsize}
-    \input{./tables/RFA_small_large_ABCE.tex}
+    \input{./tables/RFA_ABCE.tex}
   \end{scriptsize}
-    \caption{A characterization of the Small and Large firms that hold at least one A, B, C, or E category permit.  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 20018-2020 time period and are in  millions of nominal US Dollars. \label{RFA_characterization_ABCE}}
+    \caption{A characterization of directly regulated fishing firms with a Limited Access Herring permit (Tier 2).  Revenue figures represent aggregate revenue for the small and large classes of firms, averaged over the 20018-2020 time period and are in  millions of nominal US Dollars. \label{RFA_characterization_ABCE}}
   \end{center}
 \end{table}
 
+#### Tier 3 Active Directly Regulated Firms with a Limited Access Herring Permit
 
-The "active and directed" fishery, active is defined as deriving any revenue from herring in 2020, is described in Table \ref{RFA_characterization_directed_active} .  There are 2 Large and 41 small entities that meet this criteria.  Because there are only two large entities, revenue statistics for this class are not presented.  The 41 active small entities earned a combined $37.3M in fishing revenue (an average of approximately \$910,000 per firm).  Approximately \$11M (an average of approximately \$260,000 per firm) of that revenue was derived from herring.
+Some of the firms described in the previous section are not active in the herring fishery, despite controlling a Limited Access herring permit.  The "active, Limited Access" fishery, where active is defined as deriving any revenue from herring in 2020, is described in Table \ref{RFA_characterization_directed_active} .  There are 2 Large and 41 small entities that meet this criteria.  Because there are only two large entities, revenue statistics for this class are not presented.  The 41 active small entities earned a combined $37.3M in fishing revenue (an average of approximately \$910,000 per firm).  Approximately \$11M (an average of approximately \$260,000 per firm) of that revenue was derived from herring.
 
-
-\begin{table}[htbp]
+\begin{table}[p]
   \begin{center}
   \begin{scriptsize}
-    \input{./tables/RFA_small_large_active_firms.tex}
+    \input{./tables/RFA_active_ABCE.tex} 
   \end{scriptsize}
-    \caption{A characterization of the small firms in the directed, active fishery. These firms hold at least one A,B, C, D, or E category permit and had revenue from herring in 2020.  Revenue figures represent aggregate revenue for the small classes of firms, averaged over the 20018-2020 time period and are in millions of nominal US Dollars.  There were fewer than three large firms that derived revenue from herring in 2020, so these data are not presented \label{RFA_characterization_directed_active}}
+    \caption{A characterization of active, directly regulated fishing firms with a Limited Access Herring permit (Tier 3). These firms hold at least one A,B, C, D, or E category permit and had revenue from herring in 2020.  Revenue figures represent aggregate revenue for the small classes of firms, averaged over the 20018-2020 time period and are in millions of nominal US Dollars.  There were fewer than three large firms that derived revenue from herring in 2020, so these data are not presented \label{RFA_characterization_directed_active}}
   \end{center}
 \end{table}
 
-
+\clearpage
 
 ## Record Keeping and Reporting Requirements
 
@@ -378,7 +379,7 @@ Table \ref{RFA_all_revenue_changes_all} illustrates the expected changes in rece
   \begin{scriptsize}
     \input{./tables/RFA_all_revenue_changes_all.tex}
   \end{scriptsize}
-    \caption{Expected Changes in Receipts (Millions of nominal USD) \label{RFA_all_revenue_changes_all}}
+    \caption{Expected Changes in Gross Receipts (Millions of nominal USD) \label{RFA_all_revenue_changes_all}}
   \end{center}
 \end{table}
 
@@ -393,7 +394,10 @@ knitr::include_graphics(file.path(my_images,paste0("RFA_active_change_in_gross_r
 ```{r Gross_Rec_Active_Pct, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts in Percentage terms for the small Active Firms",  fig.align = "center", echo=FALSE}
 knitr::include_graphics(file.path(my_images,paste0("RFA_active_pct_change_in_gross_receipts.png")))
 ```
- 
+
+
+## Impacts of the non-preferred measures on Small Entities
+While The economic analysis of section \ref{sec:A3_economic} suggests that Action 1, Alternative 3, in combination with the preferred AM alternative, would result in higher net benefits (or lower cost) to small entities.  
 
 
 # E.O. 12866 (Regulatory Planning and Review)
