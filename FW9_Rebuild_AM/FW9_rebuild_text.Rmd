@@ -370,7 +370,7 @@ The proposed regulation would also change the accountability measures in the her
 
 In order to examine the effects of the proposed rule on small entities, we allocate the additional expected revenue to fishing firms in proportion to their share of the herring fishery over the trailing three years.  We then construct the change in gross reciepts, in both dollar and percentage terms, for each of the  firms.  This analysis assumes that fishing in the future in the "other fisheries" is similar to the 2018-2020 average and that proportional expansions or decreases at the firm level would occur relative to the 2018-2020 average. So, if a firm "exited" prior to 2018, it will not have any revenue if even if conditions improve.  
 
-Table \ref{RFA_all_revenue_changes_all} illustrates the expected changes in receipts. Most of the additional revenue accrues to small firms; however, the increase in gross receipts from fishing is quite small in magnitude.  Figure \ref{fig:Gross_Rec_Active}} is histogram of the change in gross receipts for the small firms that are active in the fishery[^fn_inactive]. There are only nine large firms, therefore a histogram of the changes in their revenues is not useful. Note that the large firms are projected to have an additional $26,000 in combined revenue. 
+Table \ref{RFA_all_revenue_changes_all} illustrates the expected changes in receipts. Most of the additional revenue accrues to small firms; however, the increase in gross receipts from fishing is quite small in magnitude[^fn_inactive].  
 
 [^fn_inactive]:Because of the way additional revenue is allocated to the firms, the gross reciepts of the inactive firms cannot increase.  
 
@@ -384,15 +384,54 @@ Table \ref{RFA_all_revenue_changes_all} illustrates the expected changes in rece
 \end{table}
 
 
-```{r Gross_Rec_Active, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for the Small Active Firms",  fig.align = "center", echo=FALSE}
-knitr::include_graphics(file.path(my_images,paste0("RFA_active_change_in_gross_receipts.png")))
+###  Tier 1 All Directly Regulated Fishing Firms  
+
+Figure \ref{fig:Tier1_change} is histogram of the change in gross receipts for small firms in the fishery. Figure \ref{fig:Tier1_pct_change} is histogram of the change in gross receipts for small firms in the fishery in percentage terms.
+
+
+```{r Tier1_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for Small Directly Regulated Firms with any Herring Permit (Tier 1)",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"RFA_all_change_in_gross_receipts.png"))
+```
+
+
+```{r Tier1_pct_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for Small Directly Regulated Firms with any Herring Permit (Tier 1) expressed in percentage terms",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"RFA_all_pct_change_in_gross_receipts.png"))
+```
+
+
+
+
+### Tier 2 Directly Regulated Firms with a Limited Access Herring Permit
+
+Figure \ref{fig:Tier2_change} is histogram of the change in gross receipts for small firms in the fishery. Figure \ref{fig:Tier2_pct_change} is histogram of the change in gross receipts for small firms in the fishery in percentage terms.
+ 
+
+```{r Tier2_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for Directly Regulated Firms with a Limited Access Herring Permit (Tier 2)",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"RFA_ABCE_change_in_gross_receipts.png"))
+```
+
+
+
+```{r Tier2_pct_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for Directly Regulated Firms with a Limited Access Herring Permit (Tier 2)",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"RFA_ABCE_pct_change_in_gross_receipts.png"))
+```
+
+
+
+### Tier 3 Active Directly Regulated Firms with a Limited Access Herring Permit
+
+Figure \ref{fig:Tier3_change} is histogram of the change in gross receipts for small firms in the fishery. Figure \ref{fig:Tier3_pct_change} is histogram of the change in gross receipts for small firms in the fishery in percentage terms.
+
+
+
+```{r Tier3_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for the Small, Active Directly Regulated Firms with a Limited Access Herring Permit (Tier 3)",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"RFA_active_ABCE_change_in_gross_receipts.png"))
 ```
  
- Figure \ref{fig:Gross_Rec_Active_Pct} is histogram of the percentage change in gross receipts for the small firms that are active in the fishery. Most firms will experience an increase of less than 0.5\% of gross receipts.
- 
- 
-```{r Gross_Rec_Active_Pct, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts in Percentage terms for the small Active Firms",  fig.align = "center", echo=FALSE}
-knitr::include_graphics(file.path(my_images,paste0("RFA_active_pct_change_in_gross_receipts.png")))
+
+
+```{r Tier3_pct_change, fig.show = "hold", out.width = "48%", fig.cap="Changes in Gross Receipts for Directly Regulated Firms with a Limited Access Herring Permit (Tier 2)",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(my_images,"RFA_active_ABCE_pct_change_in_gross_receipts.png"))
 ```
 
 
