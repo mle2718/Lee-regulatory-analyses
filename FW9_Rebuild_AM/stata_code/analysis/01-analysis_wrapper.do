@@ -25,7 +25,7 @@ do "${analysis_code}/average_prices.do"
 
 graph close _all
 
-do "${analysis_code}/rebuild_analysis/A0_annual_price_regression.do
+do "${analysis_code}/rebuild_analysis/A0_annual_price_regression.do"
 
 do "${analysis_code}/rebuild_analysis/A1_rebuild_analysis.do" 
 do "${analysis_code}/rebuild_analysis/A3_rebuild_analysis_mean_ABCs.do"
