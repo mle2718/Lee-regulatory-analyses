@@ -11,9 +11,10 @@ if(!require(DBI)) {
  #   require(ROracle)}
 
 # Setup directories
+library(here)
 
-my_projdir<- "/home/mlee/Documents/projects/READ-SSB-Lee-herring_analyses"
-my_projdir<-"C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-herring_analyses"
+my_projdir<- here::i_am("R_code/project_logistics/R_paths_libraries.R")
+#my_projdir<-"C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-herring_analyses"
 Rcodedir<-file.path(my_projdir,"R_code")
 
 #Folders to store Rcode that extracts and processes data
