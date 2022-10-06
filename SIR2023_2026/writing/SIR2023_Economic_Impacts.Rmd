@@ -3,13 +3,13 @@ title: "SIR 2023-2026 Specifications Economics"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
-  html_document:
-    df_print: paged
-  word_document: default
   pdf_document:
     keep_tex: yes
     fig_caption: yes
     number_sections: yes
+  word_document: default
+  html_document:
+    df_print: paged
 header-includes: \usepackage{setspace}\doublespacing
 urlcolor: blue
 editor_options:
@@ -175,11 +175,11 @@ GDPDEF_annual <- GDPDEF_annual %>%
 
 
 
+\setcounter{section}{8}
+\setcounter{subsection}{11}
 
 
 <!---
-\setcounter{section}{4}
-\setcounter{subsection}{1}
 \setcounter{figure}{3}
 \setcounter{table}{32}
 --->
@@ -208,15 +208,18 @@ By reference
 
 ### Description of the Fishery and other affected entitites
 
-See Section 3.0 for a description of the fishery
+See Section N.N for a description of the fishery
 
 ### Statement of the Problem 
 
+The New England Fishery Management Council adopted an ABC control rule in Herring Amendment 8.  The control rule prescribes the fishing mortality rate (F) as a function of Spawning Stock Biomass.  Framework 8 implemented the control rule for the 2021-2023 fishing years.  Framework 9 set a fishing mortality strategy to achieve rebuilding of the overfished herring stock.  Updated ABCs and Annual Catch limits are necessary to implement this strategy.
+
+
 ### Economic impacts relative to the baseline
-The primary change that would affect small firms is a change in the Annual Catch limit from 4,098mt in 2023 to 12,429mt, 19,189mt, and 23,961mt in 2023-2026 respectively.  Recent catches have been close to the ACLs, so we assume that catch is equal to the ACLs in the future. other changes are expected to have a minimal economic effects.
+The primary change that would affect firms is a change in the Annual Catch limit from 4,098mt in 2023 to 12,429mt, 19,189mt, and 23,961mt in 2023-2026 respectively.  Recent catches have been close to the ACLs, so we assume that catch is equal to the ACLs in the future. Other changes are expected to have a minimal economic effects.  For example, the regulatory change to the New Brunswick weir adjustment regulations at 648.201(h), would reduce the threshold from 3,012 mt to 2,722 mt.  If New Brunswick weir catch is under 2,722 NMFS will transfer 1,000mt from the management uncertainty buffer to the 1A sub-ACL.  The lower threshold imposes a slightly cost because it is less likely that NMFS will increase the ACL by 1,000mt. The likelihood that the small change in the threshold would affect whether or not this transfer is made is small: Table 6 illustrates that the change in threshold would have not affected the transfer decision at any time from 2016-2021.
 
 #### Prices and Revenues
-Framework 9 contained a simple model that estimate a relationship between (real 2019) prices and landings. We apply the result so that model of prices to project future prices.  Prices per metric ton and landings are expressed in thousands of metric tons.  The first column of Table \ref{regression_results} contains the model of prices that are used to predict future prices^[A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  A pair of log-transformed models are also estimated. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.   The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.44\%.].  Based on the econometric model of prices, predicted prices and revenues are calcluated according to:
+Framework 9 contained a simple model that estimate a relationship between (real 2019) prices and landings. We apply the result so that model of prices to project future prices.  Prices per metric ton and landings are expressed in thousands of metric tons.  The first column of Table \ref{regression_results} contains the model of prices that are used to predict future prices^[A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  A pair of log-transformed models are also estimated. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.   The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.44\%.].  Based on the econometric model of prices, predicted prices and revenues are calculated according to:
 
 \begin{align}
 \mbox{Predicted Price} &= 815 - 5.893*\mbox{landings}\label{eq:predicted_price}\\
@@ -227,19 +230,24 @@ The landings coefficient implies that, on average, an increase in landings of 1,
 
 \begin{table}[htbp]
   \begin{center}
-    \input{./tables/regression_results.tex}
+    \input{../tables/regression_results.tex}
      \caption{Regression results \label{regression_results}}
   \end{center}
 \end{table}
 
+### Baseline Description
+
+Framework 8 contains an ACL for 2023. This ACL is 4,098mt and is a reasonable baseline against which to evalute the economic effects of the propsed action.  Under the baseline, we project prices of **\$791/metric ton** and gross revenues of **\$3.24M**.
+
+
 ```{r prices_revenues}
 Landings<-c(4098, 12429,19189,23961)
-Year<-c("Status Quo", "2023", "2024", "2025")
+Year<-c("Baseline", "2023", "2024", "2025")
 Price<-815-5.893*Landings/1000
 Revenue<-(815-5.893*Landings/1000)*Landings/1000*1000
 proj_rev<-data.frame(Year, Landings, Price, Revenue)
 
-assign("baselineRevenue",proj_rev[proj_rev$Year =="Status Quo" ,"Revenue"])
+assign("baselineRevenue",proj_rev[proj_rev$Year =="Baseline" ,"Revenue"])
 baselineRevenue <- as.numeric(baselineRevenue)
 
 
@@ -247,14 +255,17 @@ baselineRevenue <- as.numeric(baselineRevenue)
 proj_rev<-proj_rev %>%
   mutate(Rn=Revenue,
          `Revenue Change`=Revenue-baselineRevenue) %>%
-  filter(Year %in% c("2023", "2024" ,"2025"))
+mutate(`Revenue Change` = ifelse(Year == "Baseline", NA, `Revenue Change`))
+#  filter(Year %in% c("2023", "2024" ,"2025"))
 
 proj_rev<-proj_rev %>%
-  mutate(across(c(`Revenue`, 'Revenue Change'), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")))
+  mutate(across(c(`Revenue`, 'Revenue Change'), ~ number(.x, accuracy=1000,prefix="$", big.mark=","))) 
+
 proj_rev<-proj_rev %>%
   mutate(across(c(`Price`), ~ number(.x, accuracy=1,prefix="$", big.mark=",")))
 proj_rev<-proj_rev %>%
   mutate(across(c(`Landings`), ~ number(.x, accuracy=1, big.mark=",")))
+
 
 proj_rev2 <-proj_rev %>% select(-c(Rn))
 kbl(proj_rev2, digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected Landings (mt), Prices (Real 2019 USD/mt),  Revenues (Real 2019 USD/mt) and Revenue change relative to the baseline for  2023-2026 Specifications.") %>%
@@ -263,8 +274,28 @@ kbl(proj_rev2, digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "P
       row_spec(0,bold=TRUE) 
 ```
 
+```{r npv }
+# Compute NPV of change in revenue at the 3% and 7% discount rates.
+proj_rev$df3<-1.03
+proj_rev$df7<-1.07
 
-\newpage
+proj_rev2<-proj_rev %>%
+  filter(Year %in% c("2023", "2024" ,"2025"))%>%
+  mutate(Year=as.numeric(Year),
+         `Revenue Change`=Rn-baselineRevenue,
+         df3=df3^(Year-2023),
+         df7=df7^(Year-2023)
+         ) %>%
+  mutate(rev3=`Revenue Change`/df3,
+         rev7=`Revenue Change`/df7) %>%
+ summarise(rev3=sum(rev3), rev7=sum(rev7), rc=sum(`Revenue Change`) ) %>%
+  mutate(across(c(rev3, rev7, rc), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")))
+
+```
+The proposed action will result in an **increase in revenues of `r proj_rev2$rc`** over the 2023-2027 time period. When discounted at a 3\% discount rate, this corresponds to a net present value **increase of `r  proj_rev2$rev3`**.  Using a 7\% discount rate, corresponds to a net present value **increase of `r  proj_rev2$rev7`**.
+
+
+\clearpage
 
 ## Regulatory Flexibility Act Analysis
 
@@ -275,8 +306,6 @@ By reference
 By reference
 
 ### Number of Small entities
-
-The directly regulated entities are the firms that currently hold at least 1 Northeast US herring fishing permit (Categories A, B, C, D, or E).  Table \ref{tab:Directly_Regulated_Entities} describes numbers of directly regulated entities, their main activities, and their revenues from various sources.   729 small firms derive the majority of their revenue from commercial fishing operations.   Eleven (11) of the large firms derive the majority of their revenue from commercial fishing activities.  There are 121 small firms that derive a majority of their revenue from for-hire recreational fishing activities. The for-hire firms, while they held at least one herring permit, did not derive any revenue from herring.
 
 ```{r Directly_Regulated_Entities, eval=TRUE}
 load(RFA_filepath)
@@ -336,19 +365,29 @@ Directly_Regulated_Entities_table <- Directly_Regulated_Entities %>%
   mutate(across(c(`Firms`,`Vessels`), ~ number(.x, big.mark=","))) %>%
   mutate(across(c(`Avg Gross Receipts`,`Avg Herring Receipts`, `25th pct Gross Receipts`, `75th pct Gross Receipts` ), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")))
 
- 
+small_fishing_firms<-Directly_Regulated_Entities_table$Firms[Directly_Regulated_Entities_table$Size=="Small"& Directly_Regulated_Entities_table$Type=="Fishing"]
+large_fishing_firms<-Directly_Regulated_Entities_table$Firms[Directly_Regulated_Entities_table$Size=="Large"& Directly_Regulated_Entities_table$Type=="Fishing"]
+small_forhire_firms<-Directly_Regulated_Entities_table$Firms[Directly_Regulated_Entities_table$Size=="Small"& Directly_Regulated_Entities_table$Type=="For-Hire"]
+```
+
+
+The directly regulated entities are the firms that currently hold at least 1 Northeast US herring fishing permit (Categories A, B, C, D, or E).  Table \ref{tab:make_DRE_table} describes numbers of directly regulated entities, their main activities, and their revenues from various sources.   `r  small_fishing_firms` small firms derive the majority of their revenue from commercial fishing operations.   `r large_fishing_firms` of the large firms derive the majority of their revenue from commercial fishing activities.  There are   `r small_forhire_firms` small firms that derive a majority of their revenue from for-hire recreational fishing activities. The for-hire firms, while they held at least one herring permit, did not derive any revenue from herring.
+
+```{r make_DRE_table} 
 kbl(Directly_Regulated_Entities_table, digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and Characterization of the  Directly Regulated Entities and Average Trailing Three Years of Revenue") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = T) %>% 
       row_spec(0,bold=TRUE) 
 ```
 
-While many of the firms described in table \ref{tab:Directly_Regulated_Entities} hold a herring permit, some firms only hold a category-D open access permit which has a 6,600lb possession limit.  These firms have limited opportunity to increase their catch of herring when catch limits increase. They are also less impacted by closures of the fishery when the catch limits are reached, because the possession limits are set to 2,000 lbs.
+While many of the firms described in table \ref{tab:make_DRE_table} hold a herring permit, some firms only hold a category-D open access permit which has a 6,600lb possession limit.  These firms have limited opportunity to increase their catch of herring when catch limits increase. They are also less impacted by closures of the fishery when the catch limits are reached, because the possession limits are set to 2,000 pounds when this occurs. Many of the firms described in tables \ref{tab:make_DRE_table} are not actively engaged in the herring fishery.  The herring fishery has had historically low ACLs  since 2018 and some firms have stopped participating in the fishery. They may hold herring permits to preserve the option to fish. The increases ACLs in the proposed action may or may not be high enough to induce participation.
 
-Table \ref{tab:ABCE_DREs} describes numbers of directly regulated entities that hold a category A, B, C, or E herring permit, their main activities, and their revenues from various sources. 
+Table \ref{tab:Active_DREs} describes numbers of active directly regulated entities that hold a category A, B, C, or E herring permit, their main activities, and their revenues from various sources. Because there are fewer than 3 large firms, we only present a description of the small firms.  The small firms identified in table \ref{tab:Active_DREs} are the firms most likely to be impacted by the increases in ACLs in the proposed action.
 
+<!---Table \ref{tab:ABCE_DREs} describes numbers of directly regulated entities that hold a category A, B, C, or E herring permit, their main activities, and their revenues from various sources. 
+--->
 
-```{r ABCE_DREs}
+```{r ABCE_DREs, eval=FALSE}
 # Make a keyfile based on herring2021 that just has firms with at least 1 LA herring permit. 
 
 herringABCE2021<-herring2021 %>%
@@ -371,17 +410,12 @@ ABCEherring2021_table <- herringABCE_DREs %>%
   mutate(across(c(`Firms`,`Vessels`), ~ number(.x, big.mark=","))) %>%
   mutate(across(c(`Avg Gross Receipts`,`Avg Herring Receipts`, `25th pct Gross Receipts`, `75th pct Gross Receipts` ), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")))
 
-
-
-kbl(ABCEherring2021_table, digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and Characterization of the Active Direcly Regulated Entities with A, B, C or E permits, Average Trailing Three Years of Revenue") %>%
+kbl(ABCEherring2021_table, digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and Characterization of the Direcly Regulated Entities with A, B, C or E permits, Average Trailing Three Years of Revenue") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = T) %>% 
       row_spec(0,bold=TRUE) 
 
 ```
-Many of the firms described in tables \ref{tab:Directly_Regulated_Entities} and \ref{ABCEherring2021_table} are not actively engaged in the herring fishery.  The herring fishery has had historically low ACLs  since 2018 and some firms have ceased their participation in the fishery. They may hold herring permits to preserve the option to fish. 
-
-Table \ref{tab:Active_DREs} describes numbers of active directly regulated entities that hold a category A, B, C, or E herring permit, their main activities, and their revenues from various sources. Because there are fewer than 3 large firms, we only present a description of the small firms.
 
 
 ```{r Active_DREs}
@@ -410,7 +444,7 @@ Active_DRE_table <- Active_ABCE %>%
 
 
 
-kbl(Active_DRE_table, digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and Characterization of the  Directly Regulated Entities, Trailing Three Years of Data") %>%
+kbl(Active_DRE_table, digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and Characterization of the  Small, Active Directly Regulated Entities with A, B, C, or E permit, Trailing Three Years of Data.  Figures for the large firms cannot be presented to preserve confidentiality") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = T) %>% 
       row_spec(0,bold=TRUE) 
@@ -491,9 +525,9 @@ kbl(projected_firm_rev_ABCE_table, digits=0,booktabs=T, align=c("l",rep('r',time
 
 ```
 
-Figures  \ref{fig:boxplotsR} and \ref{fig:boxplots_H} illustrate the projected yearly distribution of total and herring revenues from the Active vessels with A,B,C, or E herring permits.
+Figures  \ref{figure_boxR} and \ref{figure_boxH} illustrate the projected yearly distribution of total and herring revenues from the Active vessels with A,B,C, or E herring permits.
 
-```{r boxplotsR, fig.cap=" Projected Firm Level Revenue, Small firms only"}
+```{r boxplotsR, fig.cap="\\label{figure_boxR}Projected Firm Level Revenue, Small firms only"}
 projected_firm_rev_ABCE<-projected_firm_rev_ABCE %>%
     filter(Type !="NO_REV" & Size=="Small") #%>%
 #   mutate(sort=if_else(Year=="Status Quo", "-1", Year)) %>%
@@ -506,7 +540,7 @@ p+geom_boxplot() +
 
 ```
 
-```{r boxplots_H, fig.cap="Projected Firm Level Herring Revenue, Small firms only"}
+```{r boxplots_H, fig.cap="\\label{figure_boxH}Projected Firm Level Herring Revenue, Small firms only"}
 p<-ggplot(projected_firm_rev_ABCE, aes(Year, sim_value168/1000))
 p+geom_boxplot() + 
   labs(x="Year", y="Projected Revenue ('000s of Real2019USD)")
