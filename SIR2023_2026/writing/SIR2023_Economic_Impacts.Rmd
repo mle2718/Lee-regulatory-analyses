@@ -15,6 +15,13 @@ fontsize: 12pt
 
 ---
 
+# Summary and Housekeeping
+The 2023-2025 herring specification are needed to set the ABCs, ACLs, and other fishery specifications.  This is an application of the ABC control rule that was put in place with Amendment 8.  The previous specs were set in Framework 8 and contain specifications through 2023. 
+
+A Supplemental Information Report (SIR) is being prepared. *If* there are no implementing regulations, then only a Regulatory Flexibility Act Analysis is required. In this action, there is an implementing regulation (New Brunswick Weir), therefore an EO 12866 section is required. 
+
+This analysis was written in RMarkdown. It can be found at https://github.com/NEFSC/READ-SSB-Lee-herring-analyses
+
  <!---- 
  The global_options chunk loads libraries, sets options, figures out if you're on a desktop or server, sets years, and sets graphing options
  --->
