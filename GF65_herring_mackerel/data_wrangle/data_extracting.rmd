@@ -96,8 +96,8 @@ tabl <- "
 |DDLON  | Longitude in decimal degrees| 
 |PERMIT | Six-digit vessel fishing permit number assigned by the NE Regional Office permit system|
 |DOLLAR | This is the nominal value of fish sold.An imputed price is used in cases where the value was not reported.|
-|POUNDS | POUNDS is live weight, (in the shell)|
-|LANDED |  LANDED can be meat weights or shell weights, but is usually meats|
+|POUNDS | POUNDS is live weight|
+|LANDED |  LANDED whatever was landed, in whatever form it was landed|
 |TRIP_LENGTH | Trip length is in days; It is calculated from the elapsed time between the date-time sailed and date-time landed. This is a measure of days absent.|
 "
 cat(tabl) 
