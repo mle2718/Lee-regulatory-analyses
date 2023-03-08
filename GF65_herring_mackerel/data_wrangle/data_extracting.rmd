@@ -24,6 +24,7 @@ library("here")
 library("RODBC")
 library("tibble")
 library("dplyr")
+library("lubridate")
 vintage_string<-Sys.Date()
 vintage_string<-gsub("-","_",vintage_string)
 
@@ -37,6 +38,7 @@ source(here("R_code","project_logistics","R_credentials_RODBC.R"))
 # oracle_username
 # oracle_server
 # oracle_password
+
 # Set up paths.
 herring_haddock_AM_location<-here("input_data","Herring_Haddock_Accountability_Measure_Areas")
 ```
@@ -207,6 +209,9 @@ final_product$Area_by_stat[final_product$BROAD_AREA==522]<-"GB_AREA"
 final_product$Area_by_stat[final_product$BROAD_AREA==561]<-"GB_AREA"
 final_product$Area_by_stat[final_product$BROAD_AREA==562]<-"GB_AREA"
 final_product$Area_by_stat[final_product$BROAD_AREA==525]<-"GB_AREA"
+
+
+final_product <- final_product$Month<-lubridate::month(final_product$DATE_TRIP)
 
 
 final_DATA_name <-paste0("herring_data",vintage_string,".Rds")
