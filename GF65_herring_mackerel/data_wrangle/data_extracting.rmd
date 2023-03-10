@@ -24,6 +24,7 @@ library("here")
 library("RODBC")
 library("tibble")
 library("dplyr")
+library("haven")
 library("lubridate")
 vintage_string<-Sys.Date()
 vintage_string<-gsub("-","_",vintage_string)
@@ -211,11 +212,14 @@ final_product$Area_by_stat[final_product$BROAD_AREA==562]<-"GB_AREA"
 final_product$Area_by_stat[final_product$BROAD_AREA==525]<-"GB_AREA"
 
 
-final_product <- final_product$Month<-lubridate::month(final_product$DATE_TRIP)
+final_product$Month<-lubridate::month(final_product$DATE_TRIP)
 
 
-final_DATA_name <-paste0("herring_data",vintage_string,".Rds")
-saveRDS(final_product, file=here("GF65_herring_mackerel", "data","main",final_DATA_name))
+final_DATA_name <-paste0("herring_data",vintage_string)
+saveRDS(final_product, file=here("GF65_herring_mackerel", "data","main",paste0(final_DATA_name,".Rds")))
+haven::write_sas(data=final_product, path=here("GF65_herring_mackerel", "data","main",paste0(final_DATA_name,".sas7bdat")))
+
+
 ```
 
 
