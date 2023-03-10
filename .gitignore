@@ -24,3 +24,4 @@ library.bib
 !scenario_key.csv
 !herring_mean_ABCs.csv
 FW9_Rebuild_AM/FW9_rebuild_text.tex
+*.sas7bdat
