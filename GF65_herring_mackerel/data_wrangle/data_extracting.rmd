@@ -26,6 +26,7 @@ library("tibble")
 library("dplyr")
 library("haven")
 library("lubridate")
+library("readr")
 vintage_string<-Sys.Date()
 vintage_string<-gsub("-","_",vintage_string)
 
@@ -218,6 +219,11 @@ final_product$Month<-lubridate::month(final_product$DATE_TRIP)
 final_DATA_name <-paste0("herring_data",vintage_string)
 saveRDS(final_product, file=here("GF65_herring_mackerel", "data","main",paste0(final_DATA_name,".Rds")))
 haven::write_sas(data=final_product, path=here("GF65_herring_mackerel", "data","main",paste0(final_DATA_name,".sas7bdat")))
+
+write_delim(final_product, 
+            file=here("GF65_herring_mackerel","data","main",paste0(final_DATA_name,".csv")),
+            delim=",")
+
 
 
 ```
