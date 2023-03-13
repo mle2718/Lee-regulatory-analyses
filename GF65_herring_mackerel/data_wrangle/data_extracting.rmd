@@ -81,105 +81,22 @@ This code depends on:
 
 # Data Overview
 ##  DMIS
-We are using the DMIS_APSD_2 table.  This is a custom data query that combines [DMIS](https://github.com/NEFSC/READ-SSB-Lee-metadata/blob/master/DMIS.md) and SFCLAM data and was constructed to support the [Wind Energy tool](https://github.com/dcorvi/offshoreWind).  The sql code can be found [here](https://github.com/NEFSC/READ-SSB-Lee-metadata/blob/master/external/MAKE_DMIS_SFCLAM_122121.sql) and [here](https://github.com/NEFSC/READ-SSB-Lee-metadata/blob/master/external/make_sfclam_only_013022.sql). 
-```{r APSD_DMIS_2 overview, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- "
-| Column  | Description           |
-|------------|:-----------------------------------------------|
-|DOCID | VTR DOCUMENT table record identifier; Primary key, internally generated at scanning based on vessel id and date/time sailed. Each DOCID represents one trip; equivalent to TRIPID in VESLOGyyyyT,S,G tables.  There is no DOCID in older SFCLAM data.|
-|IMGID |VTR IMAGES table primary key; generated internally at scanning. Each IMGID represents one scanned VTR document. Foreign key linking to VTR CATCH table.  Equivalent to the GEARID in VTR.VESLOGyyyyG |
-|SECGEARFISH |A three digit code for the gear used  |
-|GEARCODE |A description of the gears used. This has constructed by aggregating SECGEARFISH |
-|SPPNAME | Common name of the species.|
-|NESPP3 |Three digit code used to identify the species |
-|SOURCE | ==DMIS or ==SFCLAM |
-|Dates | VTR land date, AMS Land Date, Dealer Sold Date Trip date is broken down into fields Calendar_Year, Month_of_Year, Week_of_Year, and Day_of_Year|
-|DDLAT | Latitude in decimal degrees| 
-|DDLON  | Longitude in decimal degrees| 
-|PERMIT | Six-digit vessel fishing permit number assigned by the NE Regional Office permit system|
-|DOLLAR | This is the nominal value of fish sold.An imputed price is used in cases where the value was not reported.|
-|POUNDS | POUNDS is live weight|
-|LANDED |  LANDED whatever was landed, in whatever form it was landed|
-|TRIP_LENGTH | Trip length is in days; It is calculated from the elapsed time between the date-time sailed and date-time landed. This is a measure of days absent.|
-"
-cat(tabl) 
-```
+We are using the APSD.t_ssb_catch_current and APSD.t_ssb_trip_current tables. We're only using the APSD.t_ssb_trip_current as a conveient way to pull out the calendar_year and trip_date fields, so we can categorize by month. We use statistical area (AREA) to assign to the haddock AM areas.   See the DMIS documentation for further information. 
 
-```{r DMIS_extra overview, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <- "
-| Column  | Description           |
-|------------|:-----------------------------------------------|
-| TRIP_ID| Don't use this column except for making a DMIS to DMIS join. |
-| DAS_ID| Identifier to link to AMS data.|
-|DOCID | VTR DOCUMENT table record identifier; Primary key, internally generated at scanning based on vessel id and date/time sailed. Each DOCID represents one trip; equivalent to TRIPID in VESLOG tables.|
-|ACTIVITY_CODE| Complicated set of letters and numbers. See below|
-| PLAN_CAT | HRG_A through HRG_D and SMB_1 through SMB_5 are a collection of true and false variables the indicate if the vessel had a particular permit when the trip was taken.  The DMIS data is missing some HRG categories.|
-"
-cat(tabl) 
-```
-
-ACTIVITY_CODE and a set of PLAN_CAT categorical variables are used from the live DMIS tables. We join using DOCID.
-
-A little more information about [VTR](https://github.com/NEFSC/READ-SSB-Lee-metadata/blob/master/veslog.md).
-
-*  It's possible that the previous trip was the same day.  It's also possible that the previous trip was from years before.  
-*The date that I am using here is the `datelnd1` field from VESLOG_T, if those are somehow missing, I have used datesold from VESLOG_S. I am using something from the Clam logbooks, but I'm not positive as to what. I normally used the datesold in VESLOG_S for spacepanels.  
-
-*  More of the `previous_` variables are missing. This is expected, because the first observation of a permit will be missing something. I don't think this will cause too much of a problem.  Some will be missing if the prior trip was a "other state."
-
-# Load Offshore Wind Tool Data sets 
-
-The frozen DMIS table from the offshoreWind project (APSD_DMIS_2) is the base dataset for the analysis.  The DMIS data are formed by combining many datasets, including VTR and Dealer.  In brief, the APSD_DMIS_2 dataset contains a mix of trip attributes (port, date),  sub-trip attributes (gear, location) , and catch outcomes (species, pounds, landed, dollar).  You can read more about DMIS [here](https://github.com/NEFSC/READ-SSB-Lee-metadata/blob/master/DMIS.md).
-
-
-```{r Data Set Loading, echo=TRUE, results=FALSE,eval=TRUE}
-# Do a live data query on DMIS OR 
-
-  oracle_server = "sole"
-  ODBC.CONNECTION <- RODBC::odbcConnect(dsn=oracle_server, uid=oracle_username, pwd=oracle_password, believeNRows=FALSE)
-  CURRENT.QUERY <- paste ("select * FROM APSD.DMIS_WIND_TEST@garfo_nefsc
-   WHERE (YEAR BETWEEN",START.YEAR,"AND",END.YEAR,")", 
-   "AND NESPP3 IN ('168','212')", sep=" ")
-  APSD.DMIS_WIND_TEST = sqlQuery(ODBC.CONNECTION, CURRENT.QUERY)
-  odbcCloseAll()
-  
-  APSD.DMIS_WIND_TEST$dbsource<-paste0("live_",vintage_string)
-
-Wind_dataname <-paste0("DMIS_WIND_TEST",vintage_string,".Rds")
-saveRDS(APSD.DMIS_WIND_TEST, file=here("GF65_herring_mackerel", "data","intermediate",Wind_dataname))
-
-
-
-##### copy over a frozen DMIS table from a location on the network.
-
-# Pick the most recent APSD_DMIS2 file. 
-```
-
-
-This match should be pretty good for source=DMIS. But it will not work for source=SFCLAM.
 
 # Loading Data fom Oracle 
 
-The APSD_DMIS_2 table must be supplemented with additional data.  This section queries the Oracle databases to extract additional information.
-
-
-
-## Herring Permit and BROAD_STOCK AREA  
-
-I'm using DMIS to get the broad stock area (BROAD_AREA) and the herring and SMB permits for trips that caught herring or mackerel.
+I'm using DMIS to get the broad stock area (area) and the herring and SMB permits for trips that caught herring or mackerel.
 
 ```{r DMIS_Query, echo=TRUE,eval=TRUE}
 oracle_server = "sole"
 
   ODBC.CONNECTION <- RODBC::odbcConnect(dsn=oracle_server, uid=oracle_username, pwd=oracle_password, believeNRows=FALSE)
 
-CURRENT.QUERY <- paste ("SELECT TRIP_ID, DOCID, ACTIVITY_CODE, BROAD_AREA,HRG_A, HRG_B, HRG_C, HRG_D, SMB_1, SMB_2, SMB_3, SMB_4, SMB_5
- FROM APSD.t_ssb_trip_current@garfo_nefsc 
- WHERE TRIP_ID in 
-    (select distinct TRIP_ID FROM APSD.t_ssb_catch_current@garfo_nefsc 
-        where NESPP3 in (168, 212)
-    ) AND
- (CALENDAR_YEAR BETWEEN",START.YEAR,"AND",END.YEAR,")", sep=" ")
+CURRENT.QUERY <- paste("select t.trip_date, t.calendar_year, c.* from APSD.t_ssb_catch_current@garfo_nefsc  c, APSD.t_ssb_trip_current@garfo_nefsc t
+where c.NESPP3 in (168, 212)
+and c.trip_id=t.trip_id 
+and t.calendar_year between", START.YEAR, "and",END.YEAR, sep=" ")
 DMIS_DATA = sqlQuery(ODBC.CONNECTION, CURRENT.QUERY)
 
 odbcCloseAll()
@@ -192,28 +109,45 @@ saveRDS(DMIS_DATA, file=here("GF65_herring_mackerel", "data","intermediate",DMIS
 ```
 
 
-# Joins
-Join the wind dataset to the supplementary DMIS dataset, on TRIP_ID. Keep rows that are in the APSD.DMIS_WIND_TEST dataset.  Assign the GB and GOM areas based on the broad stock area in DMIS.
+# Tidying up
+
+Send the NAs to zeros and bin into Haddock AM areas.
 
 ```{r merge, include=TRUE, echo=TRUE, results=TRUE, eval=TRUE}
-final_product<-dplyr::left_join(APSD.DMIS_WIND_TEST, DMIS_DATA, by = c("DOCID" = "DOCID"))
+#final_product<-dplyr::left_join(APSD.DMIS_WIND_TEST, DMIS_DATA, by = c("DOCID" = "DOCID"))
+
+final_product<-DMIS_DATA
+#Remove NAs from 2 of the value columns. Set them to zero.
+final_product<-final_product%>%
+    dplyr::mutate(DLR_DOLLAR=ifelse(is.na(DLR_DOLLAR),0,DLR_DOLLAR),
+                 DOLLAR_SSB=ifelse(is.na(DOLLAR_SSB),0,DOLLAR_SSB)
+                 )
+
 
 #assign by Stat area
 # 513, 514, 515 -- GOM Area
 # 521, 522, 561, 562, 525 GB area
 final_product$Area_by_stat<-"NONE"
-final_product$Area_by_stat[final_product$BROAD_AREA==513]<-"GOM_AREA"
-final_product$Area_by_stat[final_product$BROAD_AREA==514]<-"GOM_AREA"
-final_product$Area_by_stat[final_product$BROAD_AREA==515]<-"GOM_AREA"
+final_product$Area_by_stat[final_product$AREA==513]<-"GOM_AREA"
+final_product$Area_by_stat[final_product$AREA==514]<-"GOM_AREA"
+final_product$Area_by_stat[final_product$AREA==515]<-"GOM_AREA"
 
-final_product$Area_by_stat[final_product$BROAD_AREA==521]<-"GB_AREA"
-final_product$Area_by_stat[final_product$BROAD_AREA==522]<-"GB_AREA"
-final_product$Area_by_stat[final_product$BROAD_AREA==561]<-"GB_AREA"
-final_product$Area_by_stat[final_product$BROAD_AREA==562]<-"GB_AREA"
-final_product$Area_by_stat[final_product$BROAD_AREA==525]<-"GB_AREA"
+final_product$Area_by_stat[final_product$AREA==521]<-"GB_AREA"
+final_product$Area_by_stat[final_product$AREA==522]<-"GB_AREA"
+final_product$Area_by_stat[final_product$AREA==561]<-"GB_AREA"
+final_product$Area_by_stat[final_product$AREA==562]<-"GB_AREA"
+final_product$Area_by_stat[final_product$AREA==525]<-"GB_AREA"
+
+final_product$Month<-lubridate::month(final_product$TRIP_DATE)
+
+#Summary
+final_product %>%
+  group_by(Area_by_stat, CALENDAR_YEAR) %>%
+  summarise(pounds=sum(POUNDS), landed=sum(LANDED), revenue=sum(DLR_DOLLAR)) %>%
+  ungroup
 
 
-final_product$Month<-lubridate::month(final_product$DATE_TRIP)
+
 
 
 final_DATA_name <-paste0("herring_data",vintage_string)
