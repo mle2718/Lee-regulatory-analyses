@@ -1,0 +1,12 @@
+	(1)
+VARIABLES	lnpricemt_realGDP
+	
+lnlandings	-0.330***
+	(0.0442)
+Constant	7.399***
+	(0.173)
+	
+Observations	20
+R-squared	0.777
+Standard errors in parentheses	
+*** p<0.01, ** p<0.05, * p<0.1	
