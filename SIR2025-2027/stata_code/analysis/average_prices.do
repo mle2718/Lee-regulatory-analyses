@@ -6,9 +6,10 @@ use `data_in', replace;
 keep if nespp3==168;
 keep if year>=2017 & year<=2019;
 
-collapse (sum) landings value, by(year  nespp3);
+collapse (sum) landings_mt value, by(year  nespp3);
 tsset nespp3 year;
 gen yearcount=1;
+
 /* pull in deflators */
 
 merge m:1 year using ${data_external}\deflatorsY.dta, keep(1 3);

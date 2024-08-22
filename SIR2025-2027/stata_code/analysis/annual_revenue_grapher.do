@@ -6,6 +6,7 @@ use `data_in', replace;
 collapse (sum) landings_mt value, by(year );
 keep if year<=2023;
 tsset year;
+replace value=. if value==0;
 
 /* pull in deflators */
 
@@ -33,8 +34,7 @@ label var value_realGDP "Average Annual Value (2023M)";
 
 label var pricemt "Average Annual Price per mt (nominal)";
 label var pricemt_realGDP "Average Annual Price per mt (2023)";
-label var price "Average Annual Price per pound(nominal)";
-label var price_real "Average Annual Price per pound (2023)";
+label var pricemt_realGDP "Average Annual Price per pound (2023)";
 
 
 local graphopts tmtick(##6);

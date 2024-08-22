@@ -25,7 +25,8 @@ bysort year: egen ls=total(landings_mt);
 bysort year: egen vsR=total(value_realGDP);
 
 
-
+replace value=. if value==0;
+replace value_realGDP=. if value_realGDP==0;
 
 gen pricemt=value/landings_mt;
 gen pricemt_yr=vs/ls;
@@ -66,7 +67,7 @@ est store monthly_iv;
 local saving_opts style(tex) replace;
 local header_opts mlabels("OLS" "IV") collabels(none) nonumbers ;
 
-esttab monthly_ols monthly_iv using ${my_tables}/Mregression_results2023.tex,  b se compress  r2 label `header_opts' `saving_opts' ;
+*esttab monthly_ols monthly_iv using ${my_tables}/Mregression_results2023.tex,  b se compress  r2 label `header_opts' `saving_opts' ;
 
 
 

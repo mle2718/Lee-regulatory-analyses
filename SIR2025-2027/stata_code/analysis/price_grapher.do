@@ -52,7 +52,6 @@ tsfill;
 
 
 local graph_subset mymonth<=monthly("2023m12","YM") & mymonth>=monthly("2016m1", "YM");
-local graph_subset mymonth<=monthly("2023m12","YM") & mymonth>=monthly("2016m1", "YM");
 local graphopts tmtick(##6);
 
 
@@ -69,6 +68,13 @@ graph combine herringprice herringlandings, cols(1) imargin(b=0 t=0);
 
 graph export ${my_images}/herring_price_quantity.tif, replace as(tif);
 graph export ${my_images}/herring_price_quantity.png, replace as(png);
+
+
+
+
+
+
+
 
 
 

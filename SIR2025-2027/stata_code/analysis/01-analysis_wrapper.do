@@ -1,5 +1,4 @@
 pause off
-global vintage_string 2021_09_01
 
 /* annual prices and revenue */
 do "${analysis_code}/annual_revenue_grapher.do"
@@ -14,26 +13,11 @@ do "${analysis_code}/utilization_grapher.do"
 
 do "${analysis_code}/price_grapher.do"
 
-/* predict prices 2019 and average 
-
-dont think this is needed*/
-
-do "${analysis_code}/prices2019.do"
-
-
-do "${analysis_code}/average_prices.do"
-
 graph close _all
 
-do "${analysis_code}/rebuild_analysis/A0_annual_price_regression.do"
-
-do "${analysis_code}/rebuild_analysis/A1_rebuild_analysis.do" 
-do "${analysis_code}/rebuild_analysis/A3_rebuild_analysis_mean_ABCs.do"
+do "${analysis_code}/prices/A0_annual_price_regression.do"
 
 
-/*needs to go after the rebuild_mean */
-do "${analysis_code}/rebuild_analysis/A2_rebuild_annual_revenues.do"
-do "${analysis_code}/rebuild_analysis/A4_rebuild_analysis_stacked.do"
-do "${analysis_code}/rebuild_analysis/A5_graph_predicted_rev.do"
+do "${analysis_code}/prices/A1_monthly_price_regression.do"
 
 
