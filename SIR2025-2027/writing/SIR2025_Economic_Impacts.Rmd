@@ -131,25 +131,30 @@ GDPDEF_annual <- GDPDEF_annual %>%
 \setcounter{section}{8}
 \setcounter{subsection}{11}
 
-\setcounter{figure}{19}
-\setcounter{table}{10}
+\setcounter{figure}{15}
+\setcounter{table}{12}
 
 
 
-## Regulatory Impact Analysis (E.O. 12866)
+## Regulatory Impact Analysis 
+The purpose of Executive Order 12866 (E.O. 12866, 58 FR 51735, October 4, 1993), as amended by E.O. 14094 (88 FR 21879, April 6, 2023) is to enhance planning and coordination with respect to new and
+existing regulations. 
+This E.O. requires the Office of Management and Budget (OMB) to review regulatory programs that are considered to be “significant.” 
+A significant action is any regulatory action that may:
 
-The purpose of Executive Order 12866 (E.O. 12866, 58 FR 51735, October 4, 1993) is to enhance planning and coordination with respect to new and existing regulations. This E.O. requires the Office of Management and Budget (OMB) to review regulatory programs that are considered to be “significant.” E.O. 12866 requires a review of proposed regulations to determine whether or not the expected effects would be significant, where a significant action is any regulatory action that may:
+1. Have an annual effect on the economy of $200 million or more (adjusted every 3 years by the Administrator of OIRA for changes in gross domestic product); or adversely affect in a material way the economy, a sector of the economy, productivity, competition, jobs, the environment, public health or safety, or State, local, territorial, or tribal governments or communities;
 
-*  Have an annual effect on the economy of $100 million or more, or adversely affect in a material way the economy, a sector of the economy, productivity, jobs, the environment, public health or safety, or State, local, or tribal governments or communities;
-*  Create a serious inconsistency or otherwise interfere with an action taken or planned by another agency;
-*  Materially alter the budgetary impact of entitlements, grants, user fees, or loan programs or the rights and obligations of recipients thereof; or
-*  Raise novel legal or policy issues arising out of legal mandates, the President’s priorities, or the principles set for the Executive Order.
- 
+2. Create a serious inconsistency or otherwise interfere with an action taken or planned by another agency;
+
+3. Materially alter the budgetary impact of entitlements, grants, user fees, or loan programs or the rights and obligations of recipients thereof; or
+
+4. Raise legal or policy issues for which centralized review would meaningfully further the President's priorities or the principles set forth in this Executive order, as specifically authorized in a timely manner by the Administrator of OIRA in each case.
+
 In deciding whether and how to regulate, agencies should assess all costs and benefits of available regulatory alternatives. Costs and benefits shall be understood to include both quantifiable measures (to the fullest extent that these can be usefully estimated) and qualitative measures of costs and benefits that are difficult to quantify, but nevertheless essential to consider. 
 
 The proposed action will set Annual Catch Limits and other fishery specification for 2025-2027. In aggregate these changes will allow the fishing industry to catch, land, and sell less herring. Lower revenues are expected.  Decreases in producer surplus accrue to the herring fishing industry.  Decreases in consumer surplus accrue to the users of herring, these include the lobster industry.  We do not project changes in consumer or producer surplus.  Changes in gross revenues from herring are used as a proxy for these measures.
 
-The rebuilding plan sets lower ACLS in order to rebuild the depleted stock of herring to a biomass that can sustaim Maximum Sustainable Yield. Furthermore, the stock of herring itself has value: it produces future generations of fish and higher stock levels make harvesting less costly. A bioeconomic model with that includes a stock-recruitment relationship could be used to quantify the value of the changes in stock levels. We do not undertake this.
+The rebuilding plan sets lower ACLS in order to rebuild the depleted stock of herring to a biomass that can sustain Maximum Sustainable Yield. Furthermore, the stock of herring itself has value: it produces future generations of fish and higher stock levels make harvesting less costly. A bioeconomic model with that includes a stock-recruitment relationship could be used to quantify the value of the changes in stock levels. We do not undertake this.
 
 ### Management Goals and Objectives
 
@@ -161,23 +166,22 @@ See Sections 3 and 4 for a description of the fishery
 
 ### Statement of the Problem 
 
-The New England Fishery Management Council adopted an ABC control rule in Herring Amendment 8.  The control rule prescribes the fishing mortality rate (F) as a function of Spawning Stock Biomass.  Framework 8 implemented the control rule for the 2021-2023 fishing years. Specifications set for 2023-2025 outside the framework process.
+The New England Fishery Management Council adopted an ABC control rule in Herring Amendment 8.  The control rule prescribes the fishing mortality rate (F) as a function of Spawning Stock Biomass.  Framework 8 implemented the control rule for the 2021-2023 fishing years. Specifications were set for 2023-2025 outside the framework process.
 
 
 
 ### Economic impacts relative to the baseline
-Previous specifications set 2025 Annual Catch Limit to 23,961mt.  The proposed specifications for 2025-2027 are 2,710 mt, 6,854 mt, and 11,404mt in 2025-2027 respectively.  Recent catches have been close to the ACLs, so we assume that catch is equal to the ACLs in the future.
+Previous specifications set 2025 Annual Catch Limit to 23,961mt; this is used as a baseline.  The proposed specifications for 2025-2027 are 2,710 mt, 6,854 mt, and 6,854mt in 2025-2027 respectively.  Recent catches have been close to the ACLs, so we assume that catch is equal to the ACLs in the future.  The propsed ACLs are well below recent levels, so this seems reasonable.
 
 #### Prices and Revenues
-Framework 9 contained a simple econometric model that estimated a relationship between (real 2019) prices and landings. 
-We have updated that model to include additional years of data and normalize to Real 2023 prices. We apply the results of that model of prices to project future prices.  Prices are in dollars per metric ton and landings are expressed in thousands of metric tons.  The first column of Table \ref{regression_results} contains the model of prices that are used to predict future prices^[A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  A pair of log-transformed models are also estimated. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.   The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.36\%.].  Based on the econometric model of prices, predicted prices and revenues are calculated according to:
+We have updated Framework 9's econometric model that estimated a relationship between (real 2019) prices and landings to include additional years of data and normalize to Real 2023 prices. We apply the results of that model of prices to project future prices.  Prices are in dollars per metric ton and landings are expressed in thousands of metric tons.  The first column of Table \ref{regression_results} contains the model of prices that are used to predict future prices^[A least-squares regression will be produce biased estimates if prices and quantities are simultaneously determined.  An Instrumental Variables estimator, where previous year's landings is used as an instrument for landings, can overcome this problem.  A pair of log-transformed models are also estimated. The first column is the preferred specification and used for predictions. The other three columns are presented as robustness checks.   The log-landings coefficient from the IV model is an elasticity and implies that an increase in landings of 1\% will reduce prices by 0.36\%.].  Based on the econometric model of prices, predicted prices and revenues are calculated according to:
 
 \begin{align}
 \mbox{Predicted Price} &= 894 - 6.079*\mbox{landings}\label{eq:predicted_price}\\
 \mbox{Predicted Revenue} &=  (894 - 6.079*\mbox{landings}) *\mbox{landings}\label{eq:predicted_landings}
 \end{align}
 
-The landings coefficient implies that, on average, an increase in landings of 1,000 mt will reduce prices by approximately \$6 per metric ton.
+The landings coefficient implies that, on average, an decrease in annual landings of 1,000 mt will increases prices by approximately \$6 per metric ton.  Similarly, an increase in annual landings of 1,000 mt will decrease prices by approximately \$6 per metric ton.
 
 \begin{table}[htbp]
   \begin{center}
@@ -194,7 +198,7 @@ The previous specifications included an ACL for 2025 was that is set at 23,961mt
 
 ```{r prices_revenues, eval=TRUE}
 # 2024 quota is 19141mt
-Landings<-c(23961, 2710, 6854, 11404)
+Landings<-c(23961, 2710, 6854, 6854)
 Year<-c("Baseline", "2025", "2026", "2027")
 Price<-894-6.079*Landings/1000
 Revenue<-(894-6.079*Landings/1000)*Landings/1000*1000
@@ -224,7 +228,7 @@ proj_rev2 <-proj_rev %>% select(-c(Rn))
 kbl(proj_rev2, digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected Landings (mt), Prices (Real 2023 USD/mt),  Revenues (Real 2023 USD/mt) and Revenue change relative to the baseline for  2025-2027 Specifications.") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
-      row_spec(0,bold=TRUE) 
+      row_spec(0,bold=FALSE) 
 ```
 
 
@@ -331,7 +335,7 @@ large_fishing_firms<-Directly_Regulated_Entities_table$Firms[Directly_Regulated_
 small_forhire_firms<-Directly_Regulated_Entities_table$Firms[Directly_Regulated_Entities_table$Size=="Small"& Directly_Regulated_Entities_table$Type=="For-Hire"]
 ```
 
-The directly-regulated entities are the firms that currently hold at least 1 Northeast US herring fishing permit (Categories A, B, C, D, or E).  Firms are classified as "Large" or "Small" based in trailing 5 years of revenue.  Table \ref{tab:make_DRE_table} describes numbers of directly-regulated entities, their main activities, and their revenues from various sources.   `r  small_fishing_firms` small firms derive the majority of their revenue from commercial fishing operations.   `r large_fishing_firms` of the large firms derive the majority of their revenue from commercial fishing activities. 
+The directly-regulated entities are the firms that currently hold at least 1 Northeast US herring fishing permit (Categories A, B, C, D, or E).  Firms are classified as "Large" or "Small" based on trailing 5 years of revenue.  Table \ref{tab:make_DRE_table} describes numbers of directly-regulated entities, their main activities, and their revenues from various sources.   `r  small_fishing_firms` small firms derive the majority of their revenue from commercial fishing operations.   `r large_fishing_firms` of the large firms derive the majority of their revenue from commercial fishing activities. 
 
 There are   `r small_forhire_firms` small firms that derive a majority of their revenue from for-hire recreational fishing activities. The for-hire firms, while they held at least one herring permit, did not derive any revenue from herring.
 
@@ -339,12 +343,12 @@ There are   `r small_forhire_firms` small firms that derive a majority of their 
 kbl(Directly_Regulated_Entities_table, digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and Characterization of the  Directly Regulated Entities and Average Trailing Five Years of Revenue") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = T,latex_options = "hold_position") %>% 
-      row_spec(0,bold=TRUE) 
+      row_spec(0,bold=FALSE) 
 ```
 
 Table \ref{tab:make_DRE_table} suggests that there are many small firms in the herring industry and that herring is minimally important to those firms.  While all of the small Fishing firms described in table \ref{tab:make_DRE_table} hold a herring permit, many of these firms only hold a category-D open access permit which has a 6,600lb possession limit.  These firms are less impacted by closures of the fishery when the catch limits are reached, because the possession limits are set to 2,000 pounds when this occurs. Many of the firms described in Table \ref{tab:make_DRE_table} are not actively engaged in the herring fishery.  The herring fishery has had historically low ACLs since 2018 and some firms have stopped participating in the fishery. They may hold herring permits to preserve the option to fish.
 
-Table \ref{tab:Active_DREs} describes a subset of the directly-regulated small entities, those that are  participated in the herring fishery between 2019 and 2023 and hold a category A, B, C, or E herring permit. Because there are 2 active, large firms, we only present a description of the active small firms.  The small firms identified in table \ref{tab:Active_DREs} are the firms most likely to be impacted by the increases in ACLs in the proposed action.
+Table \ref{tab:Active_DREs} describes a subset of the directly-regulated small entities, those that are  participated in the herring fishery between 2019 and 2023 and hold a category A, B, C, or E herring permit. Because there are fewer than three active, large firms, we only present a description of the active small firms.  The small firms identified in table \ref{tab:Active_DREs} are the firms most likely to be impacted by the increases in ACLs in the proposed action.
 
 
 
@@ -375,9 +379,9 @@ Active_DRE_table <- Active_ABCE %>%
 
 
 kbl(Active_DRE_table %>% dplyr::filter(Size=="Small"), digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and Characterization of the  Small, Active Directly Regulated Entities with A, B, C, or E permit, Trailing Five Years of Data.  Figures for the large firms cannot be presented to preserve confidentiality") %>%
-    #column_spec(5:8, width = "2cm")
+    #column_spec(1:4, width = "1cm") %>%
     kable_styling(full_width = T) %>% 
-      row_spec(0,bold=TRUE) 
+      row_spec(0,bold=FALSE) 
 
 ```
 
@@ -462,14 +466,16 @@ projected_firm_rev_ABCE_table<-full_join(projected_firm_rev_ABCE_table,baseline_
 # Inspect projected_firm_rev_ABCE_table to check the number of Large firms.
 
 kbl(projected_firm_rev_ABCE_table %>%dplyr::filter(Size=="Small"), digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Average projected and baseline gross reciepts and herring receipts for Small firms with A,B,C, or E permits  Figures for large firms cannot be show due to data confidentiality.") %>%
-    #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = T) %>% 
-      row_spec(0,bold=TRUE) 
+   # column_spec(1:4, width = "1.5cm") %>%
+    kable_styling(full_width = T) %>%
+   # kable_styling(font_size = 8) %>%
+
+      row_spec(0,bold=FALSE) 
 
 
 ```
 
-To describe the effects of the changes in catch limits on small firms, we project firm-level revenue corresponding to proposed 2025-2027 ACLs. We assume that the share of herring landings for each firm is equal to their 2019-2023 average. We also assume the firms non-herring revenues are constant. Directly Regulated Entities that were inactive therefore have no projected revenue.  We focus on the vessels that have ABCE permits.  Table \ref{tab:projected_revenues} summarizes the projected gross receipts, projected herring receipts, and baseline values.  Figures  \ref{figure_boxR} and \ref{figure_boxH} illustrate the projected yearly distribution of total and herring revenues from the Active vessels with A,B,C, or E herring permits.
+To describe the effects of the changes in catch limits on small firms, we project firm-level revenue corresponding to proposed 2025-2027 ACLs. We assume that the share of herring landings for each firm is equal to their 2019-2023 average. We also assume the firms non-herring revenues are constant. Directly Regulated Entities that were inactive therefore have no projected revenue.  We focus on the vessels that have ABCE permits.  Table \ref{tab:projected_revenues} summarizes the projected gross receipts, projected herring receipts, and baseline values.  Figures  \ref{figure_boxR} and \ref{boxplots_H} illustrate the projected yearly distribution of total and herring revenues from the Active vessels with A,B,C, or E herring permits.
 
 ```{r boxplotsR, fig.cap="\\label{figure_boxR}Projected Firm Level Revenue, Small firms only"}
 projected_firm_rev_ABCE<-projected_firm_rev_ABCE %>%
