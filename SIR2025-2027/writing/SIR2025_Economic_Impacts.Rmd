@@ -544,7 +544,7 @@ kbl(projected_firm_rev_ABCE_table %>%dplyr::filter(Size=="Small"), digits=0,book
 
 ```
 
-```{r boxplotsR, fig.cap="\\label{figure_boxR}Projected Firm Level Revenue under the Herring Committee Recommendation, Small firms only"}
+```{r boxplotsR, fig.cap="\\label{figure_boxR}Projected Firm Level Revenue under the draft action, small firms only"}
 projected_firm_rev_ABCE<-projected_firm_rev_ABCE %>%
     filter(Type !="NO_REV" & Size=="Small") #%>%
 #   mutate(sort=if_else(Year=="Status Quo", "-1", Year)) %>%
@@ -558,7 +558,7 @@ p+geom_boxplot(outlier.shape = NA) +
 ```
 
 
-```{r boxplots_H,  fig.cap="\\label{fig:figure_boxH}Projected Firm Level Herring Revenue under the Herring Committee Recommendation, Small firms only"}
+```{r boxplots_H,  fig.cap="\\label{fig:figure_boxH}Projected Firm Level Herring Revenue under the draft action, small firms only"}
 p2<-ggplot(projected_firm_rev_ABCE, aes(Year, sim_value_161722/1000))
 p2+geom_boxplot(outlier.shape = NA) +
   labs(x="Year", y="Projected Revenue ('000s of Real2023USD)")+
