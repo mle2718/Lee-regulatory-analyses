@@ -242,24 +242,24 @@ kbl(proj_rev2, digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "P
 
 ```{r npv, eval=TRUE}
 # Compute NPV of change in revenue at the 3% and 7% discount rates. No table is made here. I'm just computing a pair on numbers and sticking it into the text.
-proj_rev$df3<-1.03
+proj_rev$df2<-1.02
 proj_rev$df7<-1.07
 
 proj_rev2<-proj_rev %>%
   filter(Year %in% c("2025", "2026" ,"2027"))%>%
   mutate(Year=as.numeric(Year),
          `Revenue Change`=Rn-baselineRevenue,
-         df3=df3^(Year-2025),
+         df2=df2^(Year-2025),
          df7=df7^(Year-2025)
          ) %>%
-  mutate(rev3=`Revenue Change`/df3,
+  mutate(rev2=`Revenue Change`/df2,
          rev7=`Revenue Change`/df7) %>%
- summarise(rev3=abs(sum(rev3)), rev7=abs(sum(rev7)), rc=abs(sum(`Revenue Change`)) ) %>%
-  mutate(across(c(rev3, rev7, rc), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")))
+ summarise(rev2=abs(sum(rev2)), rev7=abs(sum(rev7)), rc=abs(sum(`Revenue Change`)) ) %>%
+  mutate(across(c(rev2, rev7, rc), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")))
 
 ```
 
-Table \ref{tab:prices_revenues} summarizes the annual prices, revenues, and changes of the draft action relative to the baseline. The draft action will result substantially lower landings relative to the baseline. The decrease in landings results in modestly higher Atlantic herring prices. Overall, the model projects a **decrease in revenues of `r proj_rev2$rc`** over the 2025-2027 time period. When discounted at a 3% discount rate, this corresponds to a net present value **decrease of `r  proj_rev2$rev3`**. Using a 7% discount rate, corresponds to a net present value **decrease of `r  proj_rev2$rev7`**.
+Table \ref{tab:prices_revenues} summarizes the annual prices, revenues, and changes of the draft action relative to the baseline. The draft action will result substantially lower landings relative to the baseline. The decrease in landings results in modestly higher Atlantic herring prices. Overall, the model projects a **decrease in revenues of `r proj_rev2$rc`** over the 2025-2027 time period. When discounted at a 2% discount rate, this corresponds to a net present value **decrease of `r  proj_rev2$rev2`**.
 
 \clearpage
 
@@ -304,24 +304,24 @@ kbl(proj_revCR2, digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  
 
 ```{r npvCR, eval=TRUE}
 # Compute NPV of change in revenue at the 3% and 7% discount rates. No table is made here. I'm just computing a pair on numbers and sticking it into the text.
-proj_revCR$df3<-1.03
+proj_revCR$df2<-1.02
 proj_revCR$df7<-1.07
 
 proj_revCR2<-proj_revCR %>%
   filter(Year %in% c("2025", "2026" ,"2027"))%>%
   mutate(Year=as.numeric(Year),
          `Revenue Change`=Rn-baselineRevenue2,
-         df3=df3^(Year-2025),
+         df2=df2^(Year-2025),
          df7=df7^(Year-2025)
          ) %>%
-  mutate(rev3=`Revenue Change`/df3,
+  mutate(rev2=`Revenue Change`/df2,
          rev7=`Revenue Change`/df7) %>%
- summarise(rev3=abs(sum(rev3)), rev7=abs(sum(rev7)), rc=abs(sum(`Revenue Change`)) ) %>%
-  mutate(across(c(rev3, rev7, rc), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")))
+ summarise(rev2=abs(sum(rev2)), rev7=abs(sum(rev7)), rc=abs(sum(`Revenue Change`)) ) %>%
+  mutate(across(c(rev2, rev7, rc), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")))
 
 ```
 
-Table \ref{tab:prices_revenuesCR} summarizes the annual prices, revenues, and changes of the ABC Control rule ACLs relative to the baseline. These ACLs will result substantially lower landings relative to the baseline.  The decrease in landings results in modestly higher Atlantic herring prices. Overall, the model projects a **decrease in revenues of `r proj_revCR2$rc`** over the 2025-2027 time period. When discounted at a 3% discount rate, this corresponds to a net present value **decrease of `r  proj_revCR2$rev3`**. Using a 7% discount rate, corresponds to a net present value **decrease of `r  proj_revCR2$rev7`**.
+Table \ref{tab:prices_revenuesCR} summarizes the annual prices, revenues, and changes of the ABC Control rule ACLs relative to the baseline. These ACLs will result substantially lower landings relative to the baseline.  The decrease in landings results in modestly higher Atlantic herring prices. Overall, the model projects a **decrease in revenues of `r proj_revCR2$rc`** over the 2025-2027 time period. When discounted at a 2% discount rate, this corresponds to a net present value **decrease of `r  proj_revCR2$rev2`**.
 
 Relative to the draft action, the specifications associated with the ABC control rule have higher landings and revenues in 2027.  Because the Atlantic herring ACL is higher in 2027, this is less likely to rebuild the overfished Atlantic herring stock. 
 
