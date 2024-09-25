@@ -12,7 +12,6 @@ urlcolor: blue
 editor_options:
   chunk_output_type: console
 fontsize: 12pt
-
 ---
 
 # Summary and Housekeeping
@@ -39,7 +38,7 @@ This analysis was written in RMarkdown. It can be found at https://github.com/NE
  library("here")
  library("kableExtra")
 
-here::i_am("SIR2023_2026/writing/SIR2023_Economic_Impacts.Rmd")
+here::i_am("Herring_SIR2023_2026/writing/SIR2023_Economic_Impacts.Rmd")
 
 #############################################################################
 #knitr options
