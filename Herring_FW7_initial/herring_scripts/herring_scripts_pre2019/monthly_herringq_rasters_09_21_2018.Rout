@@ -1,0 +1,154 @@
+
+   File /home2/mlee/.Renviron contains invalid line(s)
+      export ORACLE_HOME
+   They were ignored
+
+
+R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #################################################################################
+> #################################################################################
+> ### HERE IS THE TABLE OF CONTENTS 
+> # SECTION 1 -- Set up directories 
+> # SECTION 2  - LOAD PACKAGES 
+> # SECTION 3 - SPECIFY MAPPING OPTIONS
+> # SECTION 4 - LOAD EXISTING GIS DATA
+> # SECTION 5 - MAKE MAPS
+> 
+> ###### This script is for exploratory mapping of rasters
+> rm(list=ls())
+> todaysdate = as.Date(Sys.time())
+> 
+> #################################################################################
+> # Section 1 -- Set up directories 
+> #################################################################################
+> #################################################################################
+> #################################################################################
+> 
+> # #THIS SECTION CONTAINS PLACES TO LOOK FOR DATA
+> # MINYANG's locations
+> # ML.NETWORK.PATH this is how Min-Yang Mounts his network drive.  You will want to change this.
+> # PROJECT PATH IS A FOLDER IN MY SHARED DRIVE
+> # DATA.PATH is a FOLDER INSIDE MY PROJECT PATH
+> # The TIF data is stored in a subfolder of DATA.PATH. 
+> ##########   This is because the code to get a list of files throws up if there are no subfolders.
+> ##########   The code to get a list of files throws up because I, Min-Yang, stole it from Geret.
+> # ML.GIS.PATH is the location of some shapefiles. 
+> 
+> 
+> ##YOU NEED TO CHANGE THESE THREE LINES of CODE TO POINT TO YOUR NETWORK SHARE
+> ML.NETWORK.LOCAL=file.path("/run/user/1877/gvfs/smb-share:server=net,share=home2/mlee") #THIS Is what you need to run local
+> ML.NETWORK.SERVER=file.path("/net/home2/mlee") #This Is what you need to run from the network.
+> 
+> 
+> YOUR.NETWORK.PATH=file.path(ML.NETWORK.SERVER) # Tell R which to use (local or server)
+> 
+> YOUR.PROJECT.PATH=file.path(YOUR.NETWORK.PATH,"RasterRequests")
+> # YOUR.DATA.PATH=file.path(YOUR.PROJECT.PATH,"2016-03-15_rasterexport") #Annual Kepts for 2006-2014, all herring
+> # YOUR.DATA.PATH=file.path(YOUR.PROJECT.PATH,"2016-03-07_rasterexport") #This has MWT and PUR yearly in it
+> YOUR.DATA.PATH=file.path(YOUR.PROJECT.PATH,"Herring_A8_0916016") #This has monthly MWT and PUR yearly in it
+> 
+> ML.GIS.PATH= file.path(YOUR.NETWORK.PATH, "spatial data") #Min-Yang stores some of his spatial data in this folder
+> 
+> 
+> ################################
+> #SSB DRIVE
+> #THIS MAY CHANGE IF YOU ARE NOT MINYANG.
+> ################################
+> SSB.LOCAL = file.path("/run/user/1877/gvfs/smb-share:server=net,share=socialsci") #This is what you need to run local
+> SSB.NETWORK=file.path("/net/work5/socialsci") #This is what you need to run networked
+> 
+> 
+> 
+> 
+> SSB.DRIVE = file.path(SSB.NETWORK)
+> 
+> 
+> ################################
+> #THESE LINES SHOULD NOT CHANGE.
+> GD.RASTERS = file.path(SSB.DRIVE, "Geret_Rasters")
+> GD.INVIDVIDUALRASTERS = file.path(GD.RASTERS, "Data", "individualrasters") 
+> GD.GIS.PATH = file.path(GD.RASTERS, "Data")
+> source(file.path(GD.RASTERS,"FINAL_Raster_Functions.R"))
+Loading required package: rgdal
+Loading required package: sp
+rgdal: version: 1.3-4, (SVN revision 766)
+ Geospatial Data Abstraction Library extensions to R successfully loaded
+ Loaded GDAL runtime: GDAL 1.11.5, released 2016/07/01
+ Path to GDAL shared files: /usr/local/share/gdal
+ GDAL binary built with GEOS: TRUE 
+ Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
+ Path to PROJ.4 shared files: (autodetected)
+ Linking to sp version: 1.3-1 
+Loading required package: rgeos
+rgeos version: 0.3-28, (SVN revision 572)
+ GEOS runtime version: 3.3.2-CAPI-1.7.2 
+ Linking to sp version: 1.3-1 
+ Polygon checking: TRUE 
+
+> 
+> #GENERIC GIS FOLDER (These are maintained by Sharon Benjamin) 
+> GENERIC.GIS.PATH= file.path(SSB.DRIVE, "GIS")
+> FREQUENT.USE.SSB= file.path(GENERIC.GIS.PATH, "FrequentUseSSB")
+> ################################
+> 
+> 
+> 
+> 
+> #####################################################
+> ## OUTPUT LOCATIONS
+> #####################################################
+> exportfolder = file.path(YOUR.PROJECT.PATH,paste0("thirty_minute_extractions_",todaysdate))
+> dir.create(exportfolder, recursive=T)
+Warning message:
+In dir.create(exportfolder, recursive = T) :
+  '/net/home2/mlee/RasterRequests/thirty_minute_extractions_2018-09-21' already exists
+> 
+> YOUR.STORAGE.PATH=file.path(exportfolder)  #To recap, we are storing things in the folder "exportfolder" which is in the directory defined by YOUR.DATA.PATH
+> #################################################################################
+> # END OF SECTION 1  
+> #################################################################################
+> 
+> 
+> 
+> 
+> 
+> #################################################################################
+> # SECTION 2  - LOAD PACKAGES 
+> #################################################################################
+> 
+> #Load/Install necessary libraries
+> #not all of these are required, but I'm too lazy to pull out the ones that are not.
+> if(!require(raster)) {  
++   install.packages("raster")
++   require(raster)}
+Loading required package: raster
+> if(!require(snow)) {  
++   install.packages("snow")
++   require(snow)}
+Loading required package: snow
+Installing package into ‘/usr/lib64/R/library’
+(as ‘lib’ is unspecified)
+Warning in install.packages("snow") :
+  'lib = "/usr/lib64/R/library"' is not writable
+Error in install.packages("snow") : unable to install packages
+In addition: Warning message:
+In library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE,  :
+  there is no package called ‘snow’
+Execution halted
