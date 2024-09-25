@@ -19,7 +19,7 @@ The 2025-2027 Atlantic herring fishery specifications are needed to set the ABCs
 
 A supplemental information report (SIR) is being prepared for these specifications. *If* there are no implementing regulations, then only a Regulatory Flexibility Act Analysis is required. In this action, there is an implementing regulation (New Brunswick Weir), therefore an EO 12866 section is required.
 
-This analysis was written in RMarkdown. It can be found at https://github.com/NEFSC/READ-SSB-Lee-herring-analyses
+This analysis was written in RMarkdown. It can be found at https://github.com/NEFSC/READ-SSB-Lee-regulatory-analyses
 
 \clearpage
 
@@ -363,7 +363,7 @@ affiliates<-affiliates %>%
 herring2023<-affiliates %>%
   group_by(affiliate_id) %>%
   summarise(Type=first(entity_type_2023), Size=first(SB_string),
-            vessels=sum(permit_count),
+            vessels=sum(permit_count/nyears),
             herringrev=sum(value_161722),
             herring=sum(c_across(starts_with("HRG_"))),
             herringABCE=sum(HRG_A+ HRG_B+HRG_C + HRG_E)
