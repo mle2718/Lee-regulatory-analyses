@@ -13,7 +13,7 @@ global user minyangWin;
 
 /*minyangWin is setup to connect to oracle yet */
 if strmatch("$user","minyangWin"){;
-global my_projdir "J:\\SIR2025-2027";
+global my_projdir "J:\\Herring_SIR2025-2027";
 };
 
 

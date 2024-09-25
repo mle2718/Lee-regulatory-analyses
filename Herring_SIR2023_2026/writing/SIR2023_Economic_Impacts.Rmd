@@ -19,7 +19,7 @@ The 2023-2025 herring specification are needed to set the ABCs, ACLs, and other 
 
 A Supplemental Information Report (SIR) is being prepared. *If* there are no implementing regulations, then only a Regulatory Flexibility Act Analysis is required. In this action, there is an implementing regulation (New Brunswick Weir), therefore an EO 12866 section is required. 
 
-This analysis was written in RMarkdown. It can be found at https://github.com/NEFSC/READ-SSB-Lee-herring-analyses
+This analysis was written in RMarkdown. It can be found at https://github.com/NEFSC/READ-SSB-Lee-regulatory-analyses
 
  <!---- 
  The global_options chunk loads libraries, sets options, figures out if you're on a desktop or server, sets years, and sets graphing options
