@@ -1,0 +1,398 @@
+---
+title: "Black Sea Bass 2025 Specifications"
+author: "Min-Yang Lee"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document:
+    keep_tex: yes
+    fig_caption: yes
+    number_sections: yes
+  html_document:
+    df_print: paged
+    number_sections: yes
+header-includes: \usepackage{setspace}\doublespacing
+urlcolor: blue
+editor_options:
+  chunk_output_type: console
+fontsize: 12pt
+---
+
+# Summary and Housekeeping
+This analysis was written in RMarkdown. It can be found at https://github.com/NEFSC/READ-SSB-Lee-regulatory-analyses
+
+\clearpage
+
+ <!---- 
+ The global_options chunk loads libraries, sets options, figures out if you're on a desktop or server, sets years, and sets graphing options
+ --->
+```{r global_options, include=FALSE}
+library("tidyverse")
+library("data.table")
+library("scales")
+library("knitr")
+library("lubridate")
+library("here")
+library("kableExtra")
+library("haven")
+library("DBI")
+library("dbplyr")
+library("ROracle")
+
+
+
+
+
+here::i_am("BSB_Specs2025/writing/SIR2025_Economic_Impacts.Rmd")
+
+#############################################################################
+#knitr options
+
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, error = FALSE, message = FALSE, comment = FALSE, cache = FALSE, progress = TRUE, verbose = FALSE, 
+											dpi = 600)
+options(tinytex.verbose = TRUE)
+# options(knitr.table.format = "latex")
+#############################################################################
+
+
+# RFA data
+RFA_filepath<-file.path("//nefscdata","RFA_EO12866_Guidelines" ,"Ownership Data", "current data and metadata","affiliates_2024_06_01.Rdata")
+
+  
+###################################################################################################
+```
+<!--- Set the figure numbers for the section, subsection, figures, and tables so things are properly numbered --->
+
+
+
+
+```{r pull_active_rec, results='hide'}
+# Pull in the MRIP_MA_SITE_LIST 
+
+star_dbi_ROracle <- DBI::dbConnect(dbDriver("Oracle"),id, password=novapw, dbname=nefscusers.connect.string)
+
+
+q_rec1=paste0("select g.vessel_permit_num as permit, EXTRACT(YEAR FROM g.DATE_LAND) as year, nanglers
+   from NEFSC_GARFO.trip_reports_images e, NEFSC_GARFO.trip_reports_catch f, NEFSC_GARFO.trip_reports_document g
+   where e.imgid=f.imgid
+   and  g.tripcatg in (2,3)  
+   and g.docid = e.docid
+   and f.species_id in ('FLUKE', 'SCUP', 'BSB', 'BLU') and f.kept>0
+   and trunc(g.date_land) between TO_DATE('01/01/2019', 'MM/DD/YYYY') and TO_DATE('12/31/2023', 'MM/DD/YYYY')  ")
+   
+ rec_permits<-dplyr::tbl(star_dbi_ROracle,sql(q_rec1)) %>%
+  collect()
+names(rec_permits) <- tolower(names(rec_permits))
+
+
+# Number of anglers 
+permit_anglers<-rec_permits %>%
+  group_by(permit, year) %>%
+  summarise(total_anglers=sum(nanglers))
+
+# permit and a flag for active
+active_rec<-rec_permits %>%
+  select(permit) %>%
+  distinct() %>%
+  mutate(active_rec=1)
+
+
+dbDisconnect(star_dbi_ROracle)
+
+
+```
+
+
+
+
+
+
+
+\setcounter{section}{3}
+\setcounter{subsection}{1}
+
+\setcounter{figure}{1}
+\setcounter{table}{1}
+# A Description of the Small Entities Affected
+
+## Overview
+
+The directly regulated entities are firms with at least one federal commercial or party/charter permits for the four managed species (summer flounder, scup, black sea bass, or bluefish).  Vessel ownership data, provided by federal permit holders at the time of the permit application, is used to identify all individuals who own fishing vessels. Vessels with identical owners are grouped into firms (entities).
+
+Firms are classified as "Large" or "Small" based on trailing 5 years of gross revenue (2019-2023).  For Regulatory Flexibility Act purposes only, NMFS established a $11 million size standard for firms who’s primary industry is commercial fishing (50 CFR §200.2).  A commercial fishing business (NAICS 114111 and 114112) is classified as a small business if it is independently owned and operated, is not dominant in its field of operation (including its affiliates) and has combined annual receipts not in excess of $11 million.  For-hire fishing firms (NAICS 487210) have an $8 million gross receipts threshold.
+
+Gross receipts from commercial fishing activity are assembled from NMFS Dealer data.  Gross receipts from for-hire fishing activity is constructed by multiplying the number of angler-trips by the region-wide average angler expenditure on for-hire trips.  Firms are classified as commercial fishing entities if the majority of their gross receipts in 2023 were derived from commercial fishing. Firms were classified as for-hire entities if the majority of their gross receipts in 2023 were derived from for-hire fishing.  Firms are classified as “Inactive” if they had zero gross receipts from fishing in 2023.
+
+The description of small entities describes the number of firms, their gross receipts, receipts from commercial and for-hire activities, and receipts from the four managed species.  Averages by category (Small vs Large and For-Hire vs Commercial) are presented.  For the commercial fleet, averages revenues are also presented by revenue category.
+
+
+Not all of the directly managed entities are actively fishing for four managed species.  Active is defined as having any commercial revenue from the four managed species or having taken a for-hire trip that landed any of the four managed species during the 2019-2023 time period.  This class of firms is likely to experience the largest impacts of the proposed rule.
+
+
+
+Private recreational anglers are not considered “entities” under the Regulatory Flexibility Act, thus economic impacts on private anglers are not considered here.  Firms without a federal permit (which are active in state-waters only) will also be affected by this action are not described in this analysis.
+
+## Directly Regulated Entities 
+
+```{r Directly_Regulated_Entities, eval=TRUE}
+load(RFA_filepath)
+affiliates<-affiliates_2024_06_01
+finalyr<-max(affiliates$year)
+
+rm(affiliates_2024_06_01)
+affiliates$permit_count<-1
+
+nyears<-length(unique(affiliates$year))
+
+# Recode small_business to a print friendly string (Large, Small). Recode entity_type to nice casing
+
+affiliates<-affiliates %>%
+  mutate(entity_type_2023=replace(entity_type_2023, entity_type_2023=="FISHING","Fishing"),
+         entity_type_2023=replace(entity_type_2023, entity_type_2023=="FORHIRE","For-Hire"),
+         SB_string=case_when(
+           small_business==1 ~ "Small",
+           small_business==0 ~ "Large"),
+  regulated_rev=value_169182 + value_172735 + value_167687 + value_168559
+         ) %>%
+    relocate(SB_string, .after=small_business) 
+
+
+# Pull in the active_rec column and recode it to 0/1
+affiliates <-affiliates %>%
+  left_join(active_rec, join_by(permit==permit)) %>%
+  mutate(active_rec=ifelse(is.na(active_rec),0,active_rec))%>%
+    relocate( any_of(c("regulated_rev", "active_rec")), .after=value_914179)
+
+
+
+# Make a Directly Regulated Entities keyfile that contracts to 1 row per affiliate_id that contains the entity type, small business dummy, the number of vessels, and whether the affiliate_id has one of the 4 permits. 
+
+
+BSB2023<-affiliates %>%
+ dplyr::filter(year==finalyr) %>%
+  group_by(affiliate_id) %>%
+  summarise(Type=first(entity_type_2023), 
+            Size=first(SB_string),
+            vessels=sum(permit_count),
+            FLS=sum(c_across(starts_with("FLS_"))),
+            SCP=sum(c_across(starts_with("SCP_"))),
+            BLU=sum(c_across(starts_with("BLU_"))),
+            BSB=sum(c_across(starts_with("BSB_"))),
+            reg=sum(BSB)+sum(FLS)+sum(SCP)+sum(BLU)
+            ) %>%
+  filter(reg>=1)
+
+
+# Contract to yearly revenues, flag the landings from the 4 species, and recode the active rec affiliated to a 0/1 
+yearly_affiliates<-affiliates %>%
+  group_by(affiliate_id,year) %>%
+  summarise(across(value_permit:active_rec, sum)) %>%  # Creates a firm-year dataset of values 
+      ungroup() %>%
+  mutate(active_rec=ifelse(active_rec>=1,1,0))
+
+# Contract to average revenues and flag the landings from the 4 species , and recode the active rec affiliated to a 0/1
+summary_affiliates<-yearly_affiliates %>%
+  group_by(affiliate_id) %>%
+  summarise(across(value_permit:active_rec, mean)) %>% # Takes the mean of the firm-level dataset of values
+    rename(value_firm=value_permit, value_firm_forhire=value_permit_forhire) %>%
+  mutate(active_rec=ifelse(active_rec>=1,1,0))
+
+            
+#merge together they DRE keyfile and the average revenue, keeping just the affiliate_ids that show up in BSB2023
+Directly_Regulated_Entities<-left_join(BSB2023,summary_affiliates,by='affiliate_id')
+
+Directly_Regulated_Entities <-Directly_Regulated_Entities %>%
+    mutate(`Revenue Bin (Millions)` = cut(value_firm, breaks=c(-0.1,50000,250000, 1000000, 2000000, 5000000, 11000000, 1e15),labels=c("<0.05", ".05 to .25", "0.25 to 1", "1 to 2", "2 to 5", "5 to 11", "11+")) ,
+           Regulated_fraction=regulated_rev/value_firm)
+
+
+
+# Summary of DRE large and small firms in the fishing and for-hire industries. Exclude the inactive (NO_REV).
+Directly_Regulated_Entities_table <- Directly_Regulated_Entities %>%
+  filter(Type !="NO_REV") %>%
+  group_by(Size, Type) %>%
+  summarise(Firms=n(),
+            Vessels=sum(vessels),
+            "Avg Gross Receipts"=round(mean(value_firm),0),
+            "Avg Commercial Receipts"=round(mean(value_firm-value_firm_forhire),0),
+            "Avg for-hire Receipts"=round(mean(value_firm_forhire),0),
+            "Avg 4 Species Receipts"=round(mean(regulated_rev),0)
+             ) %>%
+  mutate(across(c(`Firms`,`Vessels`), ~ number(.x, big.mark=","))) %>%
+  mutate(across(c(`Avg Gross Receipts`,`Avg 4 Species Receipts`, `Avg for-hire Receipts`, `Avg Commercial Receipts` ), ~ number(.x, accuracy=100,prefix="$", big.mark=",")))
+
+small_fishing_firms<-Directly_Regulated_Entities_table$Firms[Directly_Regulated_Entities_table$Size=="Small"& Directly_Regulated_Entities_table$Type=="Fishing"]
+large_fishing_firms<-Directly_Regulated_Entities_table$Firms[Directly_Regulated_Entities_table$Size=="Large"& Directly_Regulated_Entities_table$Type=="Fishing"]
+small_forhire_firms<-Directly_Regulated_Entities_table$Firms[Directly_Regulated_Entities_table$Size=="Small"& Directly_Regulated_Entities_table$Type=="For-Hire"]
+```
+
+
+
+```{r make_DRE_table} 
+kbl(Directly_Regulated_Entities_table, digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and characterization of the directly regulated entities and average trailing five years of revenue. receipts rounded to hundreds of USD") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = T,latex_options = "hold_position") %>% 
+      row_spec(0,bold=FALSE) 
+```
+
+
+
+Table \ref{tab:make_DRE_table} describes numbers of directly-regulated entities, their main activities, and their revenues from various sources.   `r  small_fishing_firms` small firms derive the majority of their revenue from commercial fishing operations.   `r large_fishing_firms` of the large firms derive the majority of their revenue from commercial fishing activities. 
+
+`r small_forhire_firms` small firms derive a majority of their revenue from for-hire recreational fishing activities; there are no large for-hire firms.  Because for-hire firms earn revenue from passenger fees, not selling catch, we cannot determine the for-hire revenues derived from the four managed species.  
+
+\clearpage
+
+## Active Directly Regulated Entities 
+
+
+```{r Active_DREs}
+
+
+#filter my affiliates dataset so it has only rows that have revenue from the 4 species OR actively rec fishing for those 4 species
+
+active_affiliated<-summary_affiliates %>%
+  dplyr::filter(regulated_rev>=1 | active_rec>=1)
+
+# Join to the BSB2023 keyfile  
+Active_BSB_DRE<-inner_join(BSB2023,active_affiliated,by='affiliate_id')
+
+Active_BSB_DRE <- Active_BSB_DRE %>%
+    mutate(`Revenue Bin (Millions)` = cut(value_firm, breaks=c(0,50000,250000, 1000000, 2000000, 5000000, 11000000, 1e15),labels=c("<0.05", ".05 to .25", "0.25 to 1", "1 to 2", "2 to 5", "5 to 11", "11+")) 
+    )
+
+
+
+# Summary of firms active in any of the 4 regulated stocks large and small firms in the fishing and for-hire industries.
+# Should recode small_business to a print friendly string (Large, Small)
+Active_DRE_table <- Active_BSB_DRE %>%
+  filter(Type !="NO_REV") %>%
+  group_by(Size, Type) %>%
+  summarise(Firms=n(),
+            Vessels=sum(vessels),
+            "Avg Gross Receipts"=round(mean(value_firm),0),
+            "Avg Commercial Receipts"=round(mean(value_firm-value_firm_forhire),0),
+            "Avg for-hire Receipts"=round(mean(value_firm_forhire),0),
+            "Avg 4 Species Receipts"=round(mean(regulated_rev),0)
+             ) %>%
+  mutate(across(c(`Firms`,`Vessels`), ~ number(.x, big.mark=","))) %>%
+  mutate(across(c(`Avg Gross Receipts`,`Avg 4 Species Receipts`, `Avg for-hire Receipts`, `Avg Commercial Receipts` ), ~ number(.x, accuracy=100,prefix="$", big.mark=",")))
+
+
+
+kbl(Active_DRE_table, digits=0,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Number and characterization of the small, active directly regulated entities, trailing five years of data.") %>%
+    #column_spec(1:4, width = "1cm") %>%
+    kable_styling(full_width = T) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+
+Asmall_fishing_firms<-Active_DRE_table$Firms[Active_DRE_table$Size=="Small"& Active_DRE_table$Type=="Fishing"]
+Alarge_fishing_firms<-Active_DRE_table$Firms[Active_DRE_table$Size=="Large"& Active_DRE_table$Type=="Fishing"]
+Asmall_forhire_firms<-Active_DRE_table$Firms[Active_DRE_table$Size=="Small"& Active_DRE_table$Type=="For-Hire"]
+```
+
+Not all of the permitted firms are actively fishing the four managed species.   Table \ref{tab:Active_DREs} describes numbers of active directly-regulated entities, their main activities, and their revenues from various sources.   Fishing firms are classified as active if they had any revenue from one of the four managed species over the 2019-2023 time period. For-hire firms are classified as active if they took a for-hire trip that landed any of the for species of the same time period.  
+
+There are `r  Asmall_fishing_firms` active small firms that derive the majority of their revenue from commercial fishing operations, `r Alarge_fishing_firms` active large firms derive the majority of their revenue from commercial fishing activities, and `r Asmall_forhire_firms` active small firms derive a majority of their revenue from for-hire recreational fishing activities. 
+
+
+
+
+
+
+```{r Commercial_Rev_by_firm_size}
+# Make a table that shows the revenues and commercial 4 species revenues broken down by firms size.
+
+Summary_table<-Active_BSB_DRE %>%
+  filter(Type =="Fishing") %>%
+  group_by(`Revenue Bin (Millions)`) %>%
+  summarise(Firms=n(),
+            'Total Revenue'= round(mean(value_firm),0),
+            'Avg 4 Species Commercial Receipts'=round(mean(regulated_rev),0),
+             Percentage=round(100*mean(regulated_rev)/mean( value_firm),1)
+            ) %>%
+    mutate(across(c(`Firms`), ~ number(.x, big.mark=","))) %>%
+  mutate(across(c(`Total Revenue`,`Avg 4 Species Commercial Receipts` ), ~ number(.x, accuracy=100,prefix="$", big.mark=","))) %>%
+  mutate(across(c(Percentage), ~ number(.x, suffix="%", big.mark=",")))
+
+
+  
+kbl(Summary_table,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Average annual total revenues, revenues from the four managed species, and percentage of revenue from those species during 2019-2023 for the Active, commercial Directly Regulated firms") %>%
+    #column_spec(1:4, width = "1cm") %>%
+    kable_styling(full_width = T) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+
+Table \ref{tab:Commercial_Rev_by_firm_size} characterizes the total revenue, commercial revenue from the four managed species, and percentage of revenue from those four species for the active firms.  The smallest of the commercial fishing firms tend to derive a higher percentage of gross receipts from the four managed species.   
+
+
+```{r boxplotsR, fig.cap="\\label{fig:boxR} Box plots of firm-level revenue from the four managed species, active firms only."}
+Directly_Regulated_Entities2<-Directly_Regulated_Entities %>%
+  filter(Type =="Fishing") %>%
+  mutate(fraction_reg=regulated_rev/value_firm) %>%
+    dplyr::filter(regulated_rev>=1) 
+
+
+p<-ggplot(Directly_Regulated_Entities2, aes(`Revenue Bin (Millions)`, regulated_rev/1000))
+p+geom_boxplot(staplewidth=.5) +
+  labs(x="Revenue Bin", y="Revenue from Regulated Species ('000s of USD)")
+```
+
+
+```{r boxplotsF, fig.cap="\\label{fig:boxF} Box plots of firm-level revenue from the four managed species, active firms only."}
+Directly_Regulated_Entities2<-Directly_Regulated_Entities %>%
+  filter(Type =="Fishing") %>%
+  mutate(fraction_reg=regulated_rev/value_firm) %>%
+    dplyr::filter(regulated_rev>=1) 
+
+p<-ggplot(Directly_Regulated_Entities2, aes(`Revenue Bin (Millions)`, fraction_reg*100))
+p+geom_boxplot(staplewidth=.5) +
+  labs(x="Revenue Bin", y="Percentage Revenue from Regulated Species")
+```
+
+
+The boxplots in Figure \ref{fig:boxR} and Figure \ref{fig:boxF} of commercial revenue derived from the four managed species across the revenue distribution indicate that there is substantial variability in the importance of these four managed species to firms. However, the fraction of revenue from the four managed species tends to be smaller for firms with more gross receipts.   
+
+```{r ForHire_Rev_by_firm_size}
+# Make a table that shows the revenues for the for-hire firms
+
+FH_Summary<-Directly_Regulated_Entities %>%
+  filter(Type =="For-Hire") %>%
+    mutate(`Revenue Bin (Millions)` = cut(value_firm, breaks=c(0,50000, 250000, 1000000, 1e15),labels=c("<0.05", "0.05 to .25", ".25-1","1+"))) %>%
+  group_by(`Revenue Bin (Millions)`) %>%
+  summarise(Firms=n(),
+            'Total Revenue'= round(mean(value_firm),0),
+            ) %>%
+    mutate(across(c(`Firms`), ~ number(.x, big.mark=","))) %>%
+  mutate(across(c(`Total Revenue`), ~ number(.x, accuracy=100,prefix="$", big.mark=",")))
+
+
+  
+kbl(FH_Summary,booktabs=T, align=c("l",rep('r',times=7)), caption =  "Average annual total revenues for Active, For-Hire Directly Regulated Entities during 2019-2023") %>%
+    #column_spec(1:4, width = "1cm") %>%
+    kable_styling(full_width = T) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+Table \ref{tab:ForHire_Rev_by_firm_size} characterizes the distribution of total revenue for the active For-Hire firms.
+
+
+
+\clearpage
+
+
+# Economic Impacts on Small Entities
+The proposed 2025 quotas for two species, Black Sea Bass and Summer Flounder, are constant compared to 2024.  Quota for one species, Bluefish, will increase by approximately 25%.  Quota for Scup would decrease by approximately 7%.  This decrease in the scup quota is the only plausible pathway for the proposed rule to have an adverse impact on small entities.  
+
+The scope for a negative impact on the small small entities is minimal.  Quota management for the commercial scup fishery is based on landings, which have ranged between 12 and 13 million pounds since 2018. The proposed 2025 commercial quota of 19.54 million pounds, reduced from the 21.15 million pound quota in 2024 is unlikely to constrain the commercial fishery. The proposed recreational harvest limit of 12.31 million pounds is not associated with a change in the recreational fishing regulations and also unlikely to impact firms in the for-hire industry.
+
+Therefore, economic theory implies that the proposed action will have *de minimis* or insignificant negative impacts on the small, directly regulated entities.  Because the impacts are *de minimis*, 
+
+
+\newpage
+
+
+
