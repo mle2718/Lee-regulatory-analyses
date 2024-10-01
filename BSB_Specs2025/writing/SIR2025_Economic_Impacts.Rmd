@@ -66,7 +66,7 @@ RFA_filepath<-file.path("//nefscdata","RFA_EO12866_Guidelines" ,"Ownership Data"
 
 
 ```{r pull_active_rec, results='hide'}
-# Pull in the MRIP_MA_SITE_LIST 
+# Pull in rec data. 
 
 star_dbi_ROracle <- DBI::dbConnect(dbDriver("Oracle"),id, password=novapw, dbname=nefscusers.connect.string)
 
