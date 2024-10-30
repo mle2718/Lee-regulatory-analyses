@@ -79,7 +79,7 @@ Data Comes from CAMS_LAND and CAMS_SUBTRIP.
 star_dbi_ROracle <- DBI::dbConnect(dbDriver("Oracle"),id, password=novapw, dbname=nefscusers.connect.string)
 
 
-  CURRENT.QUERY <- paste("select c.* from cams_land c, cams_subtrip t
+  CURRENT.QUERY <- paste("select c.* from cams_land c
   where C.ITIS_TSN in (161722,172414)
   and c.year between", START.YEAR, "and",END.YEAR, sep=" ")
 
@@ -102,11 +102,6 @@ CAMS_data<-CAMS_data %>%
   dplyr::left_join(itis, by=join_by(itis_tsn==itis_tsn), relationship="many-to-one", suffix=c("",".y")) %>%
   select(-ends_with(".y"))
 
-
-
-#save to RDS
-CAMS_data_name <-paste0("CAMS_data_",vintage_string,".Rds")
-saveRDS(CAMS_data, file=here("GF65_herring_mackerel", "data","intermediate",CAMS_data_name))
 ```
 
 
