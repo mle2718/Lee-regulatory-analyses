@@ -22,7 +22,7 @@ here::i_am("GF69_herring_mackerel/data_wrangle/data_extracting.rmd")
 # Please ensure you have the proper packages installed with (install.packages()) or a request to ITD if any libaries do not load.  
 library("here")
 library("ROracle")
-library("tibble")
+library("tidyvers")
 library("dplyr")
 library("haven")
 library("lubridate")
@@ -33,13 +33,6 @@ vintage_string<-gsub("-","_",vintage_string)
 
 START.YEAR = 2020
 END.YEAR = 2023
-
-# Credentials
-source(here("R_code","project_logistics","R_credentials_RODBC.R"))
-# This file leaves behind the following things:
-# oracle_username
-# oracle_server
-# oracle_password
 
 # Set up paths.
 herring_haddock_AM_location<-here("input_data","Herring_Haddock_Accountability_Measure_Areas")
@@ -61,15 +54,15 @@ dir.create(here("GF69_herring_mackerel","data", "main"), showWarnings="FALSE")
 
 # Purpose
 
-This code extracts and processes data.  We will produce a dataset containing:
+This code extracts and processes data.  We will produce a that stacks together CAMS_LAND and CAMS_SUBTRIP:
 
-*    Permit (no need to filter by LA or open access herring/mackerel vessels)
-*    NESPP3 (herring and mackerel only)
-*    Year (2019-2021 or 2020-2022 if data is complete)
+*    PERMIT and HULLID (no need to filter by LA or open access herring/mackerel vessels)
+*    ITIS_TSN and Species Name (herring and mackerel only)
+*    Year (2020-2023)
 *    Month
-*    Landings
-*    Revenue
-*    Area, where area comes from the shapoefile found at herring_haddock_AM 
+*    Landings (lndlb)
+*    Revenue (livlb)
+*    Area
 
 # Dependencies
 
@@ -79,8 +72,8 @@ This code depends on:
 
 
 # Data Overview
-##  DMIS
-We are using the APSD.t_ssb_catch_current and APSD.t_ssb_trip_current tables. We're only using the APSD.t_ssb_trip_current as a conveient way to pull out the calendar_year and trip_date fields, so we can categorize by month. We use statistical area (AREA) to assign to the haddock AM areas.   See the DMIS documentation for further information. 
+
+Data Comes from CAMS_LAND and CAMS_SUBTRIP. 
 
 
 # Loading Data fom Oracle 
@@ -157,18 +150,6 @@ final_product<-final_product %>%
 
 
 
-final_product$month<-lubridate::month(final_product$trip_date)
-
-#Summary
-final_product <- final_product%>%
-  group_by(area_by_stat, calendar_year, itis_tsn, itis_name) %>%
-  dplyr::summarise(pounds=sum(livlb), landed=sum(lndlb), revenue=sum(dlr_dollar)) %>%
-  ungroup()
-
-
-
-
-
 final_DATA_name <-paste0("herring_data",vintage_string)
 saveRDS(final_product, file=here("GF69_herring_mackerel", "data","main",paste0(final_DATA_name,".Rds")))
 haven::write_sas(data=final_product, path=here("GF69_herring_mackerel", "data","main",paste0(final_DATA_name,".sas7bdat")))
@@ -176,6 +157,29 @@ haven::write_sas(data=final_product, path=here("GF69_herring_mackerel", "data","
 write_delim(final_product, 
             file=here("GF69_herring_mackerel","data","main",paste0(final_DATA_name,".csv")),
             delim=",")
+
+
+
+
+
+
+#Summary
+final_product_summary <- final_product%>%
+  group_by(area_by_stat, calendar_year, itis_tsn, itis_name) %>%
+  dplyr::summarise(pounds=sum(livlb), landed=sum(lndlb), revenue=sum(dlr_dollar)) %>%
+  ungroup()
+
+
+summary_name <-paste0("herring_data_summary",vintage_string)
+saveRDS(final_product_summary, file=here("GF69_herring_mackerel", "data","main",paste0(summary_name,".Rds")))
+haven::write_sas(data=final_product_summary, path=here("GF69_herring_mackerel", "data","main",paste0(summary_name,".sas7bdat")))
+
+write_delim(final_product_summary, 
+            file=here("GF69_herring_mackerel","data","main",paste0(summary_name,".csv")),
+            delim=",")
+
+
+
 
 
 
