@@ -8,9 +8,6 @@ output:
 urlcolor: blue
 
 ---
-
-<!---
-In order to do a data update, you need all of the params set to "live". It takes a long, long time. --->
 # Project setup
 here(), load libraries, and set a data vintage.  
 
@@ -18,15 +15,14 @@ here(), load libraries, and set a data vintage.
 ```{r setup, include=TRUE, echo=TRUE, results=FALSE}
 # Set Path
 here::i_am("GF69_herring_mackerel/data_wrangle/data_extracting.rmd")
-
-# Please ensure you have the proper packages installed with (install.packages()) or a request to ITD if any libaries do not load.  
 library("here")
 library("ROracle")
-library("tidyvers")
-library("dplyr")
+library("tidyverse")
 library("haven")
 library("lubridate")
 library("readr")
+
+#Data vintage
 vintage_string<-Sys.Date()
 vintage_string<-gsub("-","_",vintage_string)
 
@@ -54,7 +50,7 @@ dir.create(here("GF69_herring_mackerel","data", "main"), showWarnings="FALSE")
 
 # Purpose
 
-This code extracts and processes data.  We will produce a that stacks together CAMS_LAND and CAMS_SUBTRIP:
+This code extracts and processes data, mostly from CAMS_LAND.
 
 *    PERMIT and HULLID (no need to filter by LA or open access herring/mackerel vessels)
 *    ITIS_TSN and Species Name (herring and mackerel only)
@@ -88,10 +84,9 @@ I'm using DMIS to get the broad stock area (area) and the herring and SMB permit
 star_dbi_ROracle <- DBI::dbConnect(dbDriver("Oracle"),id, password=novapw, dbname=nefscusers.connect.string)
 
 
-  CURRENT.QUERY <- paste("select t.date_trip as trip_date, t.year as CALENDAR_YEAR, c.* from cams_land c, cams_subtrip t
+  CURRENT.QUERY <- paste("select c.* from cams_land c, cams_subtrip t
   where C.ITIS_TSN in (161722,172414)
-  and c.CAMSID=t.CAMSID 
-  and t.year between", START.YEAR, "and",END.YEAR, sep=" ")
+  and c.year between", START.YEAR, "and",END.YEAR, sep=" ")
 
 CAMS_data<-dplyr::tbl(star_dbi_ROracle,sql(CURRENT.QUERY)) %>%
    collect()
