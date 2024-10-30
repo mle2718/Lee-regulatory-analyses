@@ -71,12 +71,7 @@ This code depends on:
 
 Data Comes from CAMS_LAND and CAMS_SUBTRIP. 
 
-
-# Loading Data fom Oracle 
-
-I'm using DMIS to get the broad stock area (area) and the herring and SMB permits for trips that caught herring or mackerel.
-
-```{r DMIS_Query, echo=TRUE,eval=TRUE}
+```{r CAMS_query, echo=TRUE,eval=TRUE}
 
 
 
@@ -119,7 +114,7 @@ saveRDS(CAMS_data, file=here("GF65_herring_mackerel", "data","intermediate",CAMS
 
 Send the NAs to zeros and bin into Haddock AM areas.
 
-```{r merge, include=TRUE, echo=TRUE, results=TRUE, eval=TRUE}
+```{r tidyup, include=TRUE, echo=TRUE, results=TRUE, eval=TRUE}
 #final_product<-dplyr::left_join(APSD.DMIS_WIND_TEST, DMIS_DATA, by = c("DOCID" = "DOCID"))
 
 final_product<-CAMS_data
@@ -160,7 +155,7 @@ write_delim(final_product,
 
 #Summary
 final_product_summary <- final_product%>%
-  group_by(area_by_stat, calendar_year, itis_tsn, itis_name) %>%
+  group_by(area_by_stat, year, itis_tsn, itis_name) %>%
   dplyr::summarise(pounds=sum(livlb), landed=sum(lndlb), revenue=sum(dlr_dollar)) %>%
   ungroup()
 
