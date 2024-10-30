@@ -1,0 +1,182 @@
+---
+title: "Groundfish Framework 69 --herring and mackerel"
+author: "Min-Yang Lee"
+date: "10/24/2024"
+output:
+  pdf_document: default
+  html_document: default
+urlcolor: blue
+
+---
+# Project setup
+here(), load libraries, and set a data vintage.  
+
+
+```{r setup, include=TRUE, echo=TRUE, results=FALSE}
+# Set Path
+here::i_am("GF69_herring_mackerel/data_wrangle/data_extracting.rmd")
+library("here")
+library("ROracle")
+library("tidyverse")
+library("haven")
+library("lubridate")
+library("readr")
+
+#Data vintage
+vintage_string<-Sys.Date()
+vintage_string<-gsub("-","_",vintage_string)
+
+
+START.YEAR = 2020
+END.YEAR = 2023
+
+# Set up paths.
+herring_haddock_AM_location<-here("input_data","Herring_Haddock_Accountability_Measure_Areas")
+```
+
+# Organization
+
+
+```{r folder_create, include=TRUE, echo=FALSE, results=FALSE}
+# You only need to run this once, but nothing bad will happen if you keep include=TRUE.
+
+# Set up some folders
+
+dir.create(here("GF69_herring_mackerel","data"), showWarnings="FALSE")
+dir.create(here("GF69_herring_mackerel","data", "intermediate"), showWarnings="FALSE")
+dir.create(here("GF69_herring_mackerel","data", "main"), showWarnings="FALSE")
+
+```
+
+# Purpose
+
+This code extracts and processes data, mostly from CAMS_LAND.
+
+*    PERMIT and HULLID (no need to filter by LA or open access herring/mackerel vessels)
+*    ITIS_TSN and Species Name (herring and mackerel only)
+*    Year (2020-2023)
+*    Month
+*    Landings (lndlb)
+*    Revenue (livlb)
+*    Area
+
+# Dependencies
+
+This code depends on:
+
+1.  The ability to connect to NEFSC oracle databases (CAMS).
+
+
+# Data Overview
+
+Data Comes from CAMS_LAND and CAMS_SUBTRIP. 
+
+```{r CAMS_query, echo=TRUE,eval=TRUE}
+
+
+
+# Pull in the MRIP_MA_SITE_LIST 
+star_dbi_ROracle <- DBI::dbConnect(dbDriver("Oracle"),id, password=novapw, dbname=nefscusers.connect.string)
+
+
+  CURRENT.QUERY <- paste("select c.* from cams_land c
+  where C.ITIS_TSN in (161722,172414)
+  and c.year between", START.YEAR, "and",END.YEAR, sep=" ")
+
+CAMS_data<-dplyr::tbl(star_dbi_ROracle,sql(CURRENT.QUERY)) %>%
+   collect()
+
+
+CURRENT.QUERY <- "select * from cams_garfo.cfg_itis"
+
+itis<-dplyr::tbl(star_dbi_ROracle,sql(CURRENT.QUERY)) %>%
+   collect()
+
+
+
+dbDisconnect(star_dbi_ROracle)
+names(CAMS_data) <- tolower(names(CAMS_data))
+names(itis) <- tolower(names(itis))
+
+CAMS_data<-CAMS_data %>%
+  dplyr::left_join(itis, by=join_by(itis_tsn==itis_tsn), relationship="many-to-one", suffix=c("",".y")) %>%
+  select(-ends_with(".y"))
+
+```
+
+
+# Tidying up
+
+Send the NAs to zeros and bin into Haddock AM areas.
+
+```{r tidyup, include=TRUE, echo=TRUE, results=TRUE, eval=TRUE}
+#final_product<-dplyr::left_join(APSD.DMIS_WIND_TEST, DMIS_DATA, by = c("DOCID" = "DOCID"))
+
+final_product<-CAMS_data
+#Remove NAs from 2 of the value columns. Set them to zero.
+final_product<-final_product%>%
+    dplyr::mutate(dlr_dollar=ifelse(is.na(value),0,value)
+                 
+                 )
+
+
+#assign by Stat area
+# 513, 514, 515 -- GOM Area
+# 521, 522, 561, 562, 525 GB area
+
+
+final_product<-final_product %>%
+  mutate(area_by_stat=case_when(area %in% c(513,514,515)  ~ "GOM_AREA", .default="NONE"),
+  ) %>%
+  mutate(area_by_stat=case_when(area %in% c(521,522,561,562,525)  ~ "GB_AREA", .default=area_by_stat),
+)
+
+
+
+
+
+final_DATA_name <-paste0("herring_data",vintage_string)
+saveRDS(final_product, file=here("GF69_herring_mackerel", "data","main",paste0(final_DATA_name,".Rds")))
+haven::write_sas(data=final_product, path=here("GF69_herring_mackerel", "data","main",paste0(final_DATA_name,".sas7bdat")))
+
+write_delim(final_product, 
+            file=here("GF69_herring_mackerel","data","main",paste0(final_DATA_name,".csv")),
+            delim=",")
+
+
+
+
+
+
+#Summary
+final_product_summary <- final_product%>%
+  group_by(area_by_stat, year, itis_tsn, itis_name) %>%
+  dplyr::summarise(pounds=sum(livlb), landed=sum(lndlb), revenue=sum(dlr_dollar)) %>%
+  ungroup()
+
+
+summary_name <-paste0("herring_data_summary",vintage_string)
+saveRDS(final_product_summary, file=here("GF69_herring_mackerel", "data","main",paste0(summary_name,".Rds")))
+haven::write_sas(data=final_product_summary, path=here("GF69_herring_mackerel", "data","main",paste0(summary_name,".sas7bdat")))
+
+write_delim(final_product_summary, 
+            file=here("GF69_herring_mackerel","data","main",paste0(summary_name,".csv")),
+            delim=",")
+
+
+
+
+
+
+```
+
+
+# R Session Information
+```{r session_info, include=TRUE, echo=TRUE, results=TRUE, eval=TRUE}
+sessionInfo()
+Sys.Date()
+
+```
+This may be useful for diagnosing and troubleshooting one day.
+
+
