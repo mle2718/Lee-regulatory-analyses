@@ -1,0 +1,193 @@
+---
+title: "Groundfish Framework 69 --herring and mackerel"
+author: "Min-Yang Lee"
+date: "10/24/2024"
+output:
+  pdf_document: default
+  html_document: default
+urlcolor: blue
+
+---
+
+<!---
+In order to do a data update, you need all of the params set to "live". It takes a long, long time. --->
+# Project setup
+here(), load libraries, and set a data vintage.  
+
+
+```{r setup, include=TRUE, echo=TRUE, results=FALSE}
+# Set Path
+here::i_am("GF69_herring_mackerel/data_wrangle/data_extracting.rmd")
+
+# Please ensure you have the proper packages installed with (install.packages()) or a request to ITD if any libaries do not load.  
+library("here")
+library("ROracle")
+library("tibble")
+library("dplyr")
+library("haven")
+library("lubridate")
+library("readr")
+vintage_string<-Sys.Date()
+vintage_string<-gsub("-","_",vintage_string)
+
+
+START.YEAR = 2020
+END.YEAR = 2023
+
+# Credentials
+source(here("R_code","project_logistics","R_credentials_RODBC.R"))
+# This file leaves behind the following things:
+# oracle_username
+# oracle_server
+# oracle_password
+
+# Set up paths.
+herring_haddock_AM_location<-here("input_data","Herring_Haddock_Accountability_Measure_Areas")
+```
+
+# Organization
+
+
+```{r folder_create, include=TRUE, echo=FALSE, results=FALSE}
+# You only need to run this once, but nothing bad will happen if you keep include=TRUE.
+
+# Set up some folders
+
+dir.create(here("GF69_herring_mackerel","data"), showWarnings="FALSE")
+dir.create(here("GF69_herring_mackerel","data", "intermediate"), showWarnings="FALSE")
+dir.create(here("GF69_herring_mackerel","data", "main"), showWarnings="FALSE")
+
+```
+
+# Purpose
+
+This code extracts and processes data.  We will produce a dataset containing:
+
+*    Permit (no need to filter by LA or open access herring/mackerel vessels)
+*    NESPP3 (herring and mackerel only)
+*    Year (2019-2021 or 2020-2022 if data is complete)
+*    Month
+*    Landings
+*    Revenue
+*    Area, where area comes from the shapoefile found at herring_haddock_AM 
+
+# Dependencies
+
+This code depends on:
+
+1.  The ability to connect to NEFSC oracle databases (CAMS).
+
+
+# Data Overview
+##  DMIS
+We are using the APSD.t_ssb_catch_current and APSD.t_ssb_trip_current tables. We're only using the APSD.t_ssb_trip_current as a conveient way to pull out the calendar_year and trip_date fields, so we can categorize by month. We use statistical area (AREA) to assign to the haddock AM areas.   See the DMIS documentation for further information. 
+
+
+# Loading Data fom Oracle 
+
+I'm using DMIS to get the broad stock area (area) and the herring and SMB permits for trips that caught herring or mackerel.
+
+```{r DMIS_Query, echo=TRUE,eval=TRUE}
+
+
+
+# Pull in the MRIP_MA_SITE_LIST 
+star_dbi_ROracle <- DBI::dbConnect(dbDriver("Oracle"),id, password=novapw, dbname=nefscusers.connect.string)
+
+
+  CURRENT.QUERY <- paste("select t.date_trip as trip_date, t.year as CALENDAR_YEAR, c.* from cams_land c, cams_subtrip t
+  where C.ITIS_TSN in (161722,172414)
+  and c.CAMSID=t.CAMSID 
+  and t.year between", START.YEAR, "and",END.YEAR, sep=" ")
+
+CAMS_data<-dplyr::tbl(star_dbi_ROracle,sql(CURRENT.QUERY)) %>%
+   collect()
+
+
+CURRENT.QUERY <- "select * from cams_garfo.cfg_itis"
+
+itis<-dplyr::tbl(star_dbi_ROracle,sql(CURRENT.QUERY)) %>%
+   collect()
+
+
+
+dbDisconnect(star_dbi_ROracle)
+names(CAMS_data) <- tolower(names(CAMS_data))
+names(itis) <- tolower(names(itis))
+
+CAMS_data<-CAMS_data %>%
+  dplyr::left_join(itis, by=join_by(itis_tsn==itis_tsn), relationship="many-to-one", suffix=c("",".y")) %>%
+  select(-ends_with(".y"))
+
+
+
+#save to RDS
+CAMS_data_name <-paste0("CAMS_data_",vintage_string,".Rds")
+saveRDS(CAMS_data, file=here("GF65_herring_mackerel", "data","intermediate",CAMS_data_name))
+```
+
+
+# Tidying up
+
+Send the NAs to zeros and bin into Haddock AM areas.
+
+```{r merge, include=TRUE, echo=TRUE, results=TRUE, eval=TRUE}
+#final_product<-dplyr::left_join(APSD.DMIS_WIND_TEST, DMIS_DATA, by = c("DOCID" = "DOCID"))
+
+final_product<-CAMS_data
+#Remove NAs from 2 of the value columns. Set them to zero.
+final_product<-final_product%>%
+    dplyr::mutate(dlr_dollar=ifelse(is.na(value),0,value)
+                 
+                 )
+
+
+#assign by Stat area
+# 513, 514, 515 -- GOM Area
+# 521, 522, 561, 562, 525 GB area
+
+
+final_product<-final_product %>%
+  mutate(area_by_stat=case_when(area %in% c(513,514,515)  ~ "GOM_AREA", .default="NONE"),
+  ) %>%
+  mutate(area_by_stat=case_when(area %in% c(521,522,561,562,525)  ~ "GB_AREA", .default=area_by_stat),
+)
+
+
+
+
+
+final_product$month<-lubridate::month(final_product$trip_date)
+
+#Summary
+final_product <- final_product%>%
+  group_by(area_by_stat, calendar_year, itis_tsn, itis_name) %>%
+  dplyr::summarise(pounds=sum(livlb), landed=sum(lndlb), revenue=sum(dlr_dollar)) %>%
+  ungroup()
+
+
+
+
+
+final_DATA_name <-paste0("herring_data",vintage_string)
+saveRDS(final_product, file=here("GF69_herring_mackerel", "data","main",paste0(final_DATA_name,".Rds")))
+haven::write_sas(data=final_product, path=here("GF69_herring_mackerel", "data","main",paste0(final_DATA_name,".sas7bdat")))
+
+write_delim(final_product, 
+            file=here("GF69_herring_mackerel","data","main",paste0(final_DATA_name,".csv")),
+            delim=",")
+
+
+
+```
+
+
+# R Session Information
+```{r session_info, include=TRUE, echo=TRUE, results=TRUE, eval=TRUE}
+sessionInfo()
+Sys.Date()
+
+```
+This may be useful for diagnosing and troubleshooting one day.
+
+
