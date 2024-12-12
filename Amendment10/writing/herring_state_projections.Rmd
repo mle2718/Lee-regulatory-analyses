@@ -1,0 +1,256 @@
+---
+title: "Herring state projections"
+author: "Min-Yang Lee"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    df_print: paged
+    fig_caption: yes
+  pdf_document:
+    keep_tex: yes
+    fig_caption: yes
+    number_sections: yes
+header-includes: \usepackage{setspace}\doublespacing
+urlcolor: blue
+editor_options:
+  chunk_output_type: console
+fontsize: 12pt
+---
+
+<!---- 
+ The global_options chunk loads libraries, sets options, figures out if you're on a desktop or server, sets years, and sets graphing options
+ --->
+```{r global_options, include=FALSE}
+
+library("here")
+library("ROracle")
+library("readr")
+ library("foreign")
+ library("tidyverse")
+ library("scales")
+ library("knitr")
+ library("lubridate")
+ library("kableExtra")
+ library("viridis")
+library("sf")
+library("mapview")
+here::i_am("writing/herring_state_projections.Rmd")
+
+#############################################################################
+#knitr options
+
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, error = FALSE, message = FALSE, comment = FALSE, cache = FALSE, progress = TRUE, verbose = FALSE, 
+											dpi = 600)
+options(tinytex.verbose = TRUE)
+# options(knitr.table.format = "latex")
+options(scipen=999)
+
+vintage_string<-Sys.Date()
+vintage_string<-gsub("-","_",vintage_string)
+
+con <- ROracle::dbConnect(
+  drv = ROracle::Oracle(),
+  username = id,
+  password = novapw,
+  dbname = "nefsc_users")
+
+
+#############################################################################
+my_images<-here("images")
+
+descriptive_images<-here("images","descriptive")
+exploratory_images<-here("images","exploratory")
+
+
+# Read in statistical areas
+hmas<-here("data_folder","external","Herring_Management_Areas","Herring_Management_Areas.shp")
+hmas <- st_read(dsn = hmas)
+
+
+
+
+# ggplot(stat_areas) + 
+#   geom_sf() + 
+#   geom_sf_text(aes(label = Id), colour = "black") + 
+#   coord_quickmap()
+
+# 
+# ggplot() + 
+#   geom_sf(data=stat_areas)+ 
+#   geom_sf_label(aes(label = stat_areas$Id))
+
+```
+
+# Overview -- a map
+
+Here is a quick and dirty map of the herring management areas. 
+
+1A is the inshore Gulf of Maine, which is used by purse seiners in the summer.
+
+1B is the in between area. The quota here has been extremely low in recent years.
+
+2 is Southern New England. It is used by trawlers in the winter. Some of the trawlers specialize. Some of the fishing is by the small mesh fleet out of Rhode Island that also targets squid, mackerel, and butterfish.
+
+3 is the Georges Bank area. This area is used by trawlers and midwater trawlers in the Summer.  Purse seiners cannot effectively fish here.
+
+
+
+```{r hmas, include=TRUE}
+
+ggplot(hmas) +
+  geom_sf(fill = "#69b3a2", color = "white") + 
+  geom_sf_text(aes(label = COMMNAME))
+```
+
+
+# Gross Revenues 
+
+I project gross revenues using the model of prices from Amendment 8 with updated data.  Landings are set equal to the ACLs from the Council Preferred option.  Baseline is the 2023 ACL.  
+
+```{r prices_revenuesCR, eval=TRUE}
+# 2024 quota is 19141mt
+LandingsCR<-c(23961, 2710, 6854, 6854)
+
+Year<-c("Baseline", "2025", "2026", "2027")
+Price<-894-6.079*LandingsCR/1000
+Revenue<-(894-6.079*LandingsCR/1000)*LandingsCR/1000*1000
+proj_revCR<-data.frame(Year, LandingsCR, Price, Revenue)
+names(proj_revCR)[names(proj_revCR) == 'LandingsCR'] <- 'Landings'
+
+assign("baselineRevenue",proj_revCR[proj_revCR$Year =="Baseline" ,"Revenue"])
+baselineRevenue2 <- as.numeric(baselineRevenue)
+
+
+
+proj_revCR<-proj_revCR %>%
+  mutate(Rn=Revenue,
+         `Revenue Change`=Revenue-baselineRevenue2) %>%
+mutate(`Revenue Change` = ifelse(Year == "Baseline", NA, `Revenue Change`))
+#  filter(Year %in% c("2025", "2026" ,"2027"))
+
+proj_revCR2<-proj_revCR %>%
+  mutate(across(c(`Revenue`, 'Revenue Change'), ~ number(.x, accuracy=1000,prefix="$", big.mark=","))) 
+
+proj_revCR2<-proj_revCR2 %>%
+  mutate(across(c(`Price`), ~ number(.x, accuracy=1,prefix="$", big.mark=",")))
+proj_revCR2<-proj_revCR2 %>%
+  mutate(across(c(`Landings`), ~ number(.x, accuracy=1, big.mark=",")))
+
+
+proj_revCR2 <-proj_revCR2 %>% select(-c(Rn))
+kbl(proj_revCR2, digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected landings (mt), prices (real 2023 USD/mt), revenues (real 2023 USD) and revenue change relative to the baseline for 2025-2027 specifications from the Amendment 8 ABC Control Rule.") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+```
+
+```{r break_into_hmas, include=TRUE}
+# Percentage of the total ACL to each zone
+percentages<-data.frame(
+  hma=c("1A", "1B", "2", "3"),
+  pct=c(0.289,0.043, 0.278, 0.39)
+)
+
+hma_rev<-proj_revCR %>%
+  select(Year, Landings, Revenue) %>%
+  cross_join(percentages)%>%
+  mutate(Revenue=Revenue*pct) %>%
+  select(Year, Landings, Revenue, hma)
+
+```
+
+
+```{r get_herring_data, include=TRUE}
+# Code to pull get herring data from CAMS 
+
+CURRENT.QUERY = "select cl.year, cl.state, cl.area_herr, sum(nvl(lndlb,0)) as lndlb, sum(nvl(value,0)) as value from cams_land cl
+  where cl.year between 2019 and 2023 and cl.itis_tsn=161722 
+group by cl.year, cl.state, cl.area_herr"
+
+CAMS_herring<- tbl(con,sql(CURRENT.QUERY)) %>%
+    collect() %>%
+  rename_with(tolower) %>%
+  arrange(year, area_herr, state, lndlb, value)
+
+dbDisconnect(con)
+
+```
+
+# landings, from each area to each state 
+
+There is fishing in 1B, but the total revenues are very low ($15,000 in 2023), so they don't show up well in the bar chart.
+```{r plots, include=TRUE}
+
+CAMS_herring2 <- CAMS_herring %>%
+  dplyr::filter(!is.na(area_herr)) %>%
+  dplyr::filter(state %in% c("MA","CT","ME", "NJ", "RI"))
+
+ggplot(CAMS_herring2
+       , aes(y=value, x=area_herr, fill=state)) + 
+  facet_wrap(~year) + 
+  geom_bar(position="stack", stat="identity")
+
+```
+
+
+Compute state level percentages for each herring area
+
+```{r state_pcts, include=TRUE}
+
+state_pcts<-CAMS_herring %>%
+  dplyr::filter(!is.na(area_herr)) %>%
+  group_by(area_herr, state) %>%
+  summarise(area_state_value=sum(value)) %>%
+  ungroup() %>%
+  group_by(area_herr) %>%
+  mutate(total_area=sum(area_state_value))%>%
+  ungroup()%>%
+  mutate(state_share=area_state_value/total_area) %>%
+  select(state, area_herr, state_share)%>%
+  group_by(area_herr)%>%
+  arrange(-state_share, .by_group=TRUE)
+
+
+
+kbl(state_pcts, digits=3,booktabs=T, align=c("l",rep('r',times=2)), caption =  "State shares of each HMA, averaged over 2019-2023") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+
+
+
+Project state landings for Baseline, 2026, and 2025
+
+```{r state_landings_projections, include=TRUE}
+
+state_rev<-hma_rev %>%
+  dplyr::filter(Year %in% c("Baseline","2025","2026")) %>%
+  left_join(state_pcts, by=join_by(hma==area_herr), relationship='many-to-many') %>%
+  mutate(Revenue=Revenue*state_share)%>%
+  group_by(Year,state) %>%
+  summarise(Revenue=round(sum(Revenue),0)) %>%
+  arrange(desc(Year),desc(Revenue))
+
+write.csv(state_rev, file=here("data_folder","main",paste0("state_rev_",vintage_string,".csv")), row.names=FALSE)
+
+state_rev<-state_rev %>%
+  pivot_wider(
+    names_from=Year,
+    values_from=Revenue,
+    names_glue = "Revenue_{Year}",
+
+  )
+
+kbl(state_rev, digits=3,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected Revenue by state under Baseline,  2025, and 2026 ACLs") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+```
+
+
+
+  
