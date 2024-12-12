@@ -253,4 +253,33 @@ kbl(state_rev, digits=3,booktabs=T, align=c("l",rep('r',times=3)), caption =  "P
 
 
 
+
+Compute importance of each herring area to each state. This is a quick way to determine gear: the 1A fishery is Purse Seine, everything else is a mix of Otter trawl and mid-water trawl.
+
+```{r state_hma_usage, include=TRUE}
+
+hma_importance<-CAMS_herring %>%
+  dplyr::filter(!is.na(area_herr))  %>%
+  dplyr::filter(state %in% c("MA","CT","ME", "NJ", "RI")) %>%
+  group_by(area_herr, state) %>%
+  summarise(area_state_value=sum(value)) %>%
+  ungroup() %>%
+  group_by(state) %>%
+  mutate(total_state=sum(area_state_value))%>%
+  ungroup()%>%
+  mutate(hma_importance=area_state_value/total_state) %>%
+  select(state, area_herr, hma_importance)%>%
+  group_by(state)%>%
+  arrange(-hma_importance, .by_group=TRUE)
+
+
+
+kbl(hma_importance, digits=3,booktabs=T, align=c("l",rep('r',times=2)), caption =  "Importance of each HMA to each state, averaged over 2019-2023") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+
   
