@@ -68,6 +68,7 @@ hmas <- st_read(dsn = hmas)
 
 
 
+lbs_per_mt<-2204.63
 
 # ggplot(stat_areas) + 
 #   geom_sf() + 
@@ -164,7 +165,7 @@ hma_rev<-proj_revCR %>%
 # Code to pull get herring data from CAMS 
 
 CURRENT.QUERY = "select cl.year, cl.state, cl.area_herr, sum(nvl(lndlb,0)) as lndlb, sum(nvl(value,0)) as value from cams_land cl
-  where cl.year between 2019 and 2023 and cl.itis_tsn=161722 
+  where cl.year between 2019 and 2024 and cl.itis_tsn=161722 
 group by cl.year, cl.state, cl.area_herr"
 
 CAMS_herring<- tbl(con,sql(CURRENT.QUERY)) %>%
@@ -212,13 +213,42 @@ state_pcts<-CAMS_herring %>%
 
 
 
-kbl(state_pcts, digits=3,booktabs=T, align=c("l",rep('r',times=2)), caption =  "State shares of each HMA, averaged over 2019-2023") %>%
+kbl(state_pcts, digits=3,booktabs=T, align=c("l",rep('r',times=2)), caption =  "State shares of each HMA, averaged over 2019-2024") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
 
 
 ```
+
+
+
+Actual state revenue in 2023 and 2024
+
+```{r state_landings, include=TRUE}
+state_landings<-CAMS_herring %>%
+  group_by(state, year) %>%
+  summarise(value=sum(value, na.rm=TRUE),
+            lnd_mt=sum(lndlb/lbs_per_mt, na.rm=TRUE)) %>%
+  ungroup()%>%
+  arrange(year, state)
+
+# kbl(state_landings %>%  dplyr::filter(year>=2023) %>% dplyr::filter(value>=50000)
+# , digits=0,booktabs=T, align=c("l",rep('r',times=2)), caption =  "State level herring revenue in 2023 and 2024, Real 2023 USD.") %>%
+#     #column_spec(5:8, width = "2cm")
+#     kable_styling(full_width = F) %>% 
+#       row_spec(0,bold=FALSE) 
+
+write.csv(state_landings, file=here("data_folder","main",paste0("state_actuals_",vintage_string,".csv")), row.names=FALSE)
+
+
+
+```
+
+
+
+
+
 
 
 
@@ -274,7 +304,7 @@ hma_importance<-CAMS_herring %>%
 
 
 
-kbl(hma_importance, digits=3,booktabs=T, align=c("l",rep('r',times=2)), caption =  "Importance of each HMA to each state, averaged over 2019-2023") %>%
+kbl(hma_importance, digits=3,booktabs=T, align=c("l",rep('r',times=2)), caption =  "Importance of each HMA to each state, averaged over 2019-2024") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
