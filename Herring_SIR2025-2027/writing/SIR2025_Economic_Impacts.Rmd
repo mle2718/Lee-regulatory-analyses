@@ -276,24 +276,18 @@ baseline2<-proj_rev%>%
 ```
 
 
-The 2023 actual landings of  **`r baseline2$Landings`**mt is used as the baseline. The price model projects prices of  **`r baseline2$Price` per metric ton** and real gross revenues derived from Atlantic herring of **`r baseline2$Revenue`** under baseline conditions. Both of these figures are higher than the actual prices (**`r baseline2$Actual_Price` per metric ton**) and revenues (**`r baseline2$Actual_Revenue`**). On average, predictions from the price model will match the actual prices, but in any particular year, they will be different. Nevertheless, we use the projected prices in the construction of baseline revenue so that an model errors are removed when comparing effects of different sets of ACLs to the baseline.  
+The 2023 actual landings of  **`r baseline2$Landings`mt** is used as the baseline. The price model projects prices of  **`r baseline2$Price` per metric ton** and real gross revenues derived from Atlantic herring of **`r baseline2$Revenue`** under baseline conditions. Both of these figures are higher than the actual prices (**`r baseline2$Actual_Price` per metric ton**) and revenues (**`r baseline2$Actual_Revenue`**). On average, predictions from the price model will match the actual prices, but in any particular year, they will be different. Nevertheless, we use the projected prices in the construction of baseline revenue so that an model errors are removed when comparing effects of different sets of ACLs to the baseline.  
 
 #### Benefits (Gross Revenues) of the draft action
 
-Table \ref{tab:prices_revenues_table} summarizes the annual prices, revenues, and changes of the draft action relative to the baseline. The draft action will result substantially lower landings relative to the baseline. The decrease in landings results in modestly higher Atlantic herring prices. Overall, the model projects a **decrease in revenues of `r proj_rev2$rc`** over the 2025-2027 time period. When discounted at a 2% discount rate, this corresponds to a net present value **decrease of `r  proj_rev2$rev2`**.
-
-```{r prices_revenues_table, eval=TRUE}
-
-proj_rev2 <-proj_rev %>% select(c(Year, Price, Revenue, 'Revenue Change'))
-kbl(proj_rev2, digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected landings (mt), prices (real 2023 USD/mt), revenues (real 2023 USD) and revenue change relative to the baseline for 2025-2027 draft specifications") %>%
+```{r prices_revenues_table_compute, eval=TRUE, results='hide'}
+kbl(proj_rev %>% select(c(Year, Price, Revenue, 'Revenue Change')), digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected landings (mt), prices (real 2023 USD/mt), revenues (real 2023 USD) and revenue change relative to the baseline for 2025-2027 draft specifications") %>%
     #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = F) %>% 
+    kable_styling(full_width = F, latex_options="hold_position") %>% 
       row_spec(0,bold=FALSE) 
 ```
 
-
-
-```{r npv, eval=TRUE}
+```{r npv, eval=TRUE, results='hide'}
 # Compute NPV of change in revenue at the 3% and 7% discount rates. No table is made here. I'm just computing a pair on numbers and sticking it into the text.
 proj_rev$df2<-1.02
 
@@ -309,13 +303,17 @@ proj_rev2<-proj_rev %>%
 
 ```
 
+```{r prices_revenues_table, ref.label=c('prices_revenues_table_compute'),eval=TRUE}
+```
+
+
 Table \ref{tab:prices_revenues_table} summarizes the annual prices, revenues, and changes of the draft action relative to the baseline. The draft action will result substantially lower landings relative to the baseline. The decrease in landings results in modestly higher Atlantic herring prices. Overall, the model projects a **decrease in revenues of `r proj_rev2$rc`** over the 2025-2027 time period. When discounted at a 2% discount rate, this corresponds to a net present value **decrease of `r  proj_rev2$rev2`**.
 
 \clearpage
 
 #### Benefits (Gross Revenues) of the ABC Control Rule
 
-```{r prices_revenuesCR, eval=TRUE}
+```{r prices_revenuesCR_table_compute, eval=TRUE, results='hide'}
 # 2024 quota is 19141mt
 
 proj_revCR<-data.frame(year=2025:2027,
@@ -331,29 +329,9 @@ proj_revCR$Actual_Price<-NA
 proj_revCR<-rbind(baseline,proj_revCR)
 
 proj_revCR<-proj_revCR %>%
-  mutate(Price=894-6.079*Landings/1000) %>%
+  mutate(Price=889-6.02*Landings/1000) %>%
   mutate(Revenue=Price*Landings) %>%
   rename(Year=year)
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 
-# 
-# Year<-c("Baseline", "2025", "2026", "2027")
-# Price<-894-6.079*LandingsCR/1000
-# Revenue<-(894-6.079*LandingsCR/1000)*LandingsCR/1000*1000
-# proj_revCR<-data.frame(Year, LandingsCR, Price, Revenue)
-# names(proj_revCR)[names(proj_revCR) == 'LandingsCR'] <- 'Landings'
 
 assign("baselineRevenue",proj_revCR[proj_revCR$Year =="Baseline" ,"Revenue"])
 baselineRevenue2 <- as.numeric(baselineRevenue)
@@ -375,8 +353,7 @@ proj_revCR<-proj_revCR %>%
   mutate(across(c(`Landings`), ~ number(.x, accuracy=1, big.mark=",")))
 
 
-proj_revCR2 <-proj_revCR %>% select(c(Year, Price, Revenue, 'Revenue Change'))
-kbl(proj_revCR2, digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected landings (mt), prices (real 2023 USD/mt), revenues (real 2023 USD) and revenue change relative to the baseline for 2025-2027 specifications from the Amendment 8 ABC Control Rule.") %>%
+kbl(proj_revCR %>% select(c(Year, Price, Revenue, 'Revenue Change')), digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected landings (mt), prices (real 2023 USD/mt), revenues (real 2023 USD) and revenue change relative to the baseline for 2025-2027 specifications from the Amendment 8 ABC Control Rule.") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
@@ -399,6 +376,12 @@ proj_revCR2<-proj_revCR %>%
 ```
 
 Table \ref{tab:prices_revenuesCR} summarizes the annual prices, revenues, and changes of the ABC Control rule ACLs relative to the baseline. These ACLs will result substantially lower landings relative to the baseline.  The decrease in landings results in modestly higher Atlantic herring prices. Overall, the model projects a **decrease in revenues of `r proj_revCR2$rc`** over the 2025-2027 time period. When discounted at a 2% discount rate, this corresponds to a net present value **decrease of `r  proj_revCR2$rev2`**.
+
+
+```{r prices_revenuesCR, ref.label=c('prices_revenuesCR_table_compute'),eval=TRUE}
+```
+
+
 
 Relative to the draft action, the specifications associated with the ABC control rule have higher landings and revenues in 2027.  Because the Atlantic herring ACL is higher in 2027, this is less likely to rebuild the overfished Atlantic herring stock, however we do not attempt to monetize this probability.
 
