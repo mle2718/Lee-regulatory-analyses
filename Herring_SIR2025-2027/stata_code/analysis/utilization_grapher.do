@@ -48,7 +48,7 @@ sort itis_tsn year;
 
 pause;
 
-keep if year>=2015 & year<=2023;
+keep if year>=2015 & year<=2024;
 collapse (sum) bait total, by(itis_tsn);
 gen bf=bait/total;
 browse;
