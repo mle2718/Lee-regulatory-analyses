@@ -3,13 +3,13 @@ title: "SIR 2025-2027 Specifications Economic Section"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
+  html_document:
+    df_print: paged
   pdf_document:
     keep_tex: yes
     fig_caption: yes
     number_sections: yes
   word_document: default
-  html_document:
-    df_print: paged
 header-includes: \usepackage{setspace}\doublespacing
 urlcolor: blue
 editor_options:
@@ -140,7 +140,8 @@ The rebuilding plan sets lower ABCs, and therefore lower ACLs, in order to rebui
 
 ### Description of the Fishery and other affected entitites
 
-Annual revenues from herring from 2019 to 2023, deflated to real 2023 dollars using the GDP implicit price deflator are presented in table \ref{tab:herring_rev_table}.  
+Annual revenues from herring from 2019 to 2023, deflated to real 2023 dollars using the GDP implicit price deflator are presented in table \ref{tab:herring_rev_table}.
+
 ```{r herring_rev_table, eval=TRUE}
 # ACLs from the GARFo quota monitoring page https://www.greateratlantic.fisheries.noaa.gov/ro/fso/reports/quota_monitoring_archive.html
 
@@ -157,13 +158,14 @@ yearly_rev<-monthly_util_herring %>%
   dplyr::filter(year>=2019)%>%
   left_join(ACL_mt, by=join_by(year==year))%>%
   left_join(deflatorsY, by=join_by(year==year))%>%
+  rename('ACL (mt)'=ACL) %>%
   mutate('Herring Value (M)'=((herring_value/fGDPDEF_2023))) %>%
   arrange(year)
 
 # Extract the baseline row (2023)
 baseline<-yearly_rev %>%
   dplyr::filter(year==2023)%>%
-  select(year, 'Landings (mt)', 'Herring Value (M)') %>%
+  select(year, 'ACL (mt)', 'Landings (mt)', 'Herring Value (M)') %>%
   rename(Landings='Landings (mt)') %>%
   rename(Actual_Revenue='Herring Value (M)')%>%
   mutate(Actual_Price=Actual_Revenue/Landings) %>%
@@ -175,13 +177,13 @@ yearly_rev<-yearly_rev %>%
   mutate(across(c('Herring Value (M)'), ~ number(.x, accuracy=1000,prefix="$", big.mark=","))) 
 
 yearly_rev<-yearly_rev %>%
-  mutate(across(c(`Landings (mt)`, 'ACL'), ~ number(.x, accuracy=1, big.mark=",")))
+  mutate(across(c('Landings (mt)', 'ACL (mt)'), ~ number(.x, accuracy=1, big.mark=",")))
 
 
 
 kbl(yearly_rev %>%
       dplyr::filter(year>=2021 & year<=2023) %>%
-    select(c(year, ACL, 'Landings (mt)', 'Herring Value (M)')) , digits=2,booktabs=T, align=c("l",rep('r',times=2)), caption =  "Recent ACLs (metric tons), Landings, and Gross Revenues derived from herring (Real 2023 USD)") %>%
+    select(c(year, 'ACL (mt)', 'Landings (mt)', 'Herring Value (M)')) , digits=2,booktabs=T, align=c("l",rep('r',times=2)), caption =  "Recent ACLs (metric tons), Landings (mt), and Gross Revenues derived from herring (Real 2023 USD)") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
@@ -197,7 +199,7 @@ The New England Fishery Management Council adopted an ABC control rule in Amendm
 
 ### Economic impacts relative to the baseline
 
-Fishery conditions in 2023 are used as a baseline.  In 2023, the ACL was 13,287mt and landings were 10,038mt.  The specifications recommended by the Herring Committee for are 2,710 mt, 6,854 mt, and 6,854 mt in 2025-2027 respectively.  The ABC control rule would set ACLs of 2,710 mt, 6,854 mt, and 11,404 mt in 2025-2027 respectively.  Recent catches have been close to the ACLs, and therefore, this analysis assumes that catch is equal to the ACLs in each of the specification years. This assumption seems particularly reasonable since both the proposed ACLs and those implied by the ABC control rule are well below recent values.
+Fishery conditions in 2023 are used as a baseline.  In 2023, the ACL was **`r baseline$'ACL (mt)'`mt**mt and landings were **`r baseline$Landings`**mt.  The specifications recommended by the Herring Committee for are 2,710 mt, 6,854 mt, and 6,854 mt in 2025-2027 respectively.  The ABC control rule would set ACLs of 2,710 mt, 6,854 mt, and 11,404 mt in 2025-2027 respectively.  Recent catches have been close to the ACLs, and therefore, this analysis assumes that catch is equal to the ACLs in each of the specification years. This assumption seems particularly reasonable since both the proposed ACLs and those implied by the ABC control rule are well below recent values.
 
 #### Prices and Revenues
 
@@ -205,7 +207,7 @@ This analysis updates an econometric model, developed in FW9, that estimates a r
 
 \begin{align}
 \mbox{Projected Price} &= 889 - 6.02*\mbox{landings}\label{eq:predicted_price}\\
-\mbox{Projected Revenue} &=  (889 - 6.002*\mbox{landings}) *\mbox{landings}\label{eq:predicted_landings}
+\mbox{Projected Revenue} &=  (889 - 6.02*\mbox{landings}) *\mbox{landings}\label{eq:predicted_landings}
 \end{align}
 
 The landings coefficient implies that, on average, a decrease in annual landings of 1,000 mt will increases prices by approximately \$6 per metric ton.  Similarly, an increase in annual landings of 1,000 mt will decrease prices by approximately \$6 per metric ton.
@@ -231,7 +233,7 @@ proj_rev<-data.frame(year=2025:2027,
 proj_rev<-proj_rev %>%
   mutate(year=as.character(year))
 
-
+baseline$`ACL (mt)`<-NULL
 
 proj_rev$Actual_Revenue<-NA
 proj_rev$Actual_Price<-NA
@@ -351,7 +353,6 @@ proj_revCR<-proj_revCR %>%
   mutate(across(c(`Price`), ~ number(.x, accuracy=1,prefix="$", big.mark=",")))
 proj_revCR<-proj_revCR %>%
   mutate(across(c(`Landings`), ~ number(.x, accuracy=1, big.mark=",")))
-
 
 kbl(proj_revCR %>% select(c(Year, Price, Revenue, 'Revenue Change')), digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected landings (mt), prices (real 2023 USD/mt), revenues (real 2023 USD) and revenue change relative to the baseline for 2025-2027 specifications from the Amendment 8 ABC Control Rule.") %>%
     #column_spec(5:8, width = "2cm")
