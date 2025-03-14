@@ -148,6 +148,10 @@ Annual revenues from herring from 2019 to 2023, deflated to real 2023 dollars us
 ACL_mt <- data.frame(year=2019:2024,
                              ACL=c(15574, 12195,5128, 4813, 13287,20141))
 
+
+# Inseason for 2025 is 2710
+# Draft action is 8587; 13165; 17187 for 2025-2027
+
 yearly_rev<-monthly_util_herring %>%
   select(year, landings_mt, price_mt) %>%
   mutate(herring_value=landings_mt*price_mt)%>%
