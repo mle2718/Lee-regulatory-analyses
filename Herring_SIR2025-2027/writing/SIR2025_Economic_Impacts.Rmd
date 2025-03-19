@@ -3,12 +3,12 @@ title: "SIR 2025-2027 Specifications Economic Section"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     keep_tex: yes
     fig_caption: yes
     number_sections: yes
+  html_document:
+    df_print: paged
   word_document: default
 header-includes: \usepackage{setspace}\doublespacing
 urlcolor: blue
@@ -330,7 +330,7 @@ The 2025 ACLs of **`r baselineB$Landings`mt** is used as **baseline B**; this co
 #### Benefits (Gross Revenues) of the draft action
 
 ```{r prices_revenues_table_compute, eval=TRUE, results='hide'}
-kbl(proj_rev %>% select(c(Year, Price, Revenue, 'Revenue ChangeA', 'Revenue ChangeB' )), digits=0,booktabs=T, align=c("l",rep('r',times=3)), caption =  "Projected landings (mt), prices (real 2023 USD/mt), revenues (real 2023 USD) and revenue change relative to the two baselines for 2025-2027 draft specifications") %>%
+kbl(proj_rev %>% select(c(Year, Landings, Price, Revenue, 'Revenue ChangeA', 'Revenue ChangeB' )), digits=0,booktabs=T, align=c("l",rep('r',times=4)), caption =  "Projected landings (mt), prices (real 2023 USD/mt), revenues (real 2023 USD) and revenue change relative to the two baselines for 2025-2027 draft specifications") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F, latex_options="hold_position") %>% 
       row_spec(0,bold=FALSE) 
@@ -369,11 +369,11 @@ proj_rev2<-proj_rev %>%
 ```
 
 
-Table \ref{tab:prices_revenues_table} summarizes the annual prices, revenues, and changes of the draft action relative to the baseline. The draft action will result higher landings and revenues compared to the baseline. The increase in landings results in modestly lower Atlantic herring prices. 
+Table \ref{tab:prices_revenues_table} summarizes the annual prices, revenues, and revenues changes due to the draft action relative to the two baselines. The draft action will result higher landings and revenues compared to both baselines. The increase in landings results in modestly lower Atlantic herring prices. 
 
-When discounted at 3\%, the model projects an **increase in revenues of `r proj_rev2$rev3A`** compared to Baseline A.   When discounted at a 7% discount rate, the model projects an **increase in revenues of `r proj_rev2$rev7A`** compared to Baseline A.  
+When discounted at 3\%, the model projects an **increase in revenues of `r proj_rev2$rev3A`** compared to Baseline A over three years.   When discounted at a 7% discount rate, the model projects an **increase in revenues of `r proj_rev2$rev7A`** compared to Baseline A over three years.  
 
-When discounted at 3\%, the model projects an **increase in revenues of `r proj_rev2$rev3B`** compared to Baseline B.   When discounted at a 7% discount rate, the model projects an **increase in revenues of `r proj_rev2$rev7B`** compared to Baseline B.  
+When discounted at 3\%, the model projects an **increase in revenues of `r proj_rev2$rev3B`** compared to Baseline B over three years.   When discounted at a 7% discount rate, the model projects an **increase in revenues of `r proj_rev2$rev7B`** compared to Baseline B over three years.  
 
 \clearpage
 
