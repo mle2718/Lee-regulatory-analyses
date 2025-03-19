@@ -3,12 +3,12 @@ title: "SIR 2025-2027 Specifications Economic Section"
 author: "Min-Yang Lee"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
+  html_document:
+    df_print: paged
   pdf_document:
     keep_tex: yes
     fig_caption: yes
     number_sections: yes
-  html_document:
-    df_print: paged
   word_document: default
 header-includes: \usepackage{setspace}\doublespacing
 urlcolor: blue
@@ -212,7 +212,7 @@ After reviewing the updated stock assessment, the New England Fishery Management
 
 Fishery conditions in 2023 are used as **baseline A**.  In 2023, the ACL was `r baseline$'ACL (mt)'`mt and landings were `r baseline$Landings`mt. An alternative baseline, **baseline B**, is the 2025 ACL (2,710mt) associated with in-season adjustment (89 FR 103695).  Recent catches have been close to the ACLs, and therefore, this analysis assumes that catch is equal to the ACLs in each of the specification years. 
 
-The draft ACL specifications are 8,587 mt, 13,165 mt, and 17,187 mt in 2025-2027 respectively.
+The draft ACL specifications are 4,556 mt, 9,134 mt, and 13,156 mt in 2025-2027 respectively.
 
 #### Prices and Revenues
 
@@ -292,7 +292,7 @@ baselineB<-baselineAB %>%
 
 
 proj_rev<-data.frame(year=2025:2027, 
-          Landings=c(8587, 13165, 17187)
+          Landings=c(4556, 9134,13156)
 )
 proj_rev<-proj_rev %>% 
   mutate(year=as.character(year)) %>%
@@ -371,7 +371,7 @@ proj_rev2<-proj_rev %>%
 
 Table \ref{tab:prices_revenues_table} summarizes the annual prices, revenues, and revenues changes due to the draft action relative to the two baselines. The draft action will result higher landings and revenues compared to both baselines. The increase in landings results in modestly lower Atlantic herring prices. 
 
-When discounted at 3\%, the model projects an **increase in revenues of `r proj_rev2$rev3A`** compared to Baseline A over three years.   When discounted at a 7% discount rate, the model projects an **increase in revenues of `r proj_rev2$rev7A`** compared to Baseline A over three years.  
+When discounted at 3\%, the model projects an **decrease in revenues of `r proj_rev2$rev3A`** compared to Baseline A over three years.   When discounted at a 7% discount rate, the model projects an **decrease in revenues of `r proj_rev2$rev7A`** compared to Baseline A over three years.  
 
 When discounted at 3\%, the model projects an **increase in revenues of `r proj_rev2$rev3B`** compared to Baseline B over three years.   When discounted at a 7% discount rate, the model projects an **increase in revenues of `r proj_rev2$rev7B`** compared to Baseline B over three years.  
 
@@ -697,7 +697,7 @@ p2+geom_boxplot(outlier.shape = NA) +
 
 To describe the effects of the changes in catch limits on small firms, this analysis projects firm-level revenue corresponding to the 2025-2027 ACLs in the draft action. The analysis assumes: 1)  that the share of Atlantic herring landings for each firm is equal to their 2019-2023 average and 2) that the firms non-herring revenues are constant at 2023 levels. The 2023 outcomes (herring and total revenues) are used as a baseline. Directly regulated entities that were inactive therefore have no projected revenue. The focus is on the vessels that have A, B, C, or E permits. Table \ref{tab:projected_revenues} summarizes the projected gross receipts, projected herring receipts, and baseline values.  Figures  \ref{figure_boxR} and \ref{fig:figure_boxH} illustrate the projected yearly distribution of total and herring revenues from the active vessels with A,B,C, or E Atlantic herring permits.
 
-The projected decrease in gross revenues and Atlantic herring revenues is moderate.  In 2025-2026, average gross receipts for small firms are projected to increase moderately.
+The projected decrease in gross revenues and Atlantic herring revenues is moderate.  Over the 2025-2027, average gross receipts for small firms are projected to decline slightly relative to 2023 levels.  
 
 ### Compliance Requirements
 \textcolor{red}{A description of the projected reporting, record-keeping, and other compliance requirements of the proposed rule, including an estimate of the classes of small entities which will be subject to the requirements of the report or record.}
