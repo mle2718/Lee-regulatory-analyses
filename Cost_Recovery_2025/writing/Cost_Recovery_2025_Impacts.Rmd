@@ -1,0 +1,197 @@
+---
+title: "Cost Recovery Impacts"
+author: "Min-Yang Lee"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document:
+    keep_tex: yes
+    fig_caption: yes
+    number_sections: yes
+  html_document:
+    df_print: paged
+  word_document: default
+header-includes: \usepackage{setspace}\doublespacing
+urlcolor: blue
+editor_options:
+  chunk_output_type: console
+fontsize: 12pt
+---
+
+# Summary and Housekeeping
+The Greater Atlantic Regional Fisheries Office is considering changes to the cost recovery programs for catch share fisheries in the region. These updates are intended to simplify regulations and reduce costs for the Scallop Individual Fishing Quota, Tilefish Individual Fishing Quota, and Surfclam and Ocean Quahog Individual Transferable Quota fisheries. This action would result in improved administration and management of the scallop, tilefish, and surfclam and ocean quahog fisheries.
+
+This analysis was written in RMarkdown. It can be found at https://github.com/NEFSC/READ-SSB-Lee-regulatory-analyses
+
+\clearpage
+
+ <!---- 
+ The global_options chunk loads libraries, sets options, figures out if you're on a desktop or server, sets years, and sets graphing options
+ --->
+```{r global_options, include=FALSE}
+ library("here")
+ library("tidyverse")
+ library("scales")
+ library("knitr")
+ library("kableExtra")
+ library("haven")
+library("ROracle")
+library("purrr")
+here::i_am("writing/Cost_Recovery_2025_Impacts.Rmd")
+options(scipen=999)
+#############################################################################
+#knitr options
+
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, error = FALSE, message = FALSE, comment = FALSE, cache = FALSE, progress = TRUE, verbose = FALSE, 
+											dpi = 600)
+options(tinytex.verbose = TRUE)
+# options(knitr.table.format = "latex")
+#############################################################################
+
+
+# RFA data
+RFA_filepath<-file.path("//nefscdata","RFA_EO12866_Guidelines" ,"Ownership Data", "current data and metadata","affiliates_2024_06_01.Rdata")
+
+# DeflatorsY, which are pulled by stata
+# DeflatorsQ, which are pulled by stata
+
+deflatorsY_path<-here("data_folder","external" ,"deflatorsY.dta")
+deflatorsQ_path<-here("data_folder","external" ,"deflatorsQ.dta")
+
+monthly_util_herring_path<-here("data_folder","intermediate" ,"monthly_util_herring.dta")
+
+
+###################################################################################################
+```
+
+```{r Set_switches, eval=TRUE}
+# Data_Process_Switch<-TRUE will extract and process data. This takes a while, so set to FALSE after you run the first time.
+#Data_Process_Switch<-FALSE
+#source(here("R_code","project_logistics","R_credentials_RODBC.R"))
+
+```	
+
+
+```{r Get_Deflators, include=FALSE, eval=TRUE}
+
+
+#import deflators this with haven.
+deflatorsY<-haven::read_dta(file=deflatorsY_path)%>%
+  select(year,fGDPDEF_2023) 
+deflatorsQ<-haven::read_dta(file=deflatorsQ_path)%>%
+  select(dateq,fGDPDEF_2023Q1)
+
+```
+
+```{r load_RFA_data, include=FALSE}
+load(RFA_filepath)
+affiliates<-affiliates_2024_06_01
+rm(affiliates_2024_06_01)
+
+```
+
+
+```{r get_paygov, include=FALSE, eval=TRUE}
+#Use oracle to connect
+drv<-dbDriver("Oracle")
+nova_conn<-dbConnect(drv, id, password=novapw, dbname=nefscusers.connect.string)
+
+# Set up the three sql statements to get paygov.
+# set the role
+# get the data
+# reset the role to the usual one.
+  paygov_role_set_string<-paste0("SET ROLE PAYGOV_SECURE_READ_ROLE IDENTIFIED BY ", paygovROLE)
+  querystring<-paste0("SELECT * FROM NEFSC_GARFO.PAYGOV_V_CRS_DATA")
+  reset_role_string<-paste0("SET ROLE ALL")
+  
+  dbGetQuery(nova_conn, paygov_role_set_string)
+  paygov_data<-dbGetQuery(nova_conn, querystring)
+  dbGetQuery(nova_conn, reset_role_string)
+  dbDisconnect(nova_conn)
+
+
+paygov_data <- paygov_data %>%
+  rename_with(str_to_lower) %>%
+  mutate(rightid=if_else(plan %in% c("SCALLOP","TILEFISH"),agency_debt_id,NA)
+        ) %>%
+  mutate(anum=if_else(plan %in% c("SURFCLAM OCEANQUAHOG"),agency_debt_id,NA)
+  )
+
+paygov_data_working <-paygov_data %>%
+  select(c(year, nature_of_debt_2, referred_master_case_balance, plan, rightid, anum, program_code)) %>%
+  rename(balance=referred_master_case_balance)
+  
+
+```
+<!---
+Agency_Master_Debt_ID = the right_id/allocation number plus the year the bill applies to. In 2021 we started to add a prefix to this data element to help us and our finance group to quickly identify which fishery the payment belongs to.
+
+Agency_Debt_Id = the right ID or allocation number for clams.
+
+Agency_Debtor_Id is a combination of the business ID and the right_id/allocation number.
+
+--->
+
+
+
+
+<!--- Set the figure numbers for the section, subsection, figures, and tables so things are properly numbered
+
+
+\setcounter{section}{8}
+\setcounter{subsection}{11}
+
+\setcounter{figure}{15}
+\setcounter{table}{12}
+--->
+
+
+## Regulatory Impact Analysis 
+
+The purpose of Executive Order 12866 (E.O. 12866, 58 FR 51735, October 4, 1993) is to enhance planning and coordination with respect to new and existing regulations. 
+
+This E.O. requires the Office of Management and Budget (OMB) to review regulatory programs that are considered to be “significant.” 
+A significant action is any regulatory action that may:
+
+1. Have an annual effect on the economy of $100 million or more; or adversely affect in a material way the economy, a sector of the economy, productivity, competition, jobs, the environment, public health or safety, or State, local, territorial, or tribal governments or communities;
+
+2. Create a serious inconsistency or otherwise interfere with an action taken or planned by another agency;
+
+3. Materially alter the budgetary impact of entitlements, grants, user fees, or loan programs or the rights and obligations of recipients thereof; or
+
+4. Raise legal or policy issues for which centralized review would meaningfully further the President's priorities or the principles set forth in this Executive order, as specifically authorized in a timely manner by the Administrator of OIRA in each case.
+
+In deciding whether and how to regulate, agencies should assess all costs and benefits of available regulatory alternatives. Costs and benefits shall be understood to include both quantifiable measures (to the fullest extent that these can be usefully estimated) and qualitative measures of costs and benefits that are difficult to quantify, but nevertheless essential to consider. 
+
+The proposed rule would streamline the administration of the cost recovery program, lowering the overall costs of managing the catch share program.  Because these fisheries have a cost recovery program, most of these existing costs accrue to fishing industry. Therefore most of the benefits of the proposed rule will also accrue to the fishing industry. 
+### Management Goals and Objectives
+
+\textcolor{red}{By reference}
+
+### Description of the Fishery and other affected entitites
+
+
+
+
+## Regulatory Flexibility Act Analysis
+
+###  A description of the reasons why action by the agency is being considered.
+\textcolor{red}{By reference}
+
+### A succinct statement of the objectives of, and legal basis for, the proposed rule.
+\textcolor{red}{By reference}
+
+### Number of Small entities
+
+### Impacts on Small firms
+
+### Compliance Requirements
+\textcolor{red}{A description of the projected reporting, record-keeping, and other compliance requirements of the proposed rule, including an estimate of the classes of small entities which will be subject to the requirements of the report or record.}
+
+### Duplications
+\textcolor{red}{An identification, to the extent practicable, of all relevant Federal rules, which may duplicate, overlap, or conflict with the proposed rule.}
+
+
+\newpage
+
+
+
