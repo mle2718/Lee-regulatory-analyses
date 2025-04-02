@@ -28,14 +28,17 @@ This analysis was written in RMarkdown. It can be found at https://github.com/NE
  The global_options chunk loads libraries, sets options, figures out if you're on a desktop or server, sets years, and sets graphing options
  --->
 ```{r global_options, include=FALSE}
- library("here")
- library("tidyverse")
- library("scales")
- library("knitr")
- library("kableExtra")
- library("haven")
+library("here")
+library("tidyverse")
+library("scales")
+library("knitr")
+library("kableExtra")
+library("haven")
 library("ROracle")
 library("purrr")
+library("conflicted")
+library("glue")
+conflicts_prefer(dplyr::filter)
 here::i_am("writing/Cost_Recovery_2025_Impacts.Rmd")
 options(scipen=999)
 #############################################################################
@@ -63,13 +66,6 @@ monthly_util_herring_path<-here("data_folder","intermediate" ,"monthly_util_herr
 ###################################################################################################
 ```
 
-```{r Set_switches, eval=TRUE}
-# Data_Process_Switch<-TRUE will extract and process data. This takes a while, so set to FALSE after you run the first time.
-#Data_Process_Switch<-FALSE
-#source(here("R_code","project_logistics","R_credentials_RODBC.R"))
-
-```	
-
 
 ```{r Get_Deflators, include=FALSE, eval=TRUE}
 
@@ -95,44 +91,82 @@ rm(affiliates_2024_06_01)
 drv<-dbDriver("Oracle")
 nova_conn<-dbConnect(drv, id, password=novapw, dbname=nefscusers.connect.string)
 
-# Set up the three sql statements to get paygov.
+# Set up the three sql statements to get paygov. I don't think it's necessary to have a glue() around some of these 
 # set the role
 # get the data
 # reset the role to the usual one.
-  paygov_role_set_string<-paste0("SET ROLE PAYGOV_SECURE_READ_ROLE IDENTIFIED BY ", paygovROLE)
-  querystring<-paste0("SELECT * FROM NEFSC_GARFO.PAYGOV_V_CRS_DATA")
-  reset_role_string<-paste0("SET ROLE ALL")
+  paygov_role_set_string<-glue("SET ROLE PAYGOV_SECURE_READ_ROLE IDENTIFIED BY {paygovROLE}")
+  querystring<-glue("SELECT * FROM NEFSC_GARFO.PAYGOV_V_CRS_DATA")
+  reset_role_string<-glue("SET ROLE ALL")
   
   dbGetQuery(nova_conn, paygov_role_set_string)
   paygov_data<-dbGetQuery(nova_conn, querystring)
   dbGetQuery(nova_conn, reset_role_string)
-  dbDisconnect(nova_conn)
-
-
-paygov_data <- paygov_data %>%
-  rename_with(str_to_lower) %>%
-  mutate(rightid=if_else(plan %in% c("SCALLOP","TILEFISH"),agency_debt_id,NA)
-        ) %>%
-  mutate(anum=if_else(plan %in% c("SURFCLAM OCEANQUAHOG"),agency_debt_id,NA)
-  )
-
-paygov_data_working <-paygov_data %>%
-  select(c(year, nature_of_debt_2, referred_master_case_balance, plan, rightid, anum, program_code)) %>%
-  rename(balance=referred_master_case_balance)
   
-
 ```
+
+```{r get_annual_landings, include=FALSE, eval=TRUE}
+# Scallop GC.
+# annual trips, permits, landings and value from scallop on gc scallop trips
+
+  scallopGC_querystring<-glue("select year, sum(lndlb) as scallop_landings, sum(value) as scallop_value, count(unique(camsid)) as trips, count(unique(permit)) as permits from cams_land where camsid in (
+     select distinct camsid from cams_subtrip where activity_code_1 like '%SES-SCG%' and activity_code_1 NOT LIKE '%SES-SCG-NG%' and year between 2019 and 2023
+ ) and itis_tsn=079718
+ group by year")
+
+scallopGC_data<-dbGetQuery(nova_conn, scallopGC_querystring)
+
+scallopGC_data<-scallopGC_data %>%
+  rename_with(str_to_lower) 
+
+GCREV_querystring<-glue("select year, sum(value) as total_value from cams_land where camsid in (
+     select distinct camsid from cams_subtrip where activity_code_1 like '%SES-SCG%' and activity_code_1 NOT LIKE '%SES-SCG-NG%' and year between 2019 and 2023
+ ) 
+ group by year")
+
+GCREV_data<-dbGetQuery(nova_conn, GCREV_querystring)
+
+GCREV_data<-GCREV_data %>%
+  rename_with(str_to_lower) 
+
+scallopGC_data<-scallopGC_data %>%
+  left_join(GCREV_data, by=join_by(year==year))
+
+# SCOQ
+# annual trips, permits, landings and value from scallop on gc scallop trips
+
+SCOQ_querystring<-glue("select year, sum(lndlb) as landings, sum(value) as value, count(unique(camsid)) as trips, count(unique(permit)) as permits, itis_tsn 
+    from cams_land where itis_tsn in (081343, 080944) and year between 2019 and 2023
+    group by year, itis_tsn")
+
+SCOQ_data<-dbGetQuery(nova_conn, SCOQ_querystring)
+SCOQ_data<-SCOQ_data %>%
+  rename_with(str_to_lower) 
+
+dbDisconnect(nova_conn)
+```
+
+
+
+
+
 <!---
+Some notes on the paygov schema
+The view has our bills since 2017 when we started using the Department of Treasury’s Central Receivable Services (CRS) to send our bills. Anything prior to that though would only be for scallops and tilefish as surfclams and ocean quahogs didn’t have a cost recovery component prior to us using CRS.
+
+I would also exclude the year 2024 as we are still getting those bills together and there’s only scallops in the view for 2024.
+
+
 Agency_Master_Debt_ID = the right_id/allocation number plus the year the bill applies to. In 2021 we started to add a prefix to this data element to help us and our finance group to quickly identify which fishery the payment belongs to.
 
 Agency_Debt_Id = the right ID or allocation number for clams.
 
 Agency_Debtor_Id is a combination of the business ID and the right_id/allocation number.
 
+
+The table, Paygov.CRS_Business_Debtor_Address has a column with Bids  (Business IDs) but it only has data since 2021 so I'm not really sure if that's the table or not.  At least the view (paygov.v_crs_data) has all the right ids and allocation numbers that were billed.  
+
 --->
-
-
-
 
 <!--- Set the figure numbers for the section, subsection, figures, and tables so things are properly numbered
 
@@ -162,15 +196,273 @@ A significant action is any regulatory action that may:
 
 In deciding whether and how to regulate, agencies should assess all costs and benefits of available regulatory alternatives. Costs and benefits shall be understood to include both quantifiable measures (to the fullest extent that these can be usefully estimated) and qualitative measures of costs and benefits that are difficult to quantify, but nevertheless essential to consider. 
 
-The proposed rule would streamline the administration of the cost recovery program, lowering the overall costs of managing the catch share program.  Because these fisheries have a cost recovery program, most of these existing costs accrue to fishing industry. Therefore most of the benefits of the proposed rule will also accrue to the fishing industry. 
+
 ### Management Goals and Objectives
 
-\textcolor{red}{By reference}
+\textcolor{red}{The goal of the proposed rule is to streamline the administration of the three LAPPs and lower costs to the fishing industry.}
 
-### Description of the Fishery and other affected entitites
+### Description of the Fishery
+
+Active vessels, trips, and annual revenue for each fishery from 2019 to 2023 are presented in tables\ref{tab:GCscallop_summary} to  \ref{tab:OQ_summary}.
+
+```{r GCscallop_summary}
+
+scallopGC_data<-scallopGC_data %>%
+  set_names(str_replace_all(names(.), "_", " ")) %>%
+  set_names(str_to_title(names(.),locale="en")) %>%
+  relocate(Year, Permits, Trips, `Scallop Landings`, `Scallop Value`, `Total Value`)  %>%
+   mutate(across(c(`Scallop Value`, `Total Value`), ~ number(.x, accuracy=1000,prefix="$", big.mark=","))) %>%
+   mutate(across(c(`Scallop Landings`), ~ number(.x, accuracy=1000, big.mark=","))) %>%
+   mutate(across(c(`Trips`), ~ number(.x, accuracy=1, big.mark=","))) 
+
+kbl(scallopGC_data  , booktabs=T, align=c("l",rep('r',times=5)), caption =  "Total Permits, Trips, Landings, and Value (nominal) for the Limited Access General Category Scallop Fishery") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+```
+
+```{r sc_summary}
+
+#Need to split this into 2 tables
+
+SCOQ_data2<-SCOQ_data %>%
+  mutate(species=if_else(itis_tsn=="080944", "Surf Clam", "Ocean Quahog")) %>%
+  select(-itis_tsn) %>%
+    pivot_wider(id_cols= year ,names_from=species, names_glue="{species} {.value}", values_from=c(permits, trips, landings, value), names_sep=" ") %>%
+    set_names(str_to_title(names(.),locale="en")) %>%
+  relocate(Year, any_of(starts_with("Surf Clam")))
+
+SCOQ_data2<-SCOQ_data2 %>%
+   mutate(across(any_of(ends_with("Value")), ~ number(.x, accuracy=1000,prefix="$", big.mark=",")),
+          across(any_of(ends_with("Landings")), ~ number(.x, accuracy=1000, big.mark=",")),
+          across(any_of(ends_with("Trips")), ~ number(.x, accuracy=1, big.mark=","))
+          )
+
+kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Surf Clam"))))  , booktabs=T, align=c("l",rep('r',times=8)), caption =  "Active Permits, Trips, Landings, and Value (nominal) for the Surf Clam Fishery") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+```
+
+```{r OQ_summary}
+
+kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Ocean Quahog"))))  , booktabs=T, align=c("l",rep('r',times=8)), caption =  "Total Active Permits, Trips, Landings, and Value (nominal) for the Ocean Quahog Fishery") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+```
+
+### Other affected entities
+
+NOAA Fisheries and the U.S. Department of Treasury are other affected entities. Both of these federal government entities would be expected to devote less staff time to collecting on bills.  The federal government recovers costs associated with NOAA Fisheries time, but does not recover costs associated with U.S. Department of Treasury time expended. 
+
+
+### Statement of the Problem 
+
+\textcolor{red}{Mostly by reference, but include the following}
+
+In the Surfclam and Ocean Quahog fishery, cost recovery bills are sent to the entity that received an allocation of quota, and are in proportion to amount of used quota.  When entity A leases quota out to entity B, entity A is billed for the cost recovery. The Tilefish cost recovery is similarly administered.
+
+In the LAGC IFQ scallop fishery, cost recovery bills are sent to the entity that used an allocation of quota and are in  proportion to the amount of used quota.   When entity A leases quota out to entity B, entity B is billed for the cost recovery.
+
+<!---The Magnuson-Stevens Fishery Conservation and Management Act (Magnuson-Stevens Act) requires the collection of fees to recover the “actual costs directly related to the management, data collection, and enforcement” of a Limited Access Privilege Program at 16 U.S.C. § 1854(d)(2). Permit holders in the three cost recovery programs must pay an annual cost recovery fee, not to exceed three percent of the ex-vessel value of the fish harvested under the LAPP. Vessel permits cannot be renewed until the previous year’s bill is paid. --->
+
+
+### Description of selected alternatives
+
+No action is the status quo: GARFO continues to send bills firms that are greater than \$10 and the terms of payment continue to vary by fishery.
+
+The proposed rule would streamline the administration of the cost recovery program, lowering the overall costs of managing the catch share program.   The proposed rule would set the minimum bill at \$25, which is the default minimum debt amount that can be collected by the Department of Treasury's Cross-Servicing program.  
+
+The proposed rule would also standardize billing due dates across the fisheries.  This is expected to have minimal impacts on regulated firms. 
+
+
+### Economic impacts relative to the baseline
+
+The baseline is the status quo. Under the status quo, NOAA Fisheries implements a cost recovery program as required by 16 U.S.C. § 1854(d)(2).   Table \ref{tab:status_quo_costs} summarizes the total recoverable costs of the LAPPs in the Northeast region^[ https://www.fisheries.noaa.gov/new-england-mid-atlantic/commercial-fishing/2023-annual-report-atlantic-sea-scallop-individual .  Doug: I pulled the Tilefish and SCOQ from the reports you sent, but I don't know how to cite them.]
+
+The proposed rule would reduce the administrative costs of the program. We estimate that one week of NMFS employee labor is spent resolving bills that are under the \$25 threshold.  We account for this time at the ZP-3 wage rate; including for fringe benefits, this is approximately \$3,000 per bill or \$15,000 per year.  These costs are paid by fishery participants.
+
+The proposed rule would impact the Treasury Department; we estimate one day of Treasury department employee per bill. At a similar rate, this is approximately \$600 per bill or \$3,000 per year. These costs are not paid by fishery participants.
+
+The proposed rule would impact fishery participants directly. We estimate half a day of firm labor is required per bill, or $1,500 per year.  Finally, un-collectable bills could results in a firm being unable to renew fishing permits. This would cause business planning disruptions, we do not attempt to value these disruptions.
+
+
+```{r cost_savings}
+fishery<-rep(16500, times=10)
+dr2<-.02
+dr7<-.07
+discount2<-rep(1+dr2, times=10)
+discount7<-rep(1+dr7, times=10)
+
+for (i in 1:length(discount2)){
+    discount2[i]<-discount2[i]^i
+    discount7[i]<-discount7[i]^i
+}
+
+fishery2<-sum(fishery/discount2)
+fishery7<-sum(fishery/discount7)
+
+treasury<-rep(3000, times=10)
+treasury2<-sum(treasury/discount2)
+treasury7<-sum(treasury/discount7)
 
 
 
+```
+
+Over a 10 year planning period, using a 2\% discount rate, the proposed regulation would reduce industry costs by \$`r fishery2`.  It would reduce costs to the Treasury Department by \$`r treasury2`.  
+
+Over a 10 year planning period, using a 7\% discount rate, the proposed regulation would reduce industry costs by \$`r fishery7`.  It would reduce costs to the Treasury Department by \$`r treasury7`.
+
+
+```{r status_quo_costs}
+
+sq_costs <- data.frame(
+    Fishery = c("Surfclam", "Ocean Quahog", 
+                    "LAGC-IFQ Scallop", "Tilefish"
+                ),
+    Year = c(2023, 2023, 2024, 2023),
+    Cost = c(71267, 63345, 117373, 46872),
+    stringsAsFactors = FALSE
+)
+sq_costs <-sq_costs %>%
+     mutate(across(any_of(starts_with("Cost")), ~ number(.x, accuracy=1,prefix="$", big.mark=","))
+     )      
+
+
+kbl(sq_costs , booktabs=T, align=c("l",rep('r',times=2)), caption =  "Recoverable Costs of the LAPP in the Northeast Region") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+```
+
+Table \ref{tab:annual_expenses} summarizes the total value of the cost recovery bills for the managed fisheries from 2019-2023.  
+
+
+```{r annual_expenses, include=FALSE, eval=TRUE}
+
+paygov_data <- paygov_data %>%
+  rename_with(str_to_lower) %>%
+
+    mutate(agency_debt_id=case_when(agency_debt_id == '18998' ~ 'C561', #One debt is wrong, although it could be a one of the examples of a problem
+                           .default = agency_debt_id)) %>% 
+  mutate(rightid=if_else(plan %in% c("SCALLOP","TILEFISH"),agency_debt_id,NA)
+        ) %>%
+  mutate(anum=if_else(plan %in% c("SURFCLAM OCEANQUAHOG"),agency_debt_id,NA)
+  ) %>%
+  mutate(fishery=plan) %>%
+  mutate(fishery=if_else(str_detect(anum,"C"), "Surf Clam", ""),
+         fishery=if_else(str_detect(anum,"Q"), "Ocean Quahog", fishery),
+         fishery=if_else(is.na(anum), plan, fishery)
+  ) 
+
+paygov_data_working <-paygov_data %>%
+  select(c(year, nature_of_debt_2, fishery, referred_master_case_balance, plan, rightid, anum, program_code)) %>%
+  rename(balance=referred_master_case_balance) %>%
+  filter(year>=2019 & year<=2023)  %>%# don't include 2024, year's not done yet
+  mutate(plan=str_to_title(plan), 
+         plan=if_else(plan =="Surfclam Oceanquahog","Surfclam and Ocean Quahog",plan), 
+         ) %>%
+  mutate(fishery=str_to_title(fishery))
+
+recoverable_expenses<-paygov_data_working %>%
+  group_by(fishery, year) %>%
+  summarise(cost=round(sum(balance))) %>%
+  mutate(cost= number(cost, accuracy=1,prefix="$", big.mark=","))  %>%
+  ungroup() %>%
+      set_names(str_to_title(names(.),locale="en"))  %>%
+  pivot_wider(names_from=Fishery, values_from=c(Cost),  names_glue="{Fishery}") 
+
+kbl(recoverable_expenses, booktabs=T, align=c("l",rep('r',times=4)), caption =  "Total cost recovery billing, 2019-2023") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+
+
+Table \ref{tab:annual_bills} summarizes the total number and value of bills that were over \$10.  
+
+
+```{r annual_bills, include=FALSE, eval=TRUE}
+
+
+annual_count<-paygov_data_working %>%
+  filter(balance>=10) %>%
+  group_by(plan, year) %>%
+  summarise(dollars=round(sum(balance)),
+            count=n()
+  ) %>%
+  ungroup() %>%
+  pivot_wider(names_from=plan, values_from=c(dollars, count), names_sep=" ") %>%
+  relocate(year, `count Scallop`, `dollars Scallop`, `count Surfclam and Ocean Quahog`, `dollars Surfclam and Ocean Quahog`) %>%
+  rename(`Scallop bills`=`count Scallop`,
+    `Scallop bill value`= `dollars Scallop`,
+    `SCOQ bills` = `count Surfclam and Ocean Quahog`,
+    `SCOQ bill value`= `dollars Surfclam and Ocean Quahog`,
+    `Tilefish bills` = `count Tilefish`,
+    `Tilefish bill value`= `dollars Tilefish`
+
+  ) %>%
+  mutate(`SCOQ bills`=replace_na(`SCOQ bills`,0),
+    `SCOQ bill value`=replace_na(`SCOQ bill value`,0)
+  )
+
+
+
+kbl(annual_count  %>%
+  mutate(across(c(`SCOQ bill value`, `Tilefish bill value`, `Scallop bill value`), ~ number(.x, accuracy=1,prefix="$", big.mark=","))) , booktabs=T, align=c("l",rep('r',times=6)), caption =  "Total number of bills over 10 and value of those bills") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+
+```{r under_25}
+
+under25_count<-paygov_data_working %>%
+  filter(balance<25 & balance>=10) %>%
+  group_by(plan, year) %>%
+  summarise(dollars=round(sum(balance)),
+            count=n()
+  ) %>%
+  ungroup() %>%
+  pivot_wider(names_from=plan, values_from=c(dollars, count), names_sep=" ") %>%
+  relocate(year, `count Scallop`, `dollars Scallop`, `count Surfclam and Ocean Quahog`, `dollars Surfclam and Ocean Quahog`) %>%
+  rename(`Scallop bills`=`count Scallop`,
+    `Scallop bill value`= `dollars Scallop`,
+    `SCOQ bills` = `count Surfclam and Ocean Quahog`,
+    `SCOQ bill value`= `dollars Surfclam and Ocean Quahog`#,
+   # `Tilefish bills` = `count Tilefish`,
+#    `Tilefish bill value`= `dollars Tilefish`
+
+  ) %>%
+  mutate(`SCOQ bills`=replace_na(`SCOQ bills`,0),
+    `SCOQ bill value`=replace_na(`SCOQ bill value`,0)
+  )
+
+
+
+kbl(under25_count  %>%
+  mutate(across(c(`SCOQ bill value`, `Scallop bill value`), ~ number(.x, accuracy=1,prefix="$", big.mark=","))) , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Total number of bills over 10 under 25 dollars and corresponding revenue") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+From 2019 to 2023, there have been approximately 5 bills per year and representing \$35 - \$112 in total revenue. This represents foregone receipts to the government under the proposed rule and a reduction in costs to the fishery. On average, the Surfclam and Ocean Quahog fishery has 1 per year and the scallop fishery has just under 4 per year.
+
+
+<!---
+rearrange
+
+
+
+--->
 
 ## Regulatory Flexibility Act Analysis
 
@@ -181,6 +473,16 @@ The proposed rule would streamline the administration of the cost recovery progr
 \textcolor{red}{By reference}
 
 ### Number of Small entities
+
+<!---
+
+I can use the usual affiliate data for GC scallop and tilefish.  I will aggregate
+them together.
+
+For the GC IFQ firms, I will 
+
+--->
+
 
 ### Impacts on Small firms
 
