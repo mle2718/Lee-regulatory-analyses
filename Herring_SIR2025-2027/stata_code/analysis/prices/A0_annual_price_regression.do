@@ -4,7 +4,6 @@ set scheme s2mono;
 
 local data_in "${data_intermediate}/monthly_util_herring.dta";
 use `data_in', replace;
-keep if year<=2023;
 collapse (sum) landings_mt value, by(year);
 keep if year<=2023;
 tsset year;
@@ -28,7 +27,7 @@ label var landings "(000 mt)";
 gen price=pricemt/$lbs_to_mt;
 gen price_real=pricemt_realGDP/$lbs_to_mt;
 
-local graph_subset year<=2023;
+local graph_subset year<=2024;
 
 replace value=value/1000000;
 replace value_realGDP=value_realGDP/1000000;

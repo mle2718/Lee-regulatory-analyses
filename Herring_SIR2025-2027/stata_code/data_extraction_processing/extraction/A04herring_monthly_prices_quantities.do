@@ -66,7 +66,7 @@ bysort year month: egen tv=total(value);
 gen fill_price=tv/tl;
 replace price_mt=fill_price if price_mt==.;
 drop fill_price tv tl;
-gen value=landings_mt*price_mt;
+replace value=landings_mt*price_mt if value==.;
 
 save "${data_intermediate}/monthly_util_herring.dta", replace;
 

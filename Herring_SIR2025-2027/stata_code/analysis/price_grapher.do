@@ -46,7 +46,7 @@ label var pricemt_yr2023 "annual average Real (2023) price";
 
 set scheme s2mono;
 *drop if pricemt>=500;
-drop if year>=2024;
+drop if year>=2025;
 tsfill;
 
 

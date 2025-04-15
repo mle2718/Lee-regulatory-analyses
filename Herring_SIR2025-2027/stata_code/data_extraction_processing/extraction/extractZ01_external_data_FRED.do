@@ -54,6 +54,9 @@ notes fGDPDEF_2023: GDP Implicit Price Deflator
 notes fPCU3117103117102_2023: PPI industry data for Seafood product preparation and packaging-Fresh and frozen seafood processing, not seasonally adjusted
 notes fPCU31171031171021_2023: PPI industry data for Seafood product preparation and packaging-Prepared fresh fish/seafood, inc. surimi/surimi-based products, not seasonally adjusted	
 
+sort year
+replace fGDPDEF_2023=1.03*fGDPDEF_2023[_N-1] if fGDPDEF_2023==.
+
 save "${data_external}/deflatorsY.dta", replace
 
 tsline f*
@@ -93,6 +96,12 @@ notes fGDPDEF_2023Q1: GDP Implicit Price Deflator
 notes fPCU3117103117102_2023Q1: PPI industry data for Seafood product preparation and packaging-Fresh and frozen seafood processing, not seasonally adjusted
 notes fPCU31171031171021_2023Q1: PPI industry data for Seafood product preparation and packaging-Prepared fresh fish/seafood, inc. surimi/surimi-based products, not seasonally adjusted	
 save "${data_external}/deflatorsQ.dta", replace
+
+
+
+sort dateq
+replace fGDPDEF_2023Q1=1.03*fGDPDEF_2023Q1[_N-1] if fGDPDEF_2023Q1==.
+
 
 tsline f* 
 
