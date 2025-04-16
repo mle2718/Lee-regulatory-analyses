@@ -270,7 +270,7 @@ scallopMRI<-scallopMRI %>%
 ```
 
 
-```{r get_tilefish_permits, include=FALSE, eval=FALS}
+```{r get_tilefish_permits, include=FALSE, eval=FALSE}
 
 tilefish_querystring<-glue("select fishing_year, root_mri, sum(quantity) as quantity, unit  from nefsc_garfo.ams_allocation_tx
  where fmp='TILE' and allocation_type='BASE' and fishing_year>=2019
@@ -295,6 +295,36 @@ tilefish_allocations<-tilefish_allocations %>%
 
 dbDisconnect(nova_conn)
 ```
+
+```{r munge_paygov}
+
+
+
+paygov_data <- paygov_data %>%
+  rename_with(str_to_lower) %>%
+
+    mutate(agency_debt_id=case_when(agency_debt_id == '18998' ~ 'C561', #One debt is wrong, although it could be a one of the examples of a problem
+                           .default = agency_debt_id)) %>% 
+  mutate(rightid=if_else(plan %in% c("SCALLOP","TILEFISH"),agency_debt_id,NA)
+        ) %>%
+  mutate(anum=if_else(plan %in% c("SURFCLAM OCEANQUAHOG"),agency_debt_id,NA)
+  ) %>%
+  mutate(fishery=plan) %>%
+  mutate(fishery=if_else(str_detect(anum,"C"), "Surf Clam", ""),
+         fishery=if_else(str_detect(anum,"Q"), "Ocean Quahog", fishery),
+         fishery=if_else(is.na(anum), plan, fishery)
+  ) 
+
+paygov_data_working <-paygov_data %>%
+  select(c(year, nature_of_debt_2, fishery, referred_master_case_balance, plan, rightid, anum, program_code)) %>%
+  rename(balance=referred_master_case_balance) %>%
+  filter(year>=2019 & year<=2023)  %>%# don't include 2024, year's not done yet
+  mutate(plan=str_to_title(plan), 
+         plan=if_else(plan =="Surfclam Oceanquahog","Surfclam and Ocean Quahog",plan), 
+         ) %>%
+  mutate(fishery=str_to_title(fishery))
+```
+
 
 
 
@@ -392,12 +422,9 @@ In deciding whether and how to regulate, agencies should assess all costs and be
 
 \textcolor{red}{The goal of the proposed rule is to streamline the administration of the three LAPPs and lower costs to the fishing industry.}
 
-
-\clearpage
-
 ### Description of the Fishery
 
-Active vessels, trips, and annual revenue for the fishery from 2019 to 2023 are presented in tables\ref{tab:GCscallop_summary} to  \ref{tab:OQ_summary}.  We do not summarize the Tilefish fishery: there are few participants and disclosure is likely to be inconsistent with the confidentiality requirements of the Magnuson-Stevens Act.
+Active vessels, trips, and annual revenue for the fishery from 2019 to 2023 are presented in Tables \ref{tab:GCscallop_summary} to  \ref{tab:OQ_summary}.  We do not summarize the Tilefish fishery: there are few participants and disclosure is likely to be inconsistent with the confidentiality requirements of the Magnuson-Stevens Act.
 
 ```{r GCscallop_summary}
 
@@ -411,7 +438,8 @@ scallopGC_data<-scallopGC_data %>%
 
 kbl(scallopGC_data  , booktabs=T, align=c("l",rep('r',times=5)), caption =  "Active Permits, Trips, Landings, and Value (nominal) for the Limited Access General Category IFQ Scallop Fishery") %>%
     #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = F) %>% 
+    kable_styling(full_width = F,
+                  latex_options = "hold_position" ) %>% 
       row_spec(0,bold=FALSE) 
 ```
 
@@ -434,7 +462,8 @@ SCOQ_data2<-SCOQ_data2 %>%
 
 kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Surf Clam"))))  , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Active Permits, Trips, Landings, and Value (nominal) for the Surf Clam Fishery") %>%
     #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = F) %>% 
+    kable_styling(full_width = F,
+                  latex_options = "hold_position" ) %>% 
       row_spec(0,bold=FALSE) 
 ```
 
@@ -442,14 +471,15 @@ kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Surf Clam"))))  , bookta
 
 kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Ocean Quahog"))))  , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Active Permits, Trips, Landings, and Value (nominal) for the Ocean Quahog Fishery") %>%
     #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = F) %>% 
+    kable_styling(full_width = F,
+                  latex_options = "hold_position" ) %>% 
       row_spec(0,bold=FALSE) 
 ```
 
 
 ### Other Affected Entities
 
-NOAA Fisheries and the U.S. Department of Treasury are other affected entities. Both of these federal government entities would be expected to devote less staff time to collecting on bills.  The federal government recovers costs associated with NOAA Fisheries time, but does not recover costs associated with U.S. Department of Treasury labor expenditures. 
+NOAA Fisheries and the U.S. Department of Treasury are other affected entities. Both of these federal government entities would be expected to devote less staff time to collecting on bills.  The federal government recovers costs associated with NOAA Fisheries labor expenses from the catch share program administration, but does not recover costs associated with U.S. Department of Treasury labor expenditures. 
 
 
 ### Statement of the Problem 
@@ -465,7 +495,6 @@ In the LAGC IFQ scallop fishery, cost recovery bills are sent to the entity that
 
 ### Description of Selected Alternatives
 
-No action is the status quo: GARFO continues to send bills firms that are greater than \$10 and the terms of payment continue to vary by fishery.
 
 The proposed rule would streamline the administration of the cost recovery program, lowering the overall costs of managing the catch share program.   The proposed rule would set the minimum bill at \$25, which is the default minimum debt amount that can be collected by the Department of Treasury's Cross-Servicing program.  
 
@@ -474,9 +503,84 @@ The proposed rule would also standardize billing due dates across the fisheries.
 
 ### Economic Impacts Relative to the Baseline
 
-The baseline is the status quo. Under the status quo, NOAA Fisheries implements a cost recovery program as required by 16 U.S.C. § 1854(d)(2).   Table \ref{tab:status_quo_costs} summarizes the total recoverable costs of the LAPPs in the Northeast region^[ https://www.fisheries.noaa.gov/new-england-mid-atlantic/commercial-fishing/2023-annual-report-atlantic-sea-scallop-individual.  Doug: I pulled the Tilefish and SCOQ from the reports you sent, but I don't know how to cite them.].
+The baseline is the status quo. Under the status quo, NOAA Fisheries implements a cost recovery program as required by 16 U.S.C. § 1854(d)(2).  GARFO continues to send bills firms that are greater than \$10 and the terms of payment continue to vary by fishery. Table \ref{tab:status_quo_costs} summarizes the total recoverable costs of the LAPPs in the Northeast region^[ https://www.fisheries.noaa.gov/new-england-mid-atlantic/commercial-fishing/2023-annual-report-atlantic-sea-scallop-individual.  Doug: I pulled the Tilefish and SCOQ from the reports you sent, but I don't know how to cite them.].
 
-Table \ref{tab:under_25}  summarizes the total number and value of bills that were over \$10 and under \$25.
+
+
+```{r status_quo_costs}
+
+sq_costs <- data.frame(
+    Fishery = c("Surfclam", "Ocean Quahog", 
+                    "LAGC-IFQ Scallop", "Tilefish"
+                ),
+    Year = c(2023, 2023, 2023, 2023),
+    Cost = c(71267, 63345, 117373, 46872),
+    Value=c(28632399, 21731238, 19396367, 5993249),
+    Rate = c(0.0025, 0.0029, 0.006051, 0.007820),
+    stringsAsFactors = FALSE
+)
+
+updated_costs<-sq_costs
+
+sq_costs <-sq_costs %>%
+     mutate(across(any_of(starts_with(c("Cost", "Value"))), ~ number(.x, accuracy=1,prefix="$", big.mark=","))
+     )      
+
+
+kbl(sq_costs%>% select(-c(Year)) , booktabs=T, align=c("l",rep('r',times=2)), caption =  " Recoverable Costs of the LAPPs, Gross Revenues, and Actual recovery rate in the Northeast Region in 2023") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F,
+                  latex_options = "hold_position" ) %>% 
+      row_spec(0,bold=FALSE) 
+```
+
+
+
+From 2019 to 2023, there have been approximately 5 bills per year and representing \$35 - \$112 in total revenue. This represents foregone receipts to the government under the proposed rule and a reduction in costs to the fishery. On average, the Surfclam and Ocean Quahog fishery has 1 per year and the scallop fishery has just under 4 per year. Table \ref{tab:under_25}  summarizes the total number and value of bills that were over \$10 and under \$25.
+
+
+
+```{r under_25}
+
+under25_count<-paygov_data_working %>%
+  filter(balance<25 & balance>=10) %>%
+  group_by(fishery, year) %>%
+  summarise(dollars=round(sum(balance)),
+            count=n()
+  )%>%
+  ungroup() %>%
+  pivot_wider(names_from=fishery, values_from=c(dollars, count), names_sep=" ") %>%
+  relocate(year, `count Scallop`, `dollars Scallop`, `count Surf Clam`, `dollars Surf Clam`) %>%
+  rename(`Scallop bills`=`count Scallop`,
+    `Scallop bill value`= `dollars Scallop`,
+    `SC bills` = `count Surf Clam`,
+    `SC bill value`= `dollars Surf Clam`,
+#    `OQ bills` = `count Ocean Quahog`,
+#    `OQ bill value`= `dollars Ocean Quahog`,
+#    `Tilefish bills` = `count Tilefish`,
+#    `Tilefish bill value`= `dollars Tilefish` 
+)
+
+under25_count<-under25_count %>%
+    mutate(across(everything(), ~replace_na(., 0)))
+
+
+
+kbl(under25_count  %>%
+  mutate(across(c(`SC bill value`, `Scallop bill value`), ~ number(.x, accuracy=1,prefix="$", big.mark=","))) , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Total number of bills over 10 under 25 dollars and corresponding revenue.  Tilefish and Ocean Quahog did not have bills that met this criteria") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F,
+                  latex_options = "hold_position" ) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+
+
+
+
+
+
 
 The proposed rule would reduce the administrative costs of the program. We estimate that one week of NMFS employee labor is spent for every bill that is under the \$25 threshold.  We account for this time at the ZP-3 wage rate, including fringe benefits. This is approximately \$3,000 per bill or \$15,000 per year.  These costs are paid by fishery participants through the cost recovery program.
 
@@ -534,60 +638,10 @@ We also provide estimates of cost reductions over a 10 year planning period.  Us
 Over a 10 year planning period, using a 7\% discount rate, the proposed regulation would reduce industry costs by `r fishery7`.  It would reduce costs to the Treasury Department by `r treasury7`.
 
 
-```{r status_quo_costs}
-
-sq_costs <- data.frame(
-    Fishery = c("Surfclam", "Ocean Quahog", 
-                    "LAGC-IFQ Scallop", "Tilefish"
-                ),
-    Year = c(2023, 2023, 2023, 2023),
-    Cost = c(71267, 63345, 117373, 46872),
-    Value=c(28632399, 21731238, 19396367, 5993249),
-    Rate = c(0.0025, 0.0029, 0.006051, 0.007820),
-    stringsAsFactors = FALSE
-)
-
-updated_costs<-sq_costs
-
-sq_costs <-sq_costs %>%
-     mutate(across(any_of(starts_with(c("Cost", "Value"))), ~ number(.x, accuracy=1,prefix="$", big.mark=","))
-     )      
-
-
-kbl(sq_costs%>% select(-c(Year)) , booktabs=T, align=c("l",rep('r',times=2)), caption =  " Recoverable Costs of the LAPPs, Gross Revenues, and Actual recovery rate in the Northeast Region in 2023") %>%
-    #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = F) %>% 
-      row_spec(0,bold=FALSE) 
-```
-
-
 
 
 ```{r annual_expenses, include=FALSE, eval=TRUE}
 
-paygov_data <- paygov_data %>%
-  rename_with(str_to_lower) %>%
-
-    mutate(agency_debt_id=case_when(agency_debt_id == '18998' ~ 'C561', #One debt is wrong, although it could be a one of the examples of a problem
-                           .default = agency_debt_id)) %>% 
-  mutate(rightid=if_else(plan %in% c("SCALLOP","TILEFISH"),agency_debt_id,NA)
-        ) %>%
-  mutate(anum=if_else(plan %in% c("SURFCLAM OCEANQUAHOG"),agency_debt_id,NA)
-  ) %>%
-  mutate(fishery=plan) %>%
-  mutate(fishery=if_else(str_detect(anum,"C"), "Surf Clam", ""),
-         fishery=if_else(str_detect(anum,"Q"), "Ocean Quahog", fishery),
-         fishery=if_else(is.na(anum), plan, fishery)
-  ) 
-
-paygov_data_working <-paygov_data %>%
-  select(c(year, nature_of_debt_2, fishery, referred_master_case_balance, plan, rightid, anum, program_code)) %>%
-  rename(balance=referred_master_case_balance) %>%
-  filter(year>=2019 & year<=2023)  %>%# don't include 2024, year's not done yet
-  mutate(plan=str_to_title(plan), 
-         plan=if_else(plan =="Surfclam Oceanquahog","Surfclam and Ocean Quahog",plan), 
-         ) %>%
-  mutate(fishery=str_to_title(fishery))
 
 recoverable_expenses<-paygov_data_working %>%
   group_by(fishery, year) %>%
@@ -638,41 +692,6 @@ kbl(annual_count  %>%
 
 ```
 
-```{r under_25}
-
-under25_count<-paygov_data_working %>%
-  filter(balance<25 & balance>=10) %>%
-  group_by(fishery, year) %>%
-  summarise(dollars=round(sum(balance)),
-            count=n()
-  )%>%
-  ungroup() %>%
-  pivot_wider(names_from=fishery, values_from=c(dollars, count), names_sep=" ") %>%
-  relocate(year, `count Scallop`, `dollars Scallop`, `count Surf Clam`, `dollars Surf Clam`) %>%
-  rename(`Scallop bills`=`count Scallop`,
-    `Scallop bill value`= `dollars Scallop`,
-    `SC bills` = `count Surf Clam`,
-    `SC bill value`= `dollars Surf Clam`,
-#    `OQ bills` = `count Ocean Quahog`,
-#    `OQ bill value`= `dollars Ocean Quahog`,
-#    `Tilefish bills` = `count Tilefish`,
-#    `Tilefish bill value`= `dollars Tilefish` 
-)
-
-under25_count<-under25_count %>%
-    mutate(across(everything(), ~replace_na(., 0)))
-
-
-
-kbl(under25_count  %>%
-  mutate(across(c(`SC bill value`, `Scallop bill value`), ~ number(.x, accuracy=1,prefix="$", big.mark=","))) , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Total number of bills over 10 under 25 dollars and corresponding revenue.  Tilefish and Ocean Quahog did not have bills that met this criteria") %>%
-    #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = F) %>% 
-      row_spec(0,bold=FALSE) 
-
-
-```
-From 2019 to 2023, there have been approximately 5 bills per year and representing \$35 - \$112 in total revenue. This represents foregone receipts to the government under the proposed rule and a reduction in costs to the fishery. On average, the Surfclam and Ocean Quahog fishery has 1 per year and the scallop fishery has just under 4 per year.
 
 
 <!---
@@ -710,12 +729,7 @@ Entity B is directly regulated, Entity A is not.
 
 Firms that are active in the LAGC-IFQ Scallop and Tilefish fishery are grouped 
 together. We cannot join together the allocation and ownership data, therefore we
-use active firms as a way to estimate the number of regulated entities.  This may 
-overestimate the number of regulated entities, because permits with identical owners
-should be treated as a single firm. It may underestimate the number of the total
-number of regulated entities since two fisheries bill for cost recovery based on 
-the initial quota owner.  For the same reasons, our estimate of small firms may be
-incorrect as well.
+use active firms as a way to estimate the number of regulated entities. 
 
 
 Table \ref{tab:SCOQ_DRE} summarizes the directly regulated entities in the Surf clam and
@@ -740,8 +754,8 @@ scoqDRE<-scoq %>%
 
 kbl(scoqDRE, booktabs=T, align=c("l", "l",rep('r',times=2)), caption =  "Directly Regulated Entities in the Surfclam and Ocean Quahog Fisheries") %>%
     #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = F) %>% 
-      row_spec(0,bold=FALSE) 
+    kable_styling(full_width = F,
+                  latex_options = "hold_position" )
 
 
 ```
@@ -749,10 +763,9 @@ kbl(scoqDRE, booktabs=T, align=c("l", "l",rep('r',times=2)), caption =  "Directl
 
 
 Table \ref{tab:Directly_Regulated_Entities} summarizes the directly regulated
-entities in the Scallop and Tilefish fisheries.  Most firms with Surfclam or
-Ocean Quahog allocations are Commercial fishing firms. However, some allocations are owned by firms that
-are more properly classified as Fish and Seafood Wholesalers, Commercial Banks,
-Credit Unions, Trusts, or Public Sector (Sector 92).
+entities in the Scallop and Tilefish catch share fisheries.  There are 379 small firms and 8 
+large firms that are active in these fisheries. There are a further 47 firms that are permitted
+in either of these catch share fisheries, but are not active.
 
 
 ```{r Directly_Regulated_Entities}
@@ -783,7 +796,8 @@ scal_and_tileTable <-scal_and_tileFirms %>%
 
 kbl(scal_and_tileTable %>%select(-small_business)  , booktabs=T, align=c("l",rep('r',times=5)), caption =  "Directly Regulated Entities in the Tilefish and Scallop Catch Share Fisheries") %>%
     #column_spec(5:8, width = "2cm")
-    kable_styling(full_width = F) %>% 
+    kable_styling(full_width = F,
+                  latex_options = "hold_position" ) %>% 
       row_spec(0,bold=FALSE) 
 
 
@@ -791,18 +805,14 @@ kbl(scal_and_tileTable %>%select(-small_business)  , booktabs=T, align=c("l",rep
 
 
 ### Impacts on Small firms
-\textcolor{red}{Need to do. Take yearly changes and compute updated bills.  }
-
-Over the past 5 years, all impacted bills have been in the Scallop or Surfclam fishery. 
+Over the past 5 years, all cost recovery bills between \$10 and \$25 have been in the Scallop or Surfclam fishery. 
 We therefore project no impacts to firms in the Tilefish or Ocean Quahog fisheries.
 
 To describe the yearly impacts on small firms, we adjust the recoverable LAPP costs in 2023.  
 For firms in the Surfclam fishery, we use the entity size determinations from the most 
 recent MAFMC regulatory action.  For the scallop fishery, we use the standard data on 
 ownership that links fishing vessels into firms if they fishing vessels have identical
-owners.
-
-We then summarize those cost changes for small and large firms in these two fisheries.
+owners. We then summarize those cost changes for small and large firms in these two fisheries.
 
 
 ```{r num_impacts}
@@ -869,7 +879,7 @@ sc_impacts<-surfclam_costs %>%
 ```
 
 There are 29 small firms in the surfclam fishery that would see average decreases
-in annual cost recovery costs of \$52 (Table \ref{tab:surfclam_costs}.  There are 12 large firms that would experience
+in annual cost recovery costs of \$52 (Table \ref{tab:surfclam_costs}).  There are 12 large firms that would experience
 decreases in annual cost recovery costs of \$86.  Finally, there are 4 "Sector 92" firms that would experience
 decreases in annual cost recovery costs of \$117.  
 
@@ -929,7 +939,7 @@ scallop_effects<-affiliate_effects %>%
 
 
 There are 100 small firms in the scallop fishery;  these firms would experience
-decreases in annual cost recovery costs of \$120 (Table \ref{tab:scallop_effects}.  There are two large firms that 
+decreases in annual cost recovery costs of \$120 (Table \ref{tab:scallop_effects}).  There are two large firms that 
 would experience annual decreases of \$13.
 
 ```{r scallop_effects}
