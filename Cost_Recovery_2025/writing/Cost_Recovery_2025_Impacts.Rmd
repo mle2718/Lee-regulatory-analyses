@@ -10,7 +10,7 @@ output:
   html_document:
     df_print: paged
   word_document: default
-header-includes: \usepackage{setspace}\doublespacing
+header-includes: \usepackage{setspace}\doublespacing 
 urlcolor: blue
 editor_options:
   chunk_output_type: console
@@ -54,13 +54,20 @@ options(tinytex.verbose = TRUE)
 # RFA data
 RFA_filepath<-file.path("//nefscdata","RFA_EO12866_Guidelines" ,"Ownership Data", "current data and metadata","affiliates_2024_06_01.Rdata")
 
+
+
+
 # DeflatorsY, which are pulled by stata
 # DeflatorsQ, which are pulled by stata
 
 deflatorsY_path<-here("data_folder","external" ,"deflatorsY.dta")
 deflatorsQ_path<-here("data_folder","external" ,"deflatorsQ.dta")
 
-monthly_util_herring_path<-here("data_folder","intermediate" ,"monthly_util_herring.dta")
+
+# SC 
+sc_filepath<-here("data_folder","external" ,"2024sc_allocation.csv")
+
+
 
 
 ###################################################################################################
@@ -78,12 +85,54 @@ deflatorsQ<-haven::read_dta(file=deflatorsQ_path)%>%
 
 ```
 
-```{r load_RFA_data, include=FALSE}
+```{r load_RFA_data_and_surfclam, include=FALSE}
 load(RFA_filepath)
 affiliates<-affiliates_2024_06_01
 rm(affiliates_2024_06_01)
 
+
+scoq<-read.csv(sc_filepath)
+
+scoq<-scoq %>%
+  mutate(SBA.Code = case_when(
+    SBA.Code=="" ~ "11413",  
+    SBA.Code=='?' ~ "11413",
+    SBA.Code=='11413?' ~ "11413",
+    SBA.Code=='424460?' ~ "424460",  
+     .default = SBA.Code))   %>%
+  mutate(Size.standard.in.millions = case_when(
+    SBA.Code=="11413" ~ "$11 million in revenues",
+    Size.standard.in.millions=="100 employees?" ~ "100 employees",  
+     .default = Size.standard.in.millions)  ) %>%
+     mutate(SBA.Classification = case_when(
+    SBA.Code=="11413" ~ "Commercial Fishing",
+    SBA.Classification=="Commercial Fishing?" ~ "Commercial Fishing",
+    SBA.Classification=="Fish and Seafood Merchant Wholesalers?" ~ "Fish and Seafood Merchant Wholesalers",
+     .default = SBA.Classification)  )%>%
+     mutate(Size = case_when(
+    Size=="" ~ "Small",  
+    Size=="Unknown" ~ "Small",
+    Size=="Atlantic Capes?" ~ "Small",
+    Size=="Large -201 to 500 employees" ~ "Large",
+     .default = Size)  )
+
+
+scoq<-scoq %>%
+  mutate(SBA.Code = case_when(
+    Size=="Sector 92" ~ "Sector 92",  
+     .default = SBA.Code))    %>%
+  mutate(Size.standard.in.millions = case_when(
+    Size=="Sector 92" ~ "N/A",  
+     .default = Size.standard.in.millions)  ) %>%
+     mutate(SBA.Classification = case_when(
+    Size=="Sector 92" ~ "Sector 92",  
+     .default = SBA.Classification)  )
+
 ```
+
+    
+
+
 
 
 ```{r get_paygov, include=FALSE, eval=TRUE}
@@ -99,8 +148,21 @@ nova_conn<-dbConnect(drv, id, password=novapw, dbname=nefscusers.connect.string)
   querystring<-glue("SELECT * FROM NEFSC_GARFO.PAYGOV_V_CRS_DATA")
   reset_role_string<-glue("SET ROLE ALL")
   
+  
+  
   dbGetQuery(nova_conn, paygov_role_set_string)
   paygov_data<-dbGetQuery(nova_conn, querystring)
+  
+  
+  querystring2<-glue("SELECT * FROM NEFSC_GARFO.AMS_TILEFISH_PERMIT where TILEFISH_YEAR=2024")
+
+tilefish<-dbGetQuery(nova_conn, querystring2)
+
+tilefish<-tilefish %>%
+  rename_with(str_to_lower) 
+
+
+  
   dbGetQuery(nova_conn, reset_role_string)
   
 ```
@@ -143,9 +205,139 @@ SCOQ_data<-dbGetQuery(nova_conn, SCOQ_querystring)
 SCOQ_data<-SCOQ_data %>%
   rename_with(str_to_lower) 
 
+```
+
+
+
+
+```{r get_GC_permits, include=FALSE, eval=TRUE}
+# Scallop GC.
+# permit level scallop landings and value on scallop ifq trips.
+
+scallopGC_querystring<-glue("select year, sum(lndlb) as scallop_landings, sum(value) as scallop_value, permit from cams_land where camsid in (
+     select distinct camsid from cams_subtrip where activity_code_1 like '%SES-SCG%' and activity_code_1 NOT LIKE '%SES-SCG-NG%' and year between 2019 and 2023
+ ) and itis_tsn=079718
+ group by year, permit")
+
+scallopIFQ_active<-dbGetQuery(nova_conn, scallopGC_querystring)
+
+scallopIFQ_active<-scallopIFQ_active %>%
+  rename_with(str_to_lower) %>%
+  mutate(permit=as.numeric(permit)) %>%
+  relocate(permit, year)
+
+
+scallopMRI_querystring<-glue("SELECT PER_NUM AS PERMIT,
+		RIGHT_ID AS MRI,
+		FISHERY,
+		DATE_ELIGIBLE,
+		DATE_CANCELLED,
+		AUTH_TYPE,
+		ELIG_STATUS
+	  FROM NEFSC_GARFO.mqrs_mort_elig_criteria 
+	  WHERE FISHERY = 'GENERAL CATEGORY SCALLOP'
+      AND (TRUNC(DATE_ELIGIBLE) <= '01-JAN-24'  or DATE_ELIGIBLE IS NULL) 
+      AND (TRUNC(DATE_CANCELLED) >= '01-JAN-23'  or DATE_CANCELLED IS NULL)
+      AND not (TRUNC(DATE_ELIGIBLE) =  TRUNC(NVL(DATE_CANCELLED,SYSDATE+20000)))
+      order by mri, permit")
+      
+
+scallopMRI<-dbGetQuery(nova_conn, scallopMRI_querystring)
+
+scallopMRI<-scallopMRI %>%
+  rename_with(str_to_lower) %>%
+  mutate(permit=as.numeric(permit))
+
+scallopMRI<-scallopMRI %>%
+  group_by(mri) %>%
+  arrange(mri, date_eligible) %>%
+  mutate(nobs=n(),
+    rownum=row_number()) %>%
+  filter(nobs==rownum) %>%
+  mutate(nobs=n()) %>%
+    ungroup() 
+
+
+# table(scallopMRI$nobs)
+# 1 row per mri
+stopifnot("All rows of df$nobs must equal 1" = all(scallopMRI$nobs == 1))
+
+scallopMRI<-scallopMRI %>%
+ select(permit, mri)
+
+
+
+```
+
+
+```{r get_tilefish_permits, include=FALSE, eval=FALS}
+
+tilefish_querystring<-glue("select fishing_year, root_mri, sum(quantity) as quantity, unit  from nefsc_garfo.ams_allocation_tx
+ where fmp='TILE' and allocation_type='BASE' and fishing_year>=2019
+ group by unit, root_mri, fishing_year
+ order by fishing_year, root_mri, unit")
+
+tilefish_allocations<-dbGetQuery(nova_conn, tilefish_querystring)
+
+tilefish_allocations<-tilefish_allocations %>%
+  rename_with(str_to_lower) 
+
+# This doesn't work because not all the tilefish landings are in this dataset.
+# can't use activity code because VMS is not mandatory. Can't use CAMS, because there is not TILEFISH code.
+# tilefish_landings_string<-glue("select l.fishing_year, t.permit_nbr as permit, sum(l.species_amount) as amount, l.species_uom   from nefsc_garfo.ams_trip_landing l, nefsc_garfo.ams_trip t
+#     where l.fmp='TILE' and l.das_id=t.das_id 
+#     group by l.fishing_year, t.permit_nbr, l.species_uom");
+# 
+# tilefish_landings<-dbGetQuery(nova_conn, tilefish_landings_string)
+# 
+# tilefish_landings<-tilefish_landings %>%
+#   rename_with(str_to_lower) 
+
 dbDisconnect(nova_conn)
 ```
 
+
+
+```{r munge_tilefish_scallop, include=FALSE, eval=TRUE}
+# rbind the to the scallopMRI
+# 
+
+tilefish<-tilefish %>%
+  select(c(vp_num,allocation_number))%>%
+  rename(permit=vp_num) %>%
+  rename(mri=allocation_number)
+
+#combined<-rbind(scallopMRI, tilefish)
+combined<-rbind(scallopMRI,tilefish)
+combined$mark<-1
+
+# make sure I have just 1 row per permit
+combined <-combined %>%
+  group_by(permit) %>%
+  slice(1) %>%
+  ungroup()
+
+
+
+
+scal_and_tileFirms<-affiliates %>%
+  filter(year==2023) %>%
+  left_join(combined, by=join_by(permit==permit)) %>%
+  mutate(mark=replace_na(mark,0)) %>%
+  group_by(affiliate_id) %>%
+    mutate(markin=sum(mark)) %>%
+  filter(markin>=1) %>%
+  ungroup()
+  
+# Keep 1 
+ scal_and_tileFirms<-scal_and_tileFirms %>%
+ group_by(affiliate_id) %>%
+  slice(1)%>%
+    ungroup()
+  
+
+
+```
 
 
 
@@ -196,14 +388,16 @@ A significant action is any regulatory action that may:
 
 In deciding whether and how to regulate, agencies should assess all costs and benefits of available regulatory alternatives. Costs and benefits shall be understood to include both quantifiable measures (to the fullest extent that these can be usefully estimated) and qualitative measures of costs and benefits that are difficult to quantify, but nevertheless essential to consider. 
 
-
 ### Management Goals and Objectives
 
 \textcolor{red}{The goal of the proposed rule is to streamline the administration of the three LAPPs and lower costs to the fishing industry.}
 
+
+\clearpage
+
 ### Description of the Fishery
 
-Active vessels, trips, and annual revenue for each fishery from 2019 to 2023 are presented in tables\ref{tab:GCscallop_summary} to  \ref{tab:OQ_summary}.
+Active vessels, trips, and annual revenue for the fishery from 2019 to 2023 are presented in tables\ref{tab:GCscallop_summary} to  \ref{tab:OQ_summary}.  We do not summarize the Tilefish fishery: there are few participants and disclosure is likely to be inconsistent with the confidentiality requirements of the Magnuson-Stevens Act.
 
 ```{r GCscallop_summary}
 
@@ -215,7 +409,7 @@ scallopGC_data<-scallopGC_data %>%
    mutate(across(c(`Scallop Landings`), ~ number(.x, accuracy=1000, big.mark=","))) %>%
    mutate(across(c(`Trips`), ~ number(.x, accuracy=1, big.mark=","))) 
 
-kbl(scallopGC_data  , booktabs=T, align=c("l",rep('r',times=5)), caption =  "Total Permits, Trips, Landings, and Value (nominal) for the Limited Access General Category Scallop Fishery") %>%
+kbl(scallopGC_data  , booktabs=T, align=c("l",rep('r',times=5)), caption =  "Active Permits, Trips, Landings, and Value (nominal) for the Limited Access General Category IFQ Scallop Fishery") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
@@ -238,7 +432,7 @@ SCOQ_data2<-SCOQ_data2 %>%
           across(any_of(ends_with("Trips")), ~ number(.x, accuracy=1, big.mark=","))
           )
 
-kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Surf Clam"))))  , booktabs=T, align=c("l",rep('r',times=8)), caption =  "Active Permits, Trips, Landings, and Value (nominal) for the Surf Clam Fishery") %>%
+kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Surf Clam"))))  , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Active Permits, Trips, Landings, and Value (nominal) for the Surf Clam Fishery") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
@@ -246,20 +440,21 @@ kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Surf Clam"))))  , bookta
 
 ```{r OQ_summary}
 
-kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Ocean Quahog"))))  , booktabs=T, align=c("l",rep('r',times=8)), caption =  "Total Active Permits, Trips, Landings, and Value (nominal) for the Ocean Quahog Fishery") %>%
+kbl(SCOQ_data2 %>% select(c("Year", any_of(starts_with("Ocean Quahog"))))  , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Active Permits, Trips, Landings, and Value (nominal) for the Ocean Quahog Fishery") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
 ```
 
-### Other affected entities
 
-NOAA Fisheries and the U.S. Department of Treasury are other affected entities. Both of these federal government entities would be expected to devote less staff time to collecting on bills.  The federal government recovers costs associated with NOAA Fisheries time, but does not recover costs associated with U.S. Department of Treasury time expended. 
+### Other Affected Entities
+
+NOAA Fisheries and the U.S. Department of Treasury are other affected entities. Both of these federal government entities would be expected to devote less staff time to collecting on bills.  The federal government recovers costs associated with NOAA Fisheries time, but does not recover costs associated with U.S. Department of Treasury labor expenditures. 
 
 
 ### Statement of the Problem 
 
-\textcolor{red}{Mostly by reference, but include the following}
+\textcolor{red}{Doug: Mostly by reference, but please include the following}
 
 In the Surfclam and Ocean Quahog fishery, cost recovery bills are sent to the entity that received an allocation of quota, and are in proportion to amount of used quota.  When entity A leases quota out to entity B, entity A is billed for the cost recovery. The Tilefish cost recovery is similarly administered.
 
@@ -268,7 +463,7 @@ In the LAGC IFQ scallop fishery, cost recovery bills are sent to the entity that
 <!---The Magnuson-Stevens Fishery Conservation and Management Act (Magnuson-Stevens Act) requires the collection of fees to recover the “actual costs directly related to the management, data collection, and enforcement” of a Limited Access Privilege Program at 16 U.S.C. § 1854(d)(2). Permit holders in the three cost recovery programs must pay an annual cost recovery fee, not to exceed three percent of the ex-vessel value of the fish harvested under the LAPP. Vessel permits cannot be renewed until the previous year’s bill is paid. --->
 
 
-### Description of selected alternatives
+### Description of Selected Alternatives
 
 No action is the status quo: GARFO continues to send bills firms that are greater than \$10 and the terms of payment continue to vary by fishery.
 
@@ -277,15 +472,17 @@ The proposed rule would streamline the administration of the cost recovery progr
 The proposed rule would also standardize billing due dates across the fisheries.  This is expected to have minimal impacts on regulated firms. 
 
 
-### Economic impacts relative to the baseline
+### Economic Impacts Relative to the Baseline
 
-The baseline is the status quo. Under the status quo, NOAA Fisheries implements a cost recovery program as required by 16 U.S.C. § 1854(d)(2).   Table \ref{tab:status_quo_costs} summarizes the total recoverable costs of the LAPPs in the Northeast region^[ https://www.fisheries.noaa.gov/new-england-mid-atlantic/commercial-fishing/2023-annual-report-atlantic-sea-scallop-individual .  Doug: I pulled the Tilefish and SCOQ from the reports you sent, but I don't know how to cite them.]
+The baseline is the status quo. Under the status quo, NOAA Fisheries implements a cost recovery program as required by 16 U.S.C. § 1854(d)(2).   Table \ref{tab:status_quo_costs} summarizes the total recoverable costs of the LAPPs in the Northeast region^[ https://www.fisheries.noaa.gov/new-england-mid-atlantic/commercial-fishing/2023-annual-report-atlantic-sea-scallop-individual.  Doug: I pulled the Tilefish and SCOQ from the reports you sent, but I don't know how to cite them.].
 
-The proposed rule would reduce the administrative costs of the program. We estimate that one week of NMFS employee labor is spent resolving bills that are under the \$25 threshold.  We account for this time at the ZP-3 wage rate; including for fringe benefits, this is approximately \$3,000 per bill or \$15,000 per year.  These costs are paid by fishery participants.
+Table \ref{tab:under_25}  summarizes the total number and value of bills that were over \$10 and under \$25.
+
+The proposed rule would reduce the administrative costs of the program. We estimate that one week of NMFS employee labor is spent for every bill that is under the \$25 threshold.  We account for this time at the ZP-3 wage rate, including fringe benefits. This is approximately \$3,000 per bill or \$15,000 per year.  These costs are paid by fishery participants through the cost recovery program.
 
 The proposed rule would impact the Treasury Department; we estimate one day of Treasury department employee per bill. At a similar rate, this is approximately \$600 per bill or \$3,000 per year. These costs are not paid by fishery participants.
 
-The proposed rule would impact fishery participants directly. We estimate half a day of firm labor is required per bill, or $1,500 per year.  Finally, un-collectable bills could results in a firm being unable to renew fishing permits. This would cause business planning disruptions, we do not attempt to value these disruptions.
+The proposed rule would impact fishery participants directly. We estimate half a day of firm labor is required per bill, or $1,500 per year.  Finally, un-collectable bills could results in a firm being unable to renew fishing permits. This would cause business disruptions in subsequent years, we do not attempt to value these disruptions.
 
 
 ```{r cost_savings}
@@ -307,13 +504,34 @@ treasury<-rep(3000, times=10)
 treasury2<-sum(treasury/discount2)
 treasury7<-sum(treasury/discount7)
 
+# Format
+fishery2<-number(fishery2, accuracy=1,prefix="$", big.mark=",")
+fishery7<-number(fishery7, accuracy=1,prefix="$", big.mark=",")
+treasury2<-number(treasury2, accuracy=1,prefix="$", big.mark=",")
+treasury7<-number(treasury7, accuracy=1,prefix="$", big.mark=",")
+
+
+# perpetuity
+perp_fishery2<-number(16500/dr2, accuracy=1,prefix="$", big.mark=",")
+perp_fishery7<-number(16500/dr7, accuracy=1,prefix="$", big.mark=",")
+perp_treasury2<-number(3000/dr2, accuracy=1,prefix="$", big.mark=",")
+perp_treasury7<-number(3000/dr7, accuracy=1,prefix="$", big.mark=",")
 
 
 ```
 
-Over a 10 year planning period, using a 2\% discount rate, the proposed regulation would reduce industry costs by \$`r fishery2`.  It would reduce costs to the Treasury Department by \$`r treasury2`.  
+#### Present Value of Impacts 
 
-Over a 10 year planning period, using a 7\% discount rate, the proposed regulation would reduce industry costs by \$`r fishery7`.  It would reduce costs to the Treasury Department by \$`r treasury7`.
+It is reasonable to expect these impacts would continue indefinitely. Using a 2\% discount rate, the proposed regulation would reduce  industry costs by `r perp_fishery2`.  It would reduce costs to the Treasury Department by `r perp_treasury2`.  
+
+Using a 7\% discount rate, the proposed regulation would reduce industry costs by `r perp_fishery7`.  It would reduce costs to the Treasury Department by `r perp_treasury7`.
+
+
+#### Present Value of Impacts Over at Ten Year Planning Period
+
+We also provide estimates of cost reductions over a 10 year planning period.  Using a 2\% discount rate, the proposed regulation would reduce industry costs by `r fishery2`.  It would reduce costs to the Treasury Department by `r treasury2`.  
+
+Over a 10 year planning period, using a 7\% discount rate, the proposed regulation would reduce industry costs by `r fishery7`.  It would reduce costs to the Treasury Department by `r treasury7`.
 
 
 ```{r status_quo_costs}
@@ -322,22 +540,27 @@ sq_costs <- data.frame(
     Fishery = c("Surfclam", "Ocean Quahog", 
                     "LAGC-IFQ Scallop", "Tilefish"
                 ),
-    Year = c(2023, 2023, 2024, 2023),
+    Year = c(2023, 2023, 2023, 2023),
     Cost = c(71267, 63345, 117373, 46872),
+    Value=c(28632399, 21731238, 19396367, 5993249),
+    Rate = c(0.0025, 0.0029, 0.006051, 0.007820),
     stringsAsFactors = FALSE
 )
+
+updated_costs<-sq_costs
+
 sq_costs <-sq_costs %>%
-     mutate(across(any_of(starts_with("Cost")), ~ number(.x, accuracy=1,prefix="$", big.mark=","))
+     mutate(across(any_of(starts_with(c("Cost", "Value"))), ~ number(.x, accuracy=1,prefix="$", big.mark=","))
      )      
 
 
-kbl(sq_costs , booktabs=T, align=c("l",rep('r',times=2)), caption =  "Recoverable Costs of the LAPP in the Northeast Region") %>%
+kbl(sq_costs%>% select(-c(Year)) , booktabs=T, align=c("l",rep('r',times=2)), caption =  " Recoverable Costs of the LAPPs, Gross Revenues, and Actual recovery rate in the Northeast Region in 2023") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
 ```
 
-Table \ref{tab:annual_expenses} summarizes the total value of the cost recovery bills for the managed fisheries from 2019-2023.  
+
 
 
 ```{r annual_expenses, include=FALSE, eval=TRUE}
@@ -383,37 +606,31 @@ kbl(recoverable_expenses, booktabs=T, align=c("l",rep('r',times=4)), caption =  
 ```
 
 
-Table \ref{tab:annual_bills} summarizes the total number and value of bills that were over \$10.  
-
-
 ```{r annual_bills, include=FALSE, eval=TRUE}
-
-
 annual_count<-paygov_data_working %>%
   filter(balance>=10) %>%
-  group_by(plan, year) %>%
+  group_by(fishery, year) %>%
   summarise(dollars=round(sum(balance)),
             count=n()
   ) %>%
   ungroup() %>%
-  pivot_wider(names_from=plan, values_from=c(dollars, count), names_sep=" ") %>%
-  relocate(year, `count Scallop`, `dollars Scallop`, `count Surfclam and Ocean Quahog`, `dollars Surfclam and Ocean Quahog`) %>%
+  pivot_wider(names_from=fishery, values_from=c(dollars, count), names_sep=" ") %>%
+  relocate(year, `count Scallop`, `dollars Scallop`, `count Surf Clam`, `dollars Surf Clam`, `count Ocean Quahog`, `dollars Ocean Quahog`) %>%
   rename(`Scallop bills`=`count Scallop`,
     `Scallop bill value`= `dollars Scallop`,
-    `SCOQ bills` = `count Surfclam and Ocean Quahog`,
-    `SCOQ bill value`= `dollars Surfclam and Ocean Quahog`,
+    `SC bills` = `count Surf Clam`,
+    `SC bill value`= `dollars Surf Clam`,
+    `OQ bills` = `count Ocean Quahog`,
+    `OQ bill value`= `dollars Ocean Quahog`,
     `Tilefish bills` = `count Tilefish`,
-    `Tilefish bill value`= `dollars Tilefish`
+    `Tilefish bill value`= `dollars Tilefish` ) 
 
-  ) %>%
-  mutate(`SCOQ bills`=replace_na(`SCOQ bills`,0),
-    `SCOQ bill value`=replace_na(`SCOQ bill value`,0)
-  )
-
+annual_count<-annual_count %>%
+    mutate(across(everything(), ~replace_na(., 0)))
 
 
 kbl(annual_count  %>%
-  mutate(across(c(`SCOQ bill value`, `Tilefish bill value`, `Scallop bill value`), ~ number(.x, accuracy=1,prefix="$", big.mark=","))) , booktabs=T, align=c("l",rep('r',times=6)), caption =  "Total number of bills over 10 and value of those bills") %>%
+  mutate(across(c(`SC bill value`, `OQ bill value`,`Tilefish bill value`, `Scallop bill value`), ~ number(.x, accuracy=1,prefix="$", big.mark=","))) , booktabs=T, align=c("l",rep('r',times=6)), caption =  "Total number of bills over 10 and value of those bills.") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
@@ -425,29 +642,30 @@ kbl(annual_count  %>%
 
 under25_count<-paygov_data_working %>%
   filter(balance<25 & balance>=10) %>%
-  group_by(plan, year) %>%
+  group_by(fishery, year) %>%
   summarise(dollars=round(sum(balance)),
             count=n()
-  ) %>%
+  )%>%
   ungroup() %>%
-  pivot_wider(names_from=plan, values_from=c(dollars, count), names_sep=" ") %>%
-  relocate(year, `count Scallop`, `dollars Scallop`, `count Surfclam and Ocean Quahog`, `dollars Surfclam and Ocean Quahog`) %>%
+  pivot_wider(names_from=fishery, values_from=c(dollars, count), names_sep=" ") %>%
+  relocate(year, `count Scallop`, `dollars Scallop`, `count Surf Clam`, `dollars Surf Clam`) %>%
   rename(`Scallop bills`=`count Scallop`,
     `Scallop bill value`= `dollars Scallop`,
-    `SCOQ bills` = `count Surfclam and Ocean Quahog`,
-    `SCOQ bill value`= `dollars Surfclam and Ocean Quahog`#,
-   # `Tilefish bills` = `count Tilefish`,
-#    `Tilefish bill value`= `dollars Tilefish`
+    `SC bills` = `count Surf Clam`,
+    `SC bill value`= `dollars Surf Clam`,
+#    `OQ bills` = `count Ocean Quahog`,
+#    `OQ bill value`= `dollars Ocean Quahog`,
+#    `Tilefish bills` = `count Tilefish`,
+#    `Tilefish bill value`= `dollars Tilefish` 
+)
 
-  ) %>%
-  mutate(`SCOQ bills`=replace_na(`SCOQ bills`,0),
-    `SCOQ bill value`=replace_na(`SCOQ bill value`,0)
-  )
+under25_count<-under25_count %>%
+    mutate(across(everything(), ~replace_na(., 0)))
 
 
 
 kbl(under25_count  %>%
-  mutate(across(c(`SCOQ bill value`, `Scallop bill value`), ~ number(.x, accuracy=1,prefix="$", big.mark=","))) , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Total number of bills over 10 under 25 dollars and corresponding revenue") %>%
+  mutate(across(c(`SC bill value`, `Scallop bill value`), ~ number(.x, accuracy=1,prefix="$", big.mark=","))) , booktabs=T, align=c("l",rep('r',times=4)), caption =  "Total number of bills over 10 under 25 dollars and corresponding revenue.  Tilefish and Ocean Quahog did not have bills that met this criteria") %>%
     #column_spec(5:8, width = "2cm")
     kable_styling(full_width = F) %>% 
       row_spec(0,bold=FALSE) 
@@ -474,17 +692,259 @@ rearrange
 
 ### Number of Small entities
 
-<!---
+The directly regulated entities are the firms that received allocations of Surfclam, 
+Ocean Quahog, or Tilefish quota plus the firms that landed scallops in the LAGC-IFQ 
+program.
 
-I can use the usual affiliate data for GC scallop and tilefish.  I will aggregate
-them together.
+For Surfclam, Ocean Quahog, and Tilefish, cost recovery is billed to the entity
+that received an allocation of quota, in proportion to amount of used quota. 
+When entity A leases quota out to entity B, entity A is billed for the cost 
+recovery associated with the leased quota that is used.  Entity A is directly 
+regulated, Entity B is not. For these two fisheries, quota allocations are not tied
+directly to fishing vessels.
 
-For the GC IFQ firms, I will 
+For LAGC IFQ scallop fishery, cost recovery is billed to the entity that used an
+allocation of quota and is in proportion to the amount of used quota. When 
+entity A leases quota out to entity B, entity B is billed for the cost recovery.
+Entity B is directly regulated, Entity A is not.
 
---->
+Firms that are active in the LAGC-IFQ Scallop and Tilefish fishery are grouped 
+together. We cannot join together the allocation and ownership data, therefore we
+use active firms as a way to estimate the number of regulated entities.  This may 
+overestimate the number of regulated entities, because permits with identical owners
+should be treated as a single firm. It may underestimate the number of the total
+number of regulated entities since two fisheries bill for cost recovery based on 
+the initial quota owner.  For the same reasons, our estimate of small firms may be
+incorrect as well.
+
+
+Table \ref{tab:SCOQ_DRE} summarizes the directly regulated entities in the Surf clam and
+Ocean Quahog fisheries.  Most firms with Surfclam or Ocean Quahog allocations 
+are Commercial fishing firms. However, some allocations are owned by firms that
+are more properly classified as Fish and Seafood Wholesalers, Commercial Banks,
+Credit Unions, Trusts, or Public Sector (Sector 92).
+
+
+```{r SCOQ_DRE}
+scoqDRE<-scoq %>%
+  group_by(SBA.Code, SBA.Classification, Size, Size.standard.in.millions) %>%
+  summarise(`Entity Count`=n()) %>%
+  ungroup() %>%
+  rename(`SBA Code`=SBA.Code) %>%
+  rename(`Size Standard`=Size.standard.in.millions) %>%
+  rename(`Industry Name`=SBA.Classification) %>%
+  relocate(`SBA Code`, `Industry Name`, `Size Standard`, Size, `Entity Count`) %>%
+  select(-c(`SBA Code`))
+
+
+
+kbl(scoqDRE, booktabs=T, align=c("l", "l",rep('r',times=2)), caption =  "Directly Regulated Entities in the Surfclam and Ocean Quahog Fisheries") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
+
+
+
+Table \ref{tab:Directly_Regulated_Entities} summarizes the directly regulated
+entities in the Scallop and Tilefish fisheries.  Most firms with Surfclam or
+Ocean Quahog allocations are Commercial fishing firms. However, some allocations are owned by firms that
+are more properly classified as Fish and Seafood Wholesalers, Commercial Banks,
+Credit Unions, Trusts, or Public Sector (Sector 92).
+
+
+```{r Directly_Regulated_Entities}
+
+scal_and_tileTable <-scal_and_tileFirms %>%
+    group_by(entity_type_2023, small_business) %>%
+    summarise(affiliate_total=mean(affiliate_total),
+              count_permits=mean(count_permits),
+              count_firms=n()
+    ) %>%
+  mutate(entity_type_2023=replace(entity_type_2023, entity_type_2023=="FISHING","Fishing"),
+         entity_type_2023=replace(entity_type_2023, entity_type_2023=="FORHIRE","For-Hire"),
+         entity_type_2023=replace(entity_type_2023, entity_type_2023=="NO_REV","Inactive"),
+         Size=case_when(
+           small_business==1 ~ "Small",
+           small_business==0 ~ "Large")
+         ) %>%
+  rename(`Entity Type`=entity_type_2023) %>%
+  rename(`Firm Gross Reciepts`=affiliate_total) %>%
+  rename(`Vessels per Firm`=count_permits) %>%
+  rename(`Number of Firms`=count_firms) %>%
+  relocate(`Entity Type`, Size,`Number of Firms`, `Vessels per Firm`,`Firm Gross Reciepts`) %>%
+      mutate(across(c(`Number of Firms`), ~ number(.x, accuracy=1, big.mark=","))) %>%
+      mutate(across(c(`Vessels per Firm`), ~ number(.x, accuracy=0.01, big.mark=","))) %>%
+      mutate(across(c(`Firm Gross Reciepts`), ~ number(.x, accuracy=1000, big.mark=",", prefix="$")))
+
+
+
+kbl(scal_and_tileTable %>%select(-small_business)  , booktabs=T, align=c("l",rep('r',times=5)), caption =  "Directly Regulated Entities in the Tilefish and Scallop Catch Share Fisheries") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+
+```
 
 
 ### Impacts on Small firms
+\textcolor{red}{Need to do. Take yearly changes and compute updated bills.  }
+
+Over the past 5 years, all impacted bills have been in the Scallop or Surfclam fishery. 
+We therefore project no impacts to firms in the Tilefish or Ocean Quahog fisheries.
+
+To describe the yearly impacts on small firms, we adjust the recoverable LAPP costs in 2023.  
+For firms in the Surfclam fishery, we use the entity size determinations from the most 
+recent MAFMC regulatory action.  For the scallop fishery, we use the standard data on 
+ownership that links fishing vessels into firms if they fishing vessels have identical
+owners.
+
+We then summarize those cost changes for small and large firms in these two fisheries.
+
+
+```{r num_impacts}
+
+count_impacts<-under25_count %>%
+  filter(year==2023)
+
+# there are 4 scallop and 1 surfclam. I'm just going to hard code this.
+# count_impacts_longer<-count_impacts %>%
+#   pivot_longer(
+#     cols = c('Scallop bills', 'Scallop bill value', 'SC bills', 'SC bill value'),
+#     names_to = "metric",
+#     values_to = "value"
+#   ) %>%
+#   mutate(fishery=word(metric,1))
+  
+
+
+updated_costs2<-paygov_data_working %>%
+  filter(year==2023) %>%
+  filter(fishery %in% c("Surf Clam","Scallop"))%>%
+  group_by(fishery) %>%
+  mutate(total_costs=sum(balance)) %>%
+  ungroup() %>%
+  mutate(share=balance/total_costs)
+
+# adjust cost
+
+updated_costs2<-updated_costs2 %>%
+    mutate(Updated_Cost = case_when(
+    fishery=="Surf Clam" ~ total_costs -3000,  
+    fishery=="Scallop" ~ total_costs -12000,  
+    TRUE ~ total_costs  
+  )) %>%
+  mutate(tentative_balance=Updated_Cost*share)
+
+#allocate 'forgiven' costs to remainder
+updated_costs2<-updated_costs2 %>%
+    mutate(tentative_balance2 = case_when(
+    tentative_balance<=25 ~ 0,  
+    TRUE ~ tentative_balance  
+  )) %>%
+  group_by(fishery) %>%
+  mutate(share2=sum(tentative_balance2)) %>%
+  mutate(share2=tentative_balance2/share2) %>%
+  mutate(final_updated_balance=share2*Updated_Cost) %>%
+  mutate(savings=balance-final_updated_balance) %>%
+  ungroup() %>%
+  select(c(fishery, balance, anum, rightid, final_updated_balance,savings))
+
+
+surfclam_costs<-updated_costs2 %>%
+  filter(fishery=="Surf Clam") %>%
+  full_join(scoq, by=join_by(anum==Alloc.Nbr))
+
+sc_impacts<-surfclam_costs %>%
+  filter(is.na(savings)==FALSE) %>%
+  group_by(fishery, Size) %>%
+  summarise(`Average Savings`=mean(savings),
+            `Number of Entities`=n())
+
+    
+
+```
+
+There are 29 small firms in the surfclam fishery that would see average decreases
+in annual cost recovery costs of \$52 (Table \ref{tab:surfclam_costs}.  There are 12 large firms that would experience
+decreases in annual cost recovery costs of \$86.  Finally, there are 4 "Sector 92" firms that would experience
+decreases in annual cost recovery costs of \$117.  
+
+
+```{r surfclam_costs}
+
+kbl(sc_impacts %>%  select(-fishery) %>%
+      mutate(across(c(`Average Savings`), ~ number(.x, accuracy=1, big.mark=",", prefix="$"))) 
+, booktabs=T, align=c("l",rep('r',times=2)), caption =  "Average reduction in annual cost share for entities in the surfclam fishery") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+```
+
+
+
+
+```{r scallop_costs }
+
+scallop_costs<-updated_costs2 %>%
+  filter(fishery=="Scallop") %>%
+  mutate(rightid=as.numeric(rightid)) %>%
+  full_join(scallopMRI, by=join_by(rightid==mri)) %>%
+  filter(is.na(savings)==FALSE) %>%
+  select(c(fishery, balance, rightid, permit, savings))
+
+affiliate_effects<-affiliates %>%
+  filter(year==2023)%>%
+  select(affiliate_id, small_business, entity_type_2023, permit, affiliate_total) %>%
+  left_join(scallop_costs, by=join_by(permit==permit))%>%
+  mutate(balance=replace_na(balance,0),
+         savings=replace_na(savings, 0))
+
+
+affiliate_effects<-affiliate_effects %>%
+  group_by(fishery, affiliate_id, small_business, entity_type_2023) %>%
+  summarise(affiliate_total=first(affiliate_total),
+            savings=sum(savings),
+            original_cost_recovery=sum(balance))%>%
+  filter(original_cost_recovery>0)
+
+
+
+scallop_effects<-affiliate_effects %>%
+  group_by(fishery, small_business) %>%
+  summarise(`Average Savings`=mean(savings),
+            `Number of Entities`=n()) %>%
+ mutate(Size=case_when(
+   small_business==0 ~ "Large",
+   small_business==1 ~ "Small"
+ )) %>%
+  select(c(fishery, Size, `Average Savings`, `Number of Entities`))
+
+
+```
+
+
+There are 100 small firms in the scallop fishery;  these firms would experience
+decreases in annual cost recovery costs of \$120 (Table \ref{tab:scallop_effects}.  There are two large firms that 
+would experience annual decreases of \$13.
+
+```{r scallop_effects}
+
+kbl(scallop_effects %>%  select(-fishery) %>%
+      mutate(across(c(`Average Savings`), ~ number(.x, accuracy=1, big.mark=",", prefix="$"))) 
+, booktabs=T, align=c("l",rep('r',times=2)), caption =  "Average reduction in annual cost share for entities in the scallop fishery") %>%
+    #column_spec(5:8, width = "2cm")
+    kable_styling(full_width = F) %>% 
+      row_spec(0,bold=FALSE) 
+
+```
+
+
+
 
 ### Compliance Requirements
 \textcolor{red}{A description of the projected reporting, record-keeping, and other compliance requirements of the proposed rule, including an estimate of the classes of small entities which will be subject to the requirements of the report or record.}
